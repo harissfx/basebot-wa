@@ -5,17 +5,15 @@
   "main": "src/app.js",
   "scripts": {
     "start": "node src/app.js",
-    "dev": "nodemon --config nodemon.json src/app.js"
+    "dev": "node src/app.js"
   },
   "dependencies": {
     "@whiskeysockets/baileys": "^6.7.12",
     "@hapi/boom": "^10.0.1",
     "axios": "^1.7.2",
+    "chokidar": "^3.6.0",
     "dotenv": "^16.4.5",
     "pino": "^9.0.0"
-  },
-  "devDependencies": {
-    "nodemon": "^3.1.0"
   },
   "engines": {
     "node": ">=18.0.0"

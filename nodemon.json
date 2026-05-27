@@ -1,6 +1,0 @@
-{
-  "watch": ["src", "settings.js"],
-  "ext": "js,json",
-  "ignore": ["session/*", "node_modules/*"],
-  "delay": 500
-}

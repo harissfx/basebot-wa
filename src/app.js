@@ -9,25 +9,19 @@ const { Boom } = require('@hapi/boom');
 const P = require('pino');
 const readline = require('readline');
 
-const config = require('./settings');
-const logger = P({ level: 'silent' });
+const config  = require('./settings');
+const plugins = require('./utils/PluginLoader');
+const logger  = P({ level: 'silent' });
 
 function question(query) {
     const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
     return new Promise(resolve => rl.question(query, ans => { rl.close(); resolve(ans); }));
 }
 
-// Hot-reload: hapus cache non-node_modules agar command & config fresh saat dev
-function getMessageHandler() {
-    if (config.nodeEnv === 'development') {
-        Object.keys(require.cache).forEach(key => {
-            if (!key.includes('node_modules')) delete require.cache[key];
-        });
-    }
-    return require('./handlers/messageHandler');
-}
+// PluginLoader diinit sekali di sini — chokidar akan auto-reload kalau ada file berubah
+plugins.init();
 
-let phoneNumber = null;
+let phoneNumber    = null;
 let isFirstConnect = true;
 
 async function startBot() {
@@ -59,8 +53,9 @@ async function startBot() {
     sock.ev.on('creds.update', saveCreds);
 
     sock.ev.on('messages.upsert', (m) => {
-        // Ambil handler fresh tiap pesan (untuk hot-reload di dev)
-        getMessageHandler()(sock, m);
+        // messageHandler langsung pakai plugins yang sudah di-watch chokidar
+        // Tidak perlu clearCache / re-require setiap pesan
+        require('./handlers/messageHandler')(sock, m);
     });
 
     sock.ev.on('connection.update', async (update) => {
@@ -75,12 +70,11 @@ async function startBot() {
                 console.log('\n╔═══════════════════════════════════════════╗');
                 console.log('║  ❌ DEVICE LOGGED OUT                     ║');
                 console.log('╠═══════════════════════════════════════════╣');
-                console.log('║  rm -rf session && npm run dev            ║');
+                console.log('║  rm -rf session && npm start              ║');
                 console.log('╚═══════════════════════════════════════════╝\n');
                 process.exit(0);
             }
 
-            // Status 515 (restart required) & 408 (timeout) = normal, biarkan Baileys reconnect
             const isNormalRestart = statusCode === 515 || statusCode === 408;
             if (!isNormalRestart) {
                 console.log(`🔌 Koneksi terputus (${statusCode}), mencoba reconnect...`);
@@ -97,8 +91,10 @@ async function startBot() {
                 console.log('║  ✅ BERHASIL TERHUBUNG!                   ║');
                 console.log('╠═══════════════════════════════════════════╣');
                 console.log(`║  📱 ${name.padEnd(38)} ║`);
-                console.log(`║  Prefix: ${config.prefix.padEnd(34)} ║`);
+                console.log(`║  Prefix  : ${config.prefix.padEnd(32)} ║`);
+                console.log(`║  Commands: ${String(plugins.commandList().length).padEnd(32)} ║`);
                 console.log('╚═══════════════════════════════════════════╝\n');
+                console.log('💡 Edit file di src/commands/ → reload otomatis tanpa restart!\n');
             }
         }
     });
@@ -133,10 +129,9 @@ async function startBot() {
                 console.log('║  → Link with phone number → masukkan kode║');
                 console.log('╚═══════════════════════════════════════════╝\n');
                 break;
-            } catch (err) {
+            } catch {
                 if (attempt >= 3) {
                     console.log('❌ Gagal generate pairing code setelah 3 percobaan.');
-                    console.log('   Coba: rm -rf session && npm run dev');
                     process.exit(1);
                 }
                 await delay(5000);
@@ -147,13 +142,8 @@ async function startBot() {
     return sock;
 }
 
-// FIX: Jangan swallow error secara diam-diam — log dulu baru lanjut
-process.on('uncaughtException', (err) => {
-    console.error('❌ Uncaught Exception:', err.message);
-});
-process.on('unhandledRejection', (reason) => {
-    console.error('❌ Unhandled Rejection:', reason);
-});
+process.on('uncaughtException',  (err)    => console.error('❌ Uncaught Exception:', err.message));
+process.on('unhandledRejection', (reason) => console.error('❌ Unhandled Rejection:', reason));
 
 startBot().catch((err) => {
     console.error('❌ Fatal error:', err);
