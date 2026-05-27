@@ -1,0 +1,24 @@
+{
+  "name": "whatsapp-bot-base",
+  "version": "1.0.0",
+  "description": "Base bot WhatsApp dengan Node.js & Baileys - Support Button, List, Media, Poll",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon --config nodemon.json src/app.js"
+  },
+  "dependencies": {
+    "@whiskeysockets/baileys": "^6.7.12",
+    "@hapi/boom": "^10.0.1",
+    "axios": "^1.7.2",
+    "dotenv": "^16.4.5",
+    "pino": "^9.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "license": "MIT"
+}
