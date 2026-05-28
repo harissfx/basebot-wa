@@ -2,6 +2,7 @@ const config  = require('../settings');
 const plugins = require('../utils/PluginLoader');
 const { getContentType } = require('@whiskeysockets/baileys');
 const { sendButtons, sendListMessage, sendInteractiveMessage, sendButtonWithImage, sendInteractiveWithImage } = require('../utils/interactiveHelper');
+const { fakeOrder } = require('../utils/fquoted');
 
 function extractMessageText(message) {
     if (!message) return null;
@@ -74,11 +75,13 @@ async function handleMessages(sock, m) {
                 try {
                     await handler({
                         sock, msg, sender,
-                        isGroup:             isGroup(sender),
-                        isOwner:             isOwner(sender),
+                        isGroup:                     isGroup(sender),
+                        isOwner:                     isOwner(sender),
                         command, text,
-                        reply:               (content) => sock.sendMessage(sender, content, { quoted: msg }),
-                        send:                (content) => sock.sendMessage(sender, content),
+                        fakeOrder,
+                        reply:                       (content) => sock.sendMessage(sender, content, { quoted: msg }),
+                        replyFake:                   (content) => sock.sendMessage(sender, content, { quoted: fakeOrder }),
+                        send:                        (content) => sock.sendMessage(sender, content),
                         sendButtons:         (content) => sendButtons(sock, sender, content),
                         sendList:            (content) => sendListMessage(sock, sender, content),
                         sendInteractive:     (content) => sendInteractiveMessage(sock, sender, content),

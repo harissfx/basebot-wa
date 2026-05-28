@@ -12,19 +12,22 @@ function buildInteractiveNodes(buttonType = 'mixed') {
     }];
 }
 
-// FIX: Hapus `msgType` yang tidak pernah dipakai
-function buildContextInfo(quoted) {
-    if (!quoted) return null;
-    try {
-        const { key } = quoted;
-        return {
-            stanzaId: key.id,
-            participant: key.participant || key.remoteJid,
-            quotedMessage: quoted.message,
-        };
-    } catch {
-        return null;
+// extra: object tambahan seperti { forwardingScore, isForwarded, mentionedJid }
+// semua field di extra akan di-merge ke contextInfo
+function buildContextInfo(quoted, extra = {}) {
+    const base = {};
+
+    if (quoted) {
+        try {
+            const { key } = quoted;
+            base.stanzaId      = key.id;
+            base.participant   = key.participant || key.remoteJid;
+            base.quotedMessage = quoted.message;
+        } catch { /* skip */ }
     }
+
+    const merged = { ...base, ...extra };
+    return Object.keys(merged).length ? merged : null;
 }
 
 function buildMessage(jid, interactiveMsg) {
@@ -45,8 +48,8 @@ async function relayInteractive(sock, jid, message, buttonType) {
 }
 
 async function sendButtons(sock, jid, content) {
-    const { text, footer = '', buttons = [], quoted } = content;
-    const contextInfo = buildContextInfo(quoted);
+    const { text, footer = '', buttons = [], quoted, contextInfo: extra = {} } = content;
+    const contextInfo = buildContextInfo(quoted, extra);
 
     const interactiveMsg = proto.Message.InteractiveMessage.fromObject({
         body: { text },
@@ -66,8 +69,8 @@ async function sendButtons(sock, jid, content) {
 }
 
 async function sendListMessage(sock, jid, content) {
-    const { text, footer = '', buttonTitle = '📂 Pilih', sections = [], quoted } = content;
-    const contextInfo = buildContextInfo(quoted);
+    const { text, footer = '', buttonTitle = '📂 Pilih', sections = [], quoted, contextInfo: extra = {} } = content;
+    const contextInfo = buildContextInfo(quoted, extra);
 
     const interactiveMsg = proto.Message.InteractiveMessage.fromObject({
         body: { text },
@@ -98,8 +101,8 @@ async function sendListMessage(sock, jid, content) {
 }
 
 async function sendInteractiveMessage(sock, jid, content) {
-    const { text, footer = '', buttons = [], quoted } = content;
-    const contextInfo = buildContextInfo(quoted);
+    const { text, footer = '', buttons = [], quoted, contextInfo: extra = {} } = content;
+    const contextInfo = buildContextInfo(quoted, extra);
 
     const interactiveMsg = proto.Message.InteractiveMessage.fromObject({
         body: { text },
@@ -113,8 +116,8 @@ async function sendInteractiveMessage(sock, jid, content) {
 }
 
 async function sendButtonWithImage(sock, jid, content) {
-    const { text, footer = '', buttons = [], imageUrl, quoted } = content;
-    const contextInfo = buildContextInfo(quoted);
+    const { text, footer = '', buttons = [], imageUrl, quoted, contextInfo: extra = {} } = content;
+    const contextInfo = buildContextInfo(quoted, extra);
 
     try {
         const axios = require('axios');
@@ -147,8 +150,8 @@ async function sendButtonWithImage(sock, jid, content) {
 // Foto + mixed interactive buttons (quick_reply, cta_url, cta_copy, cta_call, dll)
 // imageSource bisa Buffer (lokal) atau { url: '...' } (remote)
 async function sendInteractiveWithImage(sock, jid, content) {
-    const { text, footer = '', buttons = [], imageSource, quoted } = content;
-    const contextInfo = buildContextInfo(quoted);
+    const { text, footer = '', buttons = [], imageSource, quoted, contextInfo: extra = {} } = content;
+    const contextInfo = buildContextInfo(quoted, extra);
 
     try {
         const { prepareWAMessageMedia } = require('@whiskeysockets/baileys');

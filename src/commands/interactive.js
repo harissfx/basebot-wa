@@ -32,36 +32,44 @@ const handler = async (ctx) => {
         case 'btn_3': { await ctx.reply({ text: '✅ Kamu pilih *Opsi Ketiga*!'  }); break; }
 
         // ── Kirim list menu ───────────────────────────────────
+        // ── Kirim list menu (FORMAT BARU NATIVE FLOW) ──────────
         case 'list': {
-            await ctx.sendList({
+            await ctx.sendInteractive({
                 text: '📋 Pilih item dari menu:',
                 footer: 'WhatsApp Bot Menu',
-                buttonTitle: '📂 Buka Menu',
                 quoted: ctx.msg,
-                sections: [
+                buttons: [
                     {
-                        title: '🍔 Makanan',
-                        rows: [
-                            { id: 'food_1', title: 'Burger',    description: 'Burger daging sapi premium' },
-                            { id: 'food_2', title: 'Pizza',     description: 'Pizza pepperoni large'      },
-                            { id: 'food_3', title: 'Sushi',     description: 'Sushi salmon set'           },
-                        ]
-                    },
-                    {
-                        title: '🥤 Minuman',
-                        rows: [
-                            { id: 'drink_1', title: 'Kopi', description: 'Kopi arabica single origin' },
-                            { id: 'drink_2', title: 'Teh',  description: 'Teh hijau organik'          },
-                            { id: 'drink_3', title: 'Jus',  description: 'Jus jeruk segar'            },
-                        ]
-                    },
-                    {
-                        title: '🍰 Dessert',
-                        rows: [
-                            { id: 'dessert_1', title: 'Cheesecake', description: 'New York cheesecake'      },
-                            { id: 'dessert_2', title: 'Brownies',   description: 'Chocolate fudge brownies' },
-                        ]
-                    },
+                        name: 'single_select',
+                        buttonParamsJson: JSON.stringify({
+                            title: '📂 Buka Menu',
+                            sections: [
+                                {
+                                    title: '🍔 Makanan',
+                                    rows: [
+                                        { id: 'food_1', title: 'Burger',    description: 'Burger daging sapi premium' },
+                                        { id: 'food_2', title: 'Pizza',     description: 'Pizza pepperoni large'      },
+                                        { id: 'food_3', title: 'Sushi',     description: 'Sushi salmon set'           },
+                                    ]
+                                },
+                                {
+                                    title: '🥤 Minuman',
+                                    rows: [
+                                        { id: 'drink_1', title: 'Kopi', description: 'Kopi arabica single origin' },
+                                        { id: 'drink_2', title: 'Teh',  description: 'Teh hijau organik'          },
+                                        { id: 'drink_3', title: 'Jus',  description: 'Jus jeruk segar'            },
+                                    ]
+                                },
+                                {
+                                    title: '🍰 Dessert',
+                                    rows: [
+                                        { id: 'dessert_1', title: 'Cheesecake', description: 'New York cheesecake'      },
+                                        { id: 'dessert_2', title: 'Brownies',   description: 'Chocolate fudge brownies' },
+                                    ]
+                                },
+                            ]
+                        })
+                    }
                 ]
             });
             break;

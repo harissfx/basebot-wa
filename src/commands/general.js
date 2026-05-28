@@ -16,9 +16,8 @@ const handler = async (ctx) => {
             const path = require('path');
 
             const imgPath = path.join(__dirname, '../../assets/logo.png');
-            const imageSource = fs.existsSync(imgPath)
-                ? fs.readFileSync(imgPath)                 // lokal
-                : { url: 'https://picsum.photos/600/400' }; // fallback URL
+            if (!fs.existsSync(imgPath)) return ctx.reply({ text: '❌ File logo.png tidak ditemukan di folder assets.' });
+            const imageSource = fs.readFileSync(imgPath);
 
             await ctx.sendInteractiveWithImage({
                 imageSource,
@@ -28,25 +27,20 @@ const handler = async (ctx) => {
                     '👋 Halo! Pilih kategori menu di bawah:',
                 ].join('\n'),
                 footer: 'Ketuk tombol untuk lihat isi kategori',
-                quoted: ctx.msg,
+                quoted: ctx.fakeOrder,
+                    contextInfo: {
+        mentionedJid: ['0@s.whatsapp.net'],
+        forwardingScore: 111,
+        isForwarded: true,
+    },
                 buttons: [
-                    {
-                        name: 'quick_reply',
-                        buttonParamsJson: JSON.stringify({ display_text: '📋 General', id: 'menu_general' })
-                    },
-                    {
-                        name: 'quick_reply',
-                        buttonParamsJson: JSON.stringify({ display_text: '🎛️ Interactive', id: 'menu_interactive' })
-                    },
-                    {
-                        name: 'quick_reply',
-                        buttonParamsJson: JSON.stringify({ display_text: '🖼️ Media & Fun', id: 'menu_media' })
-                    },
+                    { name: 'quick_reply', buttonParamsJson: JSON.stringify({ display_text: '📋 General', id: 'menu_general' }) },
+                    { name: 'cta_url',     buttonParamsJson: JSON.stringify({ display_text: '🌐 Buka GitHub', url: 'https://github.com/whiskeysockets/baileys' }) },
+                    { name: 'cta_copy',    buttonParamsJson: JSON.stringify({ display_text: '📋 Copy Kode', copy_code: 'KODE-PROMO-2025' }) },
                 ]
             });
             break;
         }
-
         // ── Response tiap button menu ─────────────────────────
         case 'menu_general': {
             const p = config.prefix;
