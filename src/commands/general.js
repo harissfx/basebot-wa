@@ -8,54 +8,125 @@ const config = require('../settings');
 
 const handler = async (ctx) => {
     const { command, sock, sender } = ctx;
-    const p = config.prefix;
 
     switch (command.name) {
 
         case 'menu': {
-            await ctx.send({ text: [
-                `╔═══ *${config.botName}* ═══╗`,
-                '║',
-                '║ 👋 Halo! Menu tersedia:',
-                '║',
-                '║ *📋 General:*',
-                `║ • menu - Menu ini`,
-                `║ • ping - Latency`,
-                `║ • info - Info bot`,
-                `║ • owner - Owner`,
-                '║',
-                '║ *🎛️ Interactive:*',
-                `║ • button - Button`,
-                `║ • list - List menu`,
-                `║ • interactive - Mixed`,
-                `║ • poll - Polling`,
-                `║ • location - Lokasi`,
-                `║ • contact - Kontak`,
-                '║',
-                '║ *🖼️ Media:*',
-                `║ • media - Gambar URL`,
-                `║ • medialokal - Gambar lokal`,
-                '║',
-                '║ *👥 Group:*',
-                `║ • tagall - Tag semua`,
-                `║ • groupinfo - Info grup`,
-                `║ • kick - Kick member`,
-                `║ • add - Tambah member`,
-                `║ • promote - Promote`,
-                `║ • demote - Demote`,
-                `║ • link - Link invite`,
-                '║',
-                '║ *😄 Fun:*',
-                `║ • dice - Dadu`,
-                `║ • coin - Coin flip`,
-                `║ • random - Random`,
-                `║ • 8ball - Bola ajaib`,
-                `║ • joke - Joke`,
-                `║ • fortune - Fortune`,
-                '║',
-                `║ *💡 Bisa pakai prefix ${p} atau langsung!*`,
-                '╚════════════════════╝',
-            ].join('\n') });
+            const fs   = require('fs');
+            const path = require('path');
+
+            const imgPath = path.join(__dirname, '../../assets/logo.png');
+            const imageSource = fs.existsSync(imgPath)
+                ? fs.readFileSync(imgPath)                 // lokal
+                : { url: 'https://picsum.photos/600/400' }; // fallback URL
+
+            await ctx.sendInteractiveWithImage({
+                imageSource,
+                text: [
+                    `🤖 *${config.botName}*`,
+                    '',
+                    '👋 Halo! Pilih kategori menu di bawah:',
+                ].join('\n'),
+                footer: 'Ketuk tombol untuk lihat isi kategori',
+                quoted: ctx.msg,
+                buttons: [
+                    {
+                        name: 'quick_reply',
+                        buttonParamsJson: JSON.stringify({ display_text: '📋 General', id: 'menu_general' })
+                    },
+                    {
+                        name: 'quick_reply',
+                        buttonParamsJson: JSON.stringify({ display_text: '🎛️ Interactive', id: 'menu_interactive' })
+                    },
+                    {
+                        name: 'quick_reply',
+                        buttonParamsJson: JSON.stringify({ display_text: '🖼️ Media & Fun', id: 'menu_media' })
+                    },
+                ]
+            });
+            break;
+        }
+
+        // ── Response tiap button menu ─────────────────────────
+        case 'menu_general': {
+            const p = config.prefix;
+            await ctx.sendInteractive({
+                text: [
+                    '📋 *General Commands*',
+                    '',
+                    `• \`${p}menu\` — Menu utama`,
+                    `• \`${p}ping\` — Latency bot`,
+                    `• \`${p}info\` — Info bot`,
+                    `• \`${p}owner\` — Kontak owner`,
+                    `• \`${p}location\` — Kirim lokasi`,
+                    `• \`${p}contact\` — Kirim kontak`,
+                    `• \`${p}poll\` — Polling`,
+                ].join('\n'),
+                footer: config.botName,
+                quoted: ctx.msg,
+                buttons: [
+                    { name: 'quick_reply', buttonParamsJson: JSON.stringify({ display_text: '⬅️ Kembali ke Menu', id: 'menu' }) },
+                    { name: 'quick_reply', buttonParamsJson: JSON.stringify({ display_text: '🎛️ Interactive', id: 'menu_interactive' }) },
+                ]
+            });
+            break;
+        }
+
+        case 'menu_interactive': {
+            const p = config.prefix;
+            await ctx.sendInteractive({
+                text: [
+                    '🎛️ *Interactive Commands*',
+                    '',
+                    `• \`${p}button\` — Quick reply buttons`,
+                    `• \`${p}list\` — List menu makanan`,
+                    `• \`${p}interactive\` — Mixed buttons`,
+                    `• \`${p}buttonimage\` — Button + gambar`,
+                    `• \`${p}buttoncall\` — Button telepon`,
+                    `• \`${p}poll\` — Polling`,
+                ].join('\n'),
+                footer: config.botName,
+                quoted: ctx.msg,
+                buttons: [
+                    { name: 'quick_reply', buttonParamsJson: JSON.stringify({ display_text: '⬅️ Kembali ke Menu', id: 'menu' }) },
+                    { name: 'quick_reply', buttonParamsJson: JSON.stringify({ display_text: '🖼️ Media & Fun', id: 'menu_media' }) },
+                    {
+                        name: 'cta_url',
+                        buttonParamsJson: JSON.stringify({ display_text: '📖 Docs Baileys', url: 'https://github.com/whiskeysockets/baileys' })
+                    },
+                ]
+            });
+            break;
+        }
+
+        case 'menu_media': {
+            const p = config.prefix;
+            await ctx.sendInteractive({
+                text: [
+                    '🖼️ *Media Commands*',
+                    `• \`${p}media\` — Gambar dari URL`,
+                    `• \`${p}medialokal\` — Gambar lokal`,
+                    '',
+                    '😄 *Fun Commands*',
+                    `• \`${p}dice\` — Lempar dadu`,
+                    `• \`${p}coin\` — Coin flip`,
+                    `• \`${p}random\` — Angka random`,
+                    `• \`${p}8ball\` — Bola ajaib`,
+                    `• \`${p}joke\` — Lelucon`,
+                    `• \`${p}fortune\` — Ramalan`,
+                    '',
+                    '👥 *Group Commands*',
+                    `• \`${p}tagall\` — Tag semua member`,
+                    `• \`${p}groupinfo\` — Info grup`,
+                    `• \`${p}kick/add/promote/demote/link\``,
+                ].join('\n'),
+                footer: config.botName,
+                quoted: ctx.msg,
+                buttons: [
+                    { name: 'quick_reply', buttonParamsJson: JSON.stringify({ display_text: '⬅️ Kembali ke Menu', id: 'menu' }) },
+                    { name: 'quick_reply', buttonParamsJson: JSON.stringify({ display_text: '📋 General', id: 'menu_general' }) },
+                ]
+            });
             break;
         }
 
@@ -78,7 +149,7 @@ const handler = async (ctx) => {
                 '╔═══ *Bot Info* ═══╗',
                 `║ 🤖 *Nama:* ${config.botName}`,
                 `║ 👤 *Owner:* ${config.ownerNumber || '-'}`,
-                `║ ⚙️ *Prefix:* ${p} (atau tanpa)`,
+                `║ ⚙️ *Prefix:* ${config.prefix} (atau tanpa)`,
                 `║ 🔄 *Uptime:* ${h}j ${m}m ${s}d`,
                 `║ 📦 *Node:* ${process.version}`,
                 `║ 🖥️ *Platform:* ${process.platform}`,
@@ -137,6 +208,6 @@ const handler = async (ctx) => {
 
 // Daftar semua command yang di-handle file ini
 // Tambah di sini kalau bikin case baru di atas
-handler.commands = ['menu', 'ping', 'info', 'owner', 'location', 'contact', 'react', 'quote', 'poll'];
+handler.commands = ['menu', 'menu_general', 'menu_interactive', 'menu_media', 'ping', 'info', 'owner', 'location', 'contact', 'react', 'quote', 'poll'];
 
 module.exports = handler;

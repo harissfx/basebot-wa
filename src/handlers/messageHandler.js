@@ -1,7 +1,7 @@
 const config  = require('../settings');
 const plugins = require('../utils/PluginLoader');
 const { getContentType } = require('@whiskeysockets/baileys');
-const { sendButtons, sendListMessage, sendInteractiveMessage, sendButtonWithImage } = require('../utils/interactiveHelper');
+const { sendButtons, sendListMessage, sendInteractiveMessage, sendButtonWithImage, sendInteractiveWithImage } = require('../utils/interactiveHelper');
 
 function extractMessageText(message) {
     if (!message) return null;
@@ -82,7 +82,8 @@ async function handleMessages(sock, m) {
                         sendButtons:         (content) => sendButtons(sock, sender, content),
                         sendList:            (content) => sendListMessage(sock, sender, content),
                         sendInteractive:     (content) => sendInteractiveMessage(sock, sender, content),
-                        sendButtonWithImage: (content) => sendButtonWithImage(sock, sender, content),
+                        sendButtonWithImage:         (content) => sendButtonWithImage(sock, sender, content),
+                        sendInteractiveWithImage:    (content) => sendInteractiveWithImage(sock, sender, content),
                         react:               (emoji)   => sock.sendMessage(sender, { react: { text: emoji, key: msg.key } }),
                     });
                 } catch (err) {

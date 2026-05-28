@@ -144,4 +144,41 @@ async function sendButtonWithImage(sock, jid, content) {
     }
 }
 
-module.exports = { sendButtons, sendListMessage, sendInteractiveMessage, sendButtonWithImage };
+// Foto + mixed interactive buttons (quick_reply, cta_url, cta_copy, cta_call, dll)
+// imageSource bisa Buffer (lokal) atau { url: '...' } (remote)
+async function sendInteractiveWithImage(sock, jid, content) {
+    const { text, footer = '', buttons = [], imageSource, quoted } = content;
+    const contextInfo = buildContextInfo(quoted);
+
+    try {
+        const { prepareWAMessageMedia } = require('@whiskeysockets/baileys');
+
+        let mediaInput;
+        if (Buffer.isBuffer(imageSource)) {
+            mediaInput = { image: imageSource };
+        } else if (imageSource?.url) {
+            const axios = require('axios');
+            const { data } = await axios.get(imageSource.url, { responseType: 'arraybuffer' });
+            mediaInput = { image: Buffer.from(data) };
+        } else {
+            throw new Error('imageSource harus Buffer atau { url: "..." }');
+        }
+
+        const media = await prepareWAMessageMedia(mediaInput, { upload: sock.waUploadToServer });
+
+        const interactiveMsg = proto.Message.InteractiveMessage.fromObject({
+            body: { text },
+            footer: { text: footer },
+            header: { hasMediaAttachment: true, ...media },
+            nativeFlowMessage: { buttons, messageParamsJson: '' },
+            ...(contextInfo ? { contextInfo } : {})
+        });
+
+        return relayInteractive(sock, jid, buildMessage(jid, interactiveMsg), 'mixed');
+    } catch (err) {
+        console.error('Error sendInteractiveWithImage, fallback ke sendInteractive:', err.message);
+        return sendInteractiveMessage(sock, jid, { text, footer, buttons, quoted });
+    }
+}
+
+module.exports = { sendButtons, sendListMessage, sendInteractiveMessage, sendButtonWithImage, sendInteractiveWithImage };
