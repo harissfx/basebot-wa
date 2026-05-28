@@ -35,7 +35,7 @@ const handler = async (ctx) => {
         // ── Kirim list menu (FORMAT BARU NATIVE FLOW) ──────────
         case 'list': {
             await ctx.sendInteractive({
-                text: '📋 Pilih item dari menu:',
+                text: '📋 Pilih item dari menu ini:',
                 footer: 'WhatsApp Bot Menu',
                 quoted: ctx.msg,
                 buttons: [
