@@ -1,13 +1,21 @@
-const path = require('path');
-const fs   = require('fs');
+const path     = require('path');
+const fs       = require('fs');
 const chokidar = require('chokidar');
 
 /**
- * PluginLoader
- * - Saat startup: scan & load semua file .js di folder commands/
- * - Saat file DIUBAH: reload hanya file itu tanpa restart bot
- * - Saat file DITAMBAH: auto-load langsung, command langsung aktif
- * - Saat file DIHAPUS: auto-unload, command langsung nonaktif
+ * PluginLoader — support DUA format export:
+ *
+ * Format LAMA (object of functions):
+ *   module.exports = { ping: async (ctx) => {...}, menu: async (ctx) => {...} }
+ *
+ * Format BARU (switch case):
+ *   module.exports = async (ctx) => {
+ *       switch (ctx.command.name) {
+ *           case 'ping': ...; break;
+ *           case 'menu': ...; break;
+ *       }
+ *   }
+ *   module.exports.commands = ['ping', 'menu']  // daftar command yang di-handle
  */
 class PluginLoader {
     constructor() {
@@ -16,21 +24,16 @@ class PluginLoader {
         this.folder  = path.join(__dirname, '..', 'commands');
     }
 
-    // Baca semua .js di folder commands (non-recursive, satu level)
     _scanFiles() {
         return fs.readdirSync(this.folder)
             .filter(f => f.endsWith('.js'))
             .map(f => path.join(this.folder, f));
     }
 
-    // Load / reload satu file
     _loadFile(filePath) {
-        // Hapus cache CommonJS supaya require selalu fresh
         if (require.cache[require.resolve(filePath)]) {
             delete require.cache[require.resolve(filePath)];
         }
-
-        // Hapus command lama dari file ini (kalau reload)
         if (this.files[filePath]) {
             this.files[filePath].forEach(cmd => delete this.plugins[cmd]);
             delete this.files[filePath];
@@ -38,18 +41,29 @@ class PluginLoader {
 
         try {
             const mod = require(filePath);
-            // mod harus berupa object { commandName: handlerFn, ... }
-            if (!mod || typeof mod !== 'object') {
-                console.warn(`⚠️  [PluginLoader] Tidak ada export valid di: ${path.basename(filePath)}`);
-                return;
-            }
+            if (!mod) return;
 
             const loaded = [];
-            for (const [name, fn] of Object.entries(mod)) {
-                if (typeof fn === 'function') {
-                    this.plugins[name] = fn;
+
+            // ── Format BARU: function + .commands array ──────────
+            if (typeof mod === 'function' && Array.isArray(mod.commands)) {
+                for (const name of mod.commands) {
+                    // Bungkus switch handler supaya ctx.command.name selalu tersedia
+                    this.plugins[name] = (ctx) => mod(ctx);
                     loaded.push(name);
                 }
+
+            // ── Format LAMA: object of functions ─────────────────
+            } else if (typeof mod === 'object') {
+                for (const [name, fn] of Object.entries(mod)) {
+                    if (typeof fn === 'function') {
+                        this.plugins[name] = fn;
+                        loaded.push(name);
+                    }
+                }
+            } else {
+                console.warn(`⚠️  [PluginLoader] Format tidak dikenal: ${path.basename(filePath)}`);
+                return;
             }
 
             this.files[filePath] = loaded;
@@ -59,7 +73,6 @@ class PluginLoader {
         }
     }
 
-    // Unload file (kalau dihapus)
     _unloadFile(filePath) {
         if (this.files[filePath]) {
             const removed = this.files[filePath];
@@ -69,23 +82,17 @@ class PluginLoader {
         }
     }
 
-    // Init: load semua + mulai watch
     init() {
-        // Load semua file existing
         const files = this._scanFiles();
         for (const f of files) this._loadFile(f);
 
         console.log(`👀 [PluginLoader] Watching: ${this.folder}`);
         console.log(`📦 [PluginLoader] Total command aktif: ${Object.keys(this.plugins).length}`);
 
-        // Watch perubahan file (tanpa restart bot!)
         const watcher = chokidar.watch(this.folder, {
-            persistent:    true,
-            ignoreInitial: true,   // jangan re-trigger file yang sudah diload
-            awaitWriteFinish: {    // tunggu file selesai ditulis sebelum reload
-                stabilityThreshold: 300,
-                pollInterval: 100
-            }
+            persistent: true,
+            ignoreInitial: true,
+            awaitWriteFinish: { stabilityThreshold: 300, pollInterval: 100 }
         });
 
         watcher
@@ -107,21 +114,9 @@ class PluginLoader {
         return this;
     }
 
-    // Ambil handler untuk command tertentu
-    get(commandName) {
-        return this.plugins[commandName] || null;
-    }
-
-    // Cek apakah command ada
-    has(commandName) {
-        return commandName in this.plugins;
-    }
-
-    // Ambil semua nama command yang aktif
-    commandList() {
-        return Object.keys(this.plugins);
-    }
+    get(commandName)  { return this.plugins[commandName] || null; }
+    has(commandName)  { return commandName in this.plugins; }
+    commandList()     { return Object.keys(this.plugins); }
 }
 
-// Export singleton
 module.exports = new PluginLoader();

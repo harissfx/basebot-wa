@@ -1,62 +1,76 @@
 const { delay } = require('../utils/helper');
 
+// ─────────────────────────────────────────────────────────────
+//  FUN COMMANDS
+// ─────────────────────────────────────────────────────────────
+
 const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
-const funCommands = {
-    dice: async (ctx) => {
-        await ctx.reply({ text: `🎲 Dadu: *${Math.floor(Math.random() * 6) + 1}*` });
-    },
+const handler = async (ctx) => {
+    const { command, sock, sender } = ctx;
 
-    coin: async (ctx) => {
-        await ctx.reply({ text: `🪙 Hasil: *${Math.random() < 0.5 ? 'Kepala' : 'Ekor'}*` });
-    },
+    switch (command.name) {
 
-    random: async (ctx) => {
-        const max = parseInt(ctx.command.args[0]) || 100;
-        await ctx.reply({ text: `🔢 Random (1-${max}): *${Math.floor(Math.random() * max) + 1}*` });
-    },
+        case 'dice': {
+            await ctx.reply({ text: `🎲 Dadu: *${Math.floor(Math.random() * 6) + 1}*` });
+            break;
+        }
 
-    '8ball': async (ctx) => {
-        const answers = [
-            'Ya, pasti! ✅', 'Tidak, jelas tidak ❌', 'Mungkin saja 🤔',
-            'Coba lagi nanti ⏳', 'Saya ragu-ragu 🤷', 'Sudah pasti! 💯',
-            'Lebih baik tidak memberitahumu sekarang 🤫', 'Tanda-tanda menunjukkan ya 👍',
-            'Tidak mungkin 🚫', 'Fokus dan tanyakan lagi 🎯',
-        ];
-        await ctx.reply({ text: `🎱 *8-Ball:*\n\n${pick(answers)}` });
-    },
+        case 'coin': {
+            await ctx.reply({ text: `🪙 Hasil: *${Math.random() < 0.5 ? 'Kepala' : 'Ekor'}*` });
+            break;
+        }
 
-    joke: async (ctx) => {
-        const jokes = [
-            'Kenapa programmer suka kopi?\nKarena tanpa kopi, mereka tidak bisa *compile* pikiran! ☕',
-            'Apa bedanya bug dan fitur?\nDokumentasi! 📄',
-            'Kenapa JavaScript developer tidak bisa tidur?\nKarena mereka selalu *await* sesuatu! 😴',
-            'Apa yang dikatakan server ke client?\n"404: Joke not found" 🔍',
-            'Kenapa Python tidak bisa berkencan?\nKarena dia terlalu *indent*! 🐍',
-        ];
-        await ctx.reply({ text: `😂 *Joke:*\n\n${pick(jokes)}` });
-    },
+        case 'random': {
+            const max = parseInt(command.args[0]) || 100;
+            await ctx.reply({ text: `🔢 Random (1-${max}): *${Math.floor(Math.random() * max) + 1}*` });
+            break;
+        }
 
-    fortune: async (ctx) => {
-        const fortunes = [
-            'Hari ini adalah hari keberuntunganmu! 🍀',
-            'Kesabaran adalah kunci kesuksesanmu. 🔑',
-            'Sebuah kejutan baik akan datang segera. 🎁',
-            'Jangan takut mengambil risiko hari ini. 🚀',
-            'Seseorang spesial sedang memikirkanmu. 💭',
-            'Waktunya untuk istirahat dan recharge. 🔋',
-            'Kreativitasmu akan membawa hasil besar. 🎨',
-            'Kebaikan yang kamu lakukan akan kembali padamu. ❤️',
-        ];
-        await ctx.reply({ text: `🥠 *Fortune Cookie:*\n\n${pick(fortunes)}` });
-    },
+        case '8ball': {
+            const answers = [
+                'Ya, pasti! ✅', 'Tidak, jelas tidak ❌', 'Mungkin saja 🤔',
+                'Coba lagi nanti ⏳', 'Saya ragu-ragu 🤷', 'Sudah pasti! 💯',
+                'Tanda-tanda menunjukkan ya 👍', 'Tidak mungkin 🚫',
+            ];
+            await ctx.reply({ text: `🎱 *8-Ball:*\n\n${pick(answers)}` });
+            break;
+        }
 
-    typing: async (ctx) => {
-        await ctx.sock.sendPresenceUpdate('composing', ctx.sender);
-        await delay(2000);
-        await ctx.sock.sendPresenceUpdate('paused', ctx.sender);
-        await ctx.reply({ text: '⌨️ Ini contoh typing indicator!' });
-    },
+        case 'joke': {
+            const jokes = [
+                'Kenapa programmer suka kopi?\nKarena tanpa kopi, mereka tidak bisa *compile* pikiran! ☕',
+                'Apa bedanya bug dan fitur?\nDokumentasi! 📄',
+                'Kenapa JavaScript developer tidak bisa tidur?\nKarena mereka selalu *await* sesuatu! 😴',
+                'Apa yang dikatakan server ke client?\n"404: Joke not found" 🔍',
+            ];
+            await ctx.reply({ text: `😂 *Joke:*\n\n${pick(jokes)}` });
+            break;
+        }
+
+        case 'fortune': {
+            const fortunes = [
+                'Hari ini adalah hari keberuntunganmu! 🍀',
+                'Kesabaran adalah kunci kesuksesanmu. 🔑',
+                'Sebuah kejutan baik akan datang segera. 🎁',
+                'Jangan takut mengambil risiko hari ini. 🚀',
+                'Kreativitasmu akan membawa hasil besar. 🎨',
+            ];
+            await ctx.reply({ text: `🥠 *Fortune Cookie:*\n\n${pick(fortunes)}` });
+            break;
+        }
+
+        case 'typing': {
+            await sock.sendPresenceUpdate('composing', sender);
+            await delay(2000);
+            await sock.sendPresenceUpdate('paused', sender);
+            await ctx.reply({ text: '⌨️ Ini contoh typing indicator!' });
+            break;
+        }
+
+    }
 };
 
-module.exports = funCommands;
+handler.commands = ['dice', 'coin', 'random', '8ball', 'joke', 'fortune', 'typing'];
+
+module.exports = handler;

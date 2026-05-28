@@ -3,9 +3,6 @@ const plugins = require('../utils/PluginLoader');
 const { getContentType } = require('@whiskeysockets/baileys');
 const { sendButtons, sendListMessage, sendInteractiveMessage, sendButtonWithImage } = require('../utils/interactiveHelper');
 
-// ─────────────────────────────────────────────
-// Ambil teks dari berbagai tipe pesan WhatsApp
-// ─────────────────────────────────────────────
 function extractMessageText(message) {
     if (!message) return null;
     const type = getContentType(message);
@@ -14,53 +11,32 @@ function extractMessageText(message) {
         case 'extendedTextMessage':        return message.extendedTextMessage?.text;
         case 'imageMessage':               return message.imageMessage?.caption;
         case 'videoMessage':               return message.videoMessage?.caption;
-
-        // ✅ Response dari klik button
         case 'buttonsResponseMessage':     return message.buttonsResponseMessage?.selectedButtonId;
-
-        // ✅ Response dari pilih list
         case 'listResponseMessage':        return message.listResponseMessage?.singleSelectReply?.selectedRowId;
-
-        // ✅ Response dari interactive (quick_reply modern)
-        case 'interactiveResponseMessage': {
-            try {
-                const body = message.interactiveResponseMessage?.nativeFlowResponseMessage?.paramsJson;
-                if (body) {
-                    const parsed = JSON.parse(body);
-                    return parsed.id || parsed.display_text || null;
-                }
-            } catch {}
-            return null;
-        }
-
-        default: return null;
+        case 'templateButtonReplyMessage': return message.templateButtonReplyMessage?.selectedId;
+        default:                           return null;
     }
 }
 
 function isGroup(jid)  { return jid.endsWith('@g.us'); }
 function isFromMe(msg) { return msg.key.fromMe; }
 
+// Exact match untuk hindari false positive
 function isOwner(sender) {
     const ownerNumber  = config.ownerNumber.replace(/\D/g, '');
     const senderNumber = sender.replace(/\D/g, '').replace(/@.+$/, '');
     return ownerNumber && ownerNumber === senderNumber;
 }
 
-// ─────────────────────────────────────────────
-// Parse perintah dari teks
-// Mendukung: !menu, .ping, atau langsung "menu"
-// ─────────────────────────────────────────────
 function parseCommand(text) {
     const { prefix } = config;
 
-    // Dengan prefix (contoh: !button, .list)
     if (text.startsWith(prefix)) {
         const args = text.slice(prefix.length).trim().split(/ +/);
         const name = args.shift().toLowerCase();
         return { name, args, fullArgs: args.join(' '), raw: text, hasPrefix: true };
     }
 
-    // Tanpa prefix — cek apakah ada di plugin dulu
     const words = text.trim().split(/ +/);
     const name  = words[0].toLowerCase();
     if (plugins.has(name)) {
@@ -71,9 +47,6 @@ function parseCommand(text) {
     return null;
 }
 
-// ─────────────────────────────────────────────
-// Proses setiap pesan masuk
-// ─────────────────────────────────────────────
 async function handleMessages(sock, m) {
     for (const msg of m.messages) {
         if (!msg.message) continue;
@@ -81,7 +54,6 @@ async function handleMessages(sock, m) {
         const fromMe = isFromMe(msg);
         const sender = msg.key.remoteJid;
 
-        // Mode self → hanya owner yang bisa pakai
         if (!fromMe && config.botMode === 'self' && !isOwner(sender)) continue;
 
         const text = extractMessageText(msg.message);
@@ -118,16 +90,7 @@ async function handleMessages(sock, m) {
                     await sock.sendMessage(sender, { text: '❌ Terjadi kesalahan saat menjalankan perintah.' });
                 }
             } else {
-                // Kalau dari button/list tapi tidak ada handler → diam saja (jangan balas "tidak ditemukan")
-                const isButtonResponse = [
-                    'buttonsResponseMessage',
-                    'listResponseMessage',
-                    'interactiveResponseMessage'
-                ].includes(getContentType(msg.message));
-
-                if (!isButtonResponse) {
-                    await sock.sendMessage(sender, { text: `❓ Command *${command.name}* tidak ditemukan.` });
-                }
+                await sock.sendMessage(sender, { text: `❓ Command *${command.name}* tidak ditemukan.` });
             }
         }
 
