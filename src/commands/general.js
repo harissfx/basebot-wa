@@ -1,43 +1,100 @@
+const fs   = require('fs');
+const path = require('path');
 const config = require('../config');
+const { formatUptime } = require('../utils/helper');
 
 const handler = async (ctx) => {
     const { command, sock, sender } = ctx;
+    const p = config.prefix;
+    let imgPath, imageSource, start, sent, u, h, m, s;
 
     switch (command.name) {
 
-        case 'menu': {
-            const fs   = require('fs');
-            const path = require('path');
-
-            const imgPath = path.join(__dirname, '../media/logo.png');
+        case 'menu':
+            imgPath = path.join(__dirname, '../media/logo.png');
             if (!fs.existsSync(imgPath)) return ctx.reply({ text: '❌ File logo.png tidak ditemukan di folder media.' });
-            const imageSource = fs.readFileSync(imgPath);
-
+            imageSource = fs.readFileSync(imgPath);
+            menutxt = `┌━━━━━━━━━━━━━━┈ ❋ཻུ۪۪⸙
+│    「 𝙄𝙉𝙁𝙊 𝘽𝙊𝙏 」
+│● Owner: ${config.ownerName}
+│● Nomor: ${config.ownerNumber}
+│● Runtime: ${formatUptime(process.uptime())}
+│● Nama Bot: ${config.botName}
+└┬━━━━━━━━━━━━━━┈ ⳹
+┌┤  「 𝙈𝙀𝙉𝙐 𝘽𝙊𝙏 」
+││
+││⪩ 𝗍𝗈𝗆𝖾𝗇𝗎
+││⪩ 𝖼𝗎𝖼𝗂𝗆𝖺𝗍𝖺
+││⪩ 𝗅𝗂𝗌𝗍𝗆𝗎𝗌𝗂𝗄
+││⪩ 𝗍𝖾𝗑𝗍𝗆𝖺𝗄𝖾𝗋
+││⪩ 𝖿𝗎𝗇𝗆𝖾𝗇𝗎
+││⪩ 𝖺𝖽𝖽𝗆𝖾𝗇𝗎
+││⪩ 𝗀𝖺𝗌𝗆𝖾𝗇𝗎
+││⪩ 𝖻𝗎𝗀𝗆𝖾𝗇𝗎
+││⪩ 𝗂𝗌𝗅𝖺𝗆𝗆𝖾𝗇𝗎
+││⪩ 𝖻𝖾𝗋𝗂𝗍𝖺𝗆𝖾𝗇𝗎
+││⪩ 𝗀𝖺𝗆𝖾𝗆𝖾𝗇𝗎
+││⪩ 𝗀𝗋𝗈𝗎𝗉𝗆𝖾𝗇𝗎
+││⪩ 𝗋𝖺𝗇𝖽𝗈𝗆𝗆𝖾𝗇𝗎
+││⪩ 𝖽𝗈𝗐𝗇𝗅𝗈𝖺𝖽𝗆𝖾𝗇𝗎
+││
+│└────────────┈ ⳹
+│›⟩ ∘ 𝘓𝘢𝘯𝘨𝘶𝘢𝘨𝘦: 𝘑𝘢𝘷𝘢𝘚𝘤𝘳𝘪𝘱𝘵
+│›⟩ ∘ 𝘚𝘤𝘳𝘪𝘱𝘵?: 𝘎𝘬 𝘥𝘪 𝘫𝘶𝘢𝘭 ( ͡° ͜ʖ ͡°)
+├───────────────
+│✑ 𝖢𝗈𝗉𝗒𝗋𝗂𝗀𝗁𝗍 𝖧𝖺𝗇𝗓 𝖮𝖿𝖼
+└━━━━━━━━━━━━━━━┈ ❋ཻུ۪۪⸙`
             await ctx.sendInteractiveWithImage({
                 imageSource,
-                text: [
-                    `🤖 *${config.botName}*`,
-                    '',
-                    '👋 Halo! Pilih kategori menu di bawah:',
-                ].join('\n'),
-                footer: 'Ketuk tombol untuk lihat isi kategori',
+                text: menutxt,
+                footer: `${config.footerTxt}`,
                 quoted: ctx.fakeOrder,
-                    contextInfo: {
-        mentionedJid: ['0@s.whatsapp.net'],
-        forwardingScore: 111,
-        isForwarded: true,
-    },
+                contextInfo: {
+                    mentionedJid: ['0@s.whatsapp.net'],
+                    forwardingScore: 999,
+                    isForwarded: true,
+                },
                 buttons: [
                     { name: 'quick_reply', buttonParamsJson: JSON.stringify({ display_text: '📋 General', id: 'menu_general' }) },
                     { name: 'cta_url',     buttonParamsJson: JSON.stringify({ display_text: '🌐 Buka GitHub', url: 'https://github.com/whiskeysockets/baileys' }) },
                     { name: 'cta_copy',    buttonParamsJson: JSON.stringify({ display_text: '📋 Copy Kode', copy_code: 'KODE-PROMO-2025' }) },
+                    { name: 'cta_call', buttonParamsJson: JSON.stringify({ display_text: '📱 Telepon Sekarang', phone_number: '+6281234567890' }) },
+                                        {
+                        name: 'single_select',
+                        buttonParamsJson: JSON.stringify({
+                            title: '📂 Buka Menu',
+                            sections: [
+                                {
+                                    title: '🍔 Makanan',
+                                    rows: [
+                                        { id: 'food_1', title: 'Burger',    description: 'Burger daging sapi premium' },
+                                        { id: 'food_2', title: 'Pizza',     description: 'Pizza pepperoni large'      },
+                                        { id: 'food_3', title: 'Sushi',     description: 'Sushi salmon set'           },
+                                    ]
+                                },
+                                {
+                                    title: '🥤 Minuman',
+                                    rows: [
+                                        { id: 'drink_1', title: 'Kopi', description: 'Kopi arabica single origin' },
+                                        { id: 'drink_2', title: 'Teh',  description: 'Teh hijau organik'          },
+                                        { id: 'drink_3', title: 'Jus',  description: 'Jus jeruk segar'            },
+                                    ]
+                                },
+                                {
+                                    title: '🍰 Dessert',
+                                    rows: [
+                                        { id: 'dessert_1', title: 'Cheesecake', description: 'New York cheesecake'      },
+                                        { id: 'dessert_2', title: 'Brownies',   description: 'Chocolate fudge brownies' },
+                                    ]
+                                },
+                            ]
+                        })
+                    }
                 ]
             });
             break;
-        }
-        // ── Response tiap button menu ─────────────────────────
-        case 'menu_general': {
-            const p = config.prefix;
+
+        case 'menu_general':
             await ctx.sendInteractive({
                 text: [
                     '📋 *General Commands*',
@@ -58,10 +115,8 @@ const handler = async (ctx) => {
                 ]
             });
             break;
-        }
 
-        case 'menu_interactive': {
-            const p = config.prefix;
+        case 'menu_interactive':
             await ctx.sendInteractive({
                 text: [
                     '🎛️ *Interactive Commands*',
@@ -85,10 +140,8 @@ const handler = async (ctx) => {
                 ]
             });
             break;
-        }
 
-        case 'menu_media': {
-            const p = config.prefix;
+        case 'menu_media':
             await ctx.sendInteractive({
                 text: [
                     '🖼️ *Media Commands*',
@@ -116,23 +169,21 @@ const handler = async (ctx) => {
                 ]
             });
             break;
-        }
 
-        case 'ping': {
-            const start = Date.now();
-            const sent  = await ctx.reply({ text: '🏓 Pong!' });
+        case 'ping':
+            start = Date.now();
+            sent  = await ctx.reply({ text: '🏓 Pong!' });
             await sock.sendMessage(sender, {
                 text: `🏓 *Pong!*\n\n⏱️ Latency: *${Date.now() - start}ms*`,
                 edit: sent.key
             });
             break;
-        }
 
-        case 'info': {
-            const u = process.uptime();
-            const h = Math.floor(u / 3600);
-            const m = Math.floor((u % 3600) / 60);
-            const s = Math.floor(u % 60);
+        case 'info':
+            u = process.uptime();
+            h = Math.floor(u / 3600);
+            m = Math.floor((u % 3600) / 60);
+            s = Math.floor(u % 60);
             await ctx.send({ text: [
                 '╔═══ *Bot Info* ═══╗',
                 `║ 🤖 *Nama:* ${config.botName}`,
@@ -144,9 +195,8 @@ const handler = async (ctx) => {
                 '╚════════════════════╝',
             ].join('\n') });
             break;
-        }
 
-        case 'owner': {
+        case 'owner':
             if (!config.ownerNumber) return ctx.reply({ text: '❌ Nomor owner belum diatur.' });
             await ctx.send({
                 contacts: {
@@ -155,16 +205,14 @@ const handler = async (ctx) => {
                 }
             });
             break;
-        }
 
-        case 'location': {
+        case 'location':
             await ctx.reply({
                 location: { degreesLatitude: -6.1754, degreesLongitude: 106.8272, name: 'Monumen Nasional', address: 'Jakarta, Indonesia' }
             });
             break;
-        }
 
-        case 'contact': {
+        case 'contact':
             await ctx.reply({
                 contacts: {
                     displayName: 'Test Contact',
@@ -172,30 +220,22 @@ const handler = async (ctx) => {
                 }
             });
             break;
-        }
 
-        case 'react': {
+        case 'react':
             await ctx.react(command.args[0] || '👍');
             break;
-        }
 
-        case 'quote': {
+        case 'quote':
             await ctx.reply({ text: '📌 Quoted message!' });
             break;
-        }
 
-        case 'poll': {
+        case 'poll':
             await ctx.reply({
                 poll: { name: 'Polling Favorit', values: ['Node.js', 'Python', 'Golang', 'Rust'], selectableCount: 1, toAnnouncementGroup: false }
             });
             break;
-        }
 
     }
 };
-
-// Daftar semua command yang di-handle file ini
-// Tambah di sini kalau bikin case baru di atas
-handler.commands = ['menu', 'menu_general', 'menu_interactive', 'menu_media', 'ping', 'info', 'owner', 'location', 'contact', 'react', 'quote', 'poll'];
 
 module.exports = handler;

@@ -13,7 +13,7 @@ const handler = async (ctx) => {
 
     switch (command.name) {
         // ── Kirim button ──────────────────────────────────────
-        case 'button': {
+        case 'button':
             await ctx.sendButtons({
                 text: '🎛️ Silakan pilih salah satu:',
                 footer: 'WhatsApp Bot',
@@ -25,15 +25,14 @@ const handler = async (ctx) => {
                 ]
             });
             break;
-        }
 
         // ── Response klik button ──────────────────────────────
-        case 'btn_1': { await ctx.reply({ text: '✅ Kamu pilih *Opsi Pertama*!' }); break; }
-        case 'btn_2': { await ctx.reply({ text: '✅ Kamu pilih *Opsi Kedua*!'   }); break; }
-        case 'btn_3': { await ctx.reply({ text: '✅ Kamu pilih *Opsi Ketiga*!'  }); break; }
+        case 'btn_1': await ctx.reply({ text: '✅ Kamu pilih *Opsi Pertama*!' }); break;
+        case 'btn_2': await ctx.reply({ text: '✅ Kamu pilih *Opsi Kedua*!'   }); break;
+        case 'btn_3': await ctx.reply({ text: '✅ Kamu pilih *Opsi Ketiga*!'  }); break;
 
         // ── Kirim list menu ───────────────────────────────────
-        case 'list': {
+        case 'list':
             await ctx.sendInteractive({
                 text: '📋 Pilih item dari menu ini:',
                 footer: 'WhatsApp Bot Menu',
@@ -73,20 +72,19 @@ const handler = async (ctx) => {
                 ]
             });
             break;
-        }
 
         // ── Response pilih list ───────────────────────────────
-        case 'food_1':    { await ctx.reply({ text: '🍔 Kamu pesan *Burger*!\nHarga: Rp 45.000'     }); break; }
-        case 'food_2':    { await ctx.reply({ text: '🍕 Kamu pesan *Pizza*!\nHarga: Rp 75.000'      }); break; }
-        case 'food_3':    { await ctx.reply({ text: '🍣 Kamu pesan *Sushi*!\nHarga: Rp 95.000'      }); break; }
-        case 'drink_1':   { await ctx.reply({ text: '☕ Kamu pesan *Kopi*!\nHarga: Rp 25.000'       }); break; }
-        case 'drink_2':   { await ctx.reply({ text: '🍵 Kamu pesan *Teh*!\nHarga: Rp 15.000'        }); break; }
-        case 'drink_3':   { await ctx.reply({ text: '🍊 Kamu pesan *Jus*!\nHarga: Rp 20.000'        }); break; }
-        case 'dessert_1': { await ctx.reply({ text: '🍰 Kamu pesan *Cheesecake*!\nHarga: Rp 55.000' }); break; }
-        case 'dessert_2': { await ctx.reply({ text: '🍫 Kamu pesan *Brownies*!\nHarga: Rp 35.000'   }); break; }
+        case 'food_1': await ctx.reply({ text: '🍔 Kamu pesan *Burger*!\nHarga: Rp 45.000'     }); break;
+        case 'food_2': await ctx.reply({ text: '🍕 Kamu pesan *Pizza*!\nHarga: Rp 75.000'      }); break;
+        case 'food_3': await ctx.reply({ text: '🍣 Kamu pesan *Sushi*!\nHarga: Rp 95.000'      }); break;
+        case 'drink_1': await ctx.reply({ text: '☕ Kamu pesan *Kopi*!\nHarga: Rp 25.000'       }); break;
+        case 'drink_2': await ctx.reply({ text: '🍵 Kamu pesan *Teh*!\nHarga: Rp 15.000'        }); break;
+        case 'drink_3': await ctx.reply({ text: '🍊 Kamu pesan *Jus*!\nHarga: Rp 20.000'        }); break;
+        case 'dessert_1': await ctx.reply({ text: '🍰 Kamu pesan *Cheesecake*!\nHarga: Rp 55.000' }); break;
+        case 'dessert_2': await ctx.reply({ text: '🍫 Kamu pesan *Brownies*!\nHarga: Rp 35.000'   }); break;
 
         // ── Mixed interactive ─────────────────────────────────
-        case 'interactive': {
+        case 'interactive':
             await ctx.sendInteractive({
                 text: '🚀 Pilih aksi:',
                 footer: 'WhatsApp Bot',
@@ -98,24 +96,21 @@ const handler = async (ctx) => {
                 ]
             });
             break;
-        }
-        case 'qr_hello': { await ctx.reply({ text: '👋 Halo juga! Ada yang bisa saya bantu?' }); break; }
+        case 'qr_hello': await ctx.reply({ text: '👋 Halo juga! Ada yang bisa saya bantu?' }); break;
 
         // ── Media ─────────────────────────────────────────────
-        case 'media': {
+        case 'media':
             await ctx.reply({ image: { url: 'https://picsum.photos/400/300' }, caption: '🖼️ Gambar dari internet' });
             break;
-        }
 
-        case 'medialokal': {
+        case 'medialokal':
             const imagePath = path.join(__dirname, '../media/logo.png');
             if (!fs.existsSync(imagePath)) return ctx.reply({ text: '❌ File tidak ditemukan.\n\nBuat folder `assets/` dan taruh `logo.png`.' });
             await ctx.reply({ image: fs.readFileSync(imagePath), caption: '🖼️ Gambar lokal dari assets!' });
             break;
-        }
 
         // ── Button + gambar ───────────────────────────────────
-        case 'buttonimage': {
+        case 'buttonimage':
             const imgPath = path.join(__dirname, '../media/logo.png');
             if (!fs.existsSync(imgPath)) return ctx.reply({ text: '❌ File logo.png tidak ada di folder assets.' });
             const base64Image = fs.readFileSync(imgPath).toString('base64');
@@ -130,12 +125,11 @@ const handler = async (ctx) => {
                 ]
             });
             break;
-        }
-        case 'like':  { await ctx.react('❤️'); break; }
-        case 'share': { await ctx.reply({ text: '📤 Makasih udah mau share!' }); break; }
+        case 'like': await ctx.react('❤️'); break;
+        case 'share': await ctx.reply({ text: '📤 Makasih udah mau share!' }); break;
 
         // ── Button telepon ────────────────────────────────────
-        case 'buttoncall': {
+        case 'buttoncall':
             await ctx.sendInteractive({
                 text: '📞 Hubungi kami:',
                 footer: 'Customer Service',
@@ -146,11 +140,10 @@ const handler = async (ctx) => {
                 }]
             });
             break;
-        }
 
         // ── FITUR OTP MAPCLUB (SEMUA DALAM SATU CASE) ─────────
-        case 'otp': {
-            const TOKEN_FILE = path.join(__dirname, '../../database/token.json');
+        case 'otp':
+            const TOKEN_FILE = path.join(__dirname, '../database/token.json');
             
             // Fungsi2 helper di dalam case
             const loadToken = () => {
@@ -256,18 +249,8 @@ const handler = async (ctx) => {
                 }
             }
             break;
-        }
     }
 };
 
-handler.commands = [
-    'button', 'tester', 'btn_1', 'btn_2', 'btn_3',
-    'list', 'food_1', 'food_2', 'food_3', 'drink_1', 'drink_2', 'drink_3', 'dessert_1', 'dessert_2',
-    'interactive', 'qr_hello',
-    'media', 'medialokal',
-    'buttonimage', 'like', 'share',
-    'buttoncall',
-    'otp',
-];
 
 module.exports = handler;

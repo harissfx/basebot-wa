@@ -2,6 +2,20 @@
  * Utility Helper Functions
  */
 
+/** Format detik ke string human-readable (1 hari 2 jam 3 menit) */
+function formatUptime(seconds) {
+    const d = Math.floor(seconds / 86400);
+    const h = Math.floor((seconds % 86400) / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = Math.floor(seconds % 60);
+    const parts = [];
+    if (d > 0) parts.push(`${d} hari`);
+    if (h > 0) parts.push(`${h} jam`);
+    if (m > 0) parts.push(`${m} menit`);
+    if (s > 0 || parts.length === 0) parts.push(`${s} detik`);
+    return parts.join(' ');
+}
+
 /** Format nomor ke JID WhatsApp (support: 08xx, 628xx, atau tanpa prefix) */
 function formatJid(number) {
     let n = number.replace(/\D/g, '');
@@ -59,4 +73,4 @@ async function isGroupAdmin(sock, groupJid, userJid) {
 /** Ambil JID bot sendiri */
 function getBotJid(sock) { return sock.user?.id || ''; }
 
-module.exports = { formatJid, formatGroupJid, delay, formatBytes, randomString, isGroupJid, getGroupInfo, isGroupAdmin, getBotJid };
+module.exports = { formatUptime, formatJid, formatGroupJid, delay, formatBytes, randomString, isGroupJid, getGroupInfo, isGroupAdmin, getBotJid };

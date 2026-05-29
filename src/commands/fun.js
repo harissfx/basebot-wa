@@ -1,44 +1,37 @@
 const { delay } = require('../utils/helper');
 
-// ─────────────────────────────────────────────────────────────
-//  FUN COMMANDS
-// ─────────────────────────────────────────────────────────────
-
 const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
 const handler = async (ctx) => {
     const { command, sock, sender } = ctx;
+    let max, answers, jokes, fortunes;
 
     switch (command.name) {
 
-        case 'dice': {
+        case 'dice':
             await ctx.reply({ text: `🎲 Dadu: *${Math.floor(Math.random() * 6) + 1}*` });
             break;
-        }
 
-        case 'coin': {
+        case 'coin':
             await ctx.reply({ text: `🪙 Hasil: *${Math.random() < 0.5 ? 'Kepala' : 'Ekor'}*` });
             break;
-        }
 
-        case 'random': {
-            const max = parseInt(command.args[0]) || 100;
+        case 'random':
+            max = parseInt(command.args[0]) || 100;
             await ctx.reply({ text: `🔢 Random (1-${max}): *${Math.floor(Math.random() * max) + 1}*` });
             break;
-        }
 
-        case '8ball': {
-            const answers = [
+        case '8ball':
+            answers = [
                 'Ya, pasti! ✅', 'Tidak, jelas tidak ❌', 'Mungkin saja 🤔',
                 'Coba lagi nanti ⏳', 'Saya ragu-ragu 🤷', 'Sudah pasti! 💯',
                 'Tanda-tanda menunjukkan ya 👍', 'Tidak mungkin 🚫',
             ];
             await ctx.reply({ text: `🎱 *8-Ball:*\n\n${pick(answers)}` });
             break;
-        }
 
-        case 'joke': {
-            const jokes = [
+        case 'joke':
+            jokes = [
                 'Kenapa programmer suka kopi?\nKarena tanpa kopi, mereka tidak bisa *compile* pikiran! ☕',
                 'Apa bedanya bug dan fitur?\nDokumentasi! 📄',
                 'Kenapa JavaScript developer tidak bisa tidur?\nKarena mereka selalu *await* sesuatu! 😴',
@@ -46,10 +39,9 @@ const handler = async (ctx) => {
             ];
             await ctx.reply({ text: `😂 *Joke:*\n\n${pick(jokes)}` });
             break;
-        }
 
-        case 'fortune': {
-            const fortunes = [
+        case 'fortune':
+            fortunes = [
                 'Hari ini adalah hari keberuntunganmu! 🍀',
                 'Kesabaran adalah kunci kesuksesanmu. 🔑',
                 'Sebuah kejutan baik akan datang segera. 🎁',
@@ -58,19 +50,15 @@ const handler = async (ctx) => {
             ];
             await ctx.reply({ text: `🥠 *Fortune Cookie:*\n\n${pick(fortunes)}` });
             break;
-        }
 
-        case 'typing': {
+        case 'typing':
             await sock.sendPresenceUpdate('composing', sender);
             await delay(2000);
             await sock.sendPresenceUpdate('paused', sender);
             await ctx.reply({ text: '⌨️ Ini contoh typing indicator!' });
             break;
-        }
 
     }
 };
-
-handler.commands = ['dice', 'coin', 'random', '8ball', 'joke', 'fortune', 'typing'];
 
 module.exports = handler;

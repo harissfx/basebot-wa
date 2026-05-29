@@ -1,47 +1,35 @@
 const { isGroupAdmin, getGroupInfo } = require('../utils/helper');
 
-// ─────────────────────────────────────────────────────────────
-//  ADMIN / GROUP COMMANDS
-// ─────────────────────────────────────────────────────────────
-
 const handler = async (ctx) => {
     const { command, sock, sender, msg } = ctx;
-
-    // Hanya bisa dipakai di grup
+    let metadata, mentions, text, isAdmin, mentioned, number, subject, desc, code;
     if (!ctx.isGroup) {
         await ctx.reply({ text: '❌ Command ini hanya bisa digunakan di grup.' });
         return;
     }
-
-    // Helper: ambil JID yang di-mention
+    
     const getMentioned = () => msg.message?.extendedTextMessage?.contextInfo?.mentionedJid || [];
-
-    // Helper: JID pengirim (bukan group JID)
     const senderJid = msg.key.participant || msg.key.remoteJid;
 
     switch (command.name) {
 
-        case 'tagall': {
-            const metadata = await getGroupInfo(sock, sender);
+        case 'tagall':
+            metadata = await getGroupInfo(sock, sender);
             if (!metadata) return ctx.reply({ text: '❌ Gagal mendapatkan info grup.' });
-            const mentions = metadata.participants.map(p => p.id);
-            const text = `📢 *Tag All Members*\n\n` + metadata.participants.map((p, i) => `${i + 1}. @${p.id.split('@')[0]}`).join('\n');
+            mentions = metadata.participants.map(p => p.id);
+            text = `📢 *Tag All Members*\n\n` + metadata.participants.map((p, i) => `${i + 1}. @${p.id.split('@')[0]}`).join('\n');
             await sock.sendMessage(sender, { text, mentions });
             break;
-        }
-
-        case 'hidetag': {
-            const metadata = await getGroupInfo(sock, sender);
+        case 'hidetag':
+            metadata = await getGroupInfo(sock, sender);
             if (!metadata) return;
             await sock.sendMessage(sender, {
                 text: command.fullArgs || '👀',
                 mentions: metadata.participants.map(p => p.id)
             });
             break;
-        }
-
-        case 'groupinfo': {
-            const metadata = await getGroupInfo(sock, sender);
+        case 'groupinfo':
+            metadata = await getGroupInfo(sock, sender);
             if (!metadata) return ctx.reply({ text: '❌ Gagal mendapatkan info grup.' });
             await ctx.reply({ text: [
                 '╔═══ *Group Info* ═══╗',
@@ -54,12 +42,10 @@ const handler = async (ctx) => {
                 '╚════════════════════╝'
             ].join('\n') });
             break;
-        }
-
-        case 'kick': {
-            const isAdmin = await isGroupAdmin(sock, sender, senderJid);
+        case 'kick':
+            isAdmin = await isGroupAdmin(sock, sender, senderJid);
             if (!isAdmin) return ctx.reply({ text: '❌ Kamu bukan admin grup.' });
-            const mentioned = getMentioned();
+            mentioned = getMentioned();
             if (!mentioned.length) return ctx.reply({ text: '❌ Tag member yang ingin dikick.\nContoh: !kick @user' });
             try {
                 await sock.groupParticipantsUpdate(sender, mentioned, 'remove');
@@ -68,10 +54,8 @@ const handler = async (ctx) => {
                 await ctx.reply({ text: '❌ Gagal. Pastikan bot adalah admin.' });
             }
             break;
-        }
-
-        case 'add': {
-            const number = command.args[0];
+        case 'add':
+            number = command.args[0];
             if (!number) return ctx.reply({ text: '❌ Masukkan nomor.\nContoh: !add 6281234567890' });
             try {
                 await sock.groupParticipantsUpdate(sender, [number.replace(/\D/g, '') + '@s.whatsapp.net'], 'add');
@@ -80,10 +64,8 @@ const handler = async (ctx) => {
                 await ctx.reply({ text: '❌ Gagal. Pastikan nomor valid dan bot adalah admin.' });
             }
             break;
-        }
-
-        case 'promote': {
-            const mentioned = getMentioned();
+        case 'promote':
+            mentioned = getMentioned();
             if (!mentioned.length) return ctx.reply({ text: '❌ Tag member yang ingin dipromote.\nContoh: !promote @user' });
             try {
                 await sock.groupParticipantsUpdate(sender, mentioned, 'promote');
@@ -92,10 +74,8 @@ const handler = async (ctx) => {
                 await ctx.reply({ text: '❌ Gagal promote member.' });
             }
             break;
-        }
-
-        case 'demote': {
-            const mentioned = getMentioned();
+        case 'demote':
+            mentioned = getMentioned();
             if (!mentioned.length) return ctx.reply({ text: '❌ Tag admin yang ingin didemote.\nContoh: !demote @admin' });
             try {
                 await sock.groupParticipantsUpdate(sender, mentioned, 'demote');
@@ -104,10 +84,8 @@ const handler = async (ctx) => {
                 await ctx.reply({ text: '❌ Gagal demote admin.' });
             }
             break;
-        }
-
-        case 'setsubject': {
-            const subject = command.fullArgs;
+        case 'setsubject':
+            subject = command.fullArgs;
             if (!subject) return ctx.reply({ text: '❌ Masukkan nama grup baru.\nContoh: !setsubject Nama Grup Baru' });
             try {
                 await sock.groupUpdateSubject(sender, subject);
@@ -116,10 +94,8 @@ const handler = async (ctx) => {
                 await ctx.reply({ text: '❌ Gagal mengubah nama grup.' });
             }
             break;
-        }
-
-        case 'setdesc': {
-            const desc = command.fullArgs;
+        case 'setdesc':
+            desc = command.fullArgs;
             if (!desc) return ctx.reply({ text: '❌ Masukkan deskripsi baru.\nContoh: !setdesc Deskripsi grup' });
             try {
                 await sock.groupUpdateDescription(sender, desc);
@@ -128,9 +104,7 @@ const handler = async (ctx) => {
                 await ctx.reply({ text: '❌ Gagal mengubah deskripsi grup.' });
             }
             break;
-        }
-
-        case 'revoke': {
+        case 'revoke':
             try {
                 await sock.groupRevokeInvite(sender);
                 await ctx.reply({ text: '✅ Link invite grup berhasil direvoke.' });
@@ -138,21 +112,14 @@ const handler = async (ctx) => {
                 await ctx.reply({ text: '❌ Gagal revoke link invite.' });
             }
             break;
-        }
-
-        case 'link': {
+        case 'link':
             try {
-                const code = await sock.groupInviteCode(sender);
+                code = await sock.groupInviteCode(sender);
                 await ctx.reply({ text: `🔗 Link Invite Grup:\nhttps://chat.whatsapp.com/${code}` });
             } catch {
                 await ctx.reply({ text: '❌ Gagal mendapatkan link invite.' });
             }
             break;
-        }
-
     }
 };
-
-handler.commands = ['tagall', 'hidetag', 'groupinfo', 'kick', 'add', 'promote', 'demote', 'setsubject', 'setdesc', 'revoke', 'link'];
-
 module.exports = handler;

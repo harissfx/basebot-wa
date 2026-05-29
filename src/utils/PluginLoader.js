@@ -43,18 +43,32 @@ class PluginLoader {
             const mod = require(filePath);
             if (!mod) return;
 
+            // 1. Baca isi text file asli untuk scan kata "case '...':" secara otomatis
+            const fileContent = fs.readFileSync(filePath, 'utf8');
+            const caseRegex = /case\s+['"]([^'"]+)['"]\s*:/g;
+            const autoCommands = [];
+            let match;
+
+            while ((match = caseRegex.exec(fileContent)) !== null) {
+                // Hindari duplikasi jika ada nama case yang sama dalam satu file
+                if (!autoCommands.includes(match[1])) {
+                    autoCommands.push(match[1]);
+                }
+            }
+
+            // 2. Tentukan daftar command (prioritas hasil auto-scan, fallback ke manual array)
+            const cmds = autoCommands.length > 0 ? autoCommands : (mod.commands || []);
             const loaded = [];
 
-            // ── Format BARU: function + .commands array ──────────
-            if (typeof mod === 'function' && Array.isArray(mod.commands)) {
-                for (const name of mod.commands) {
-                    // Bungkus switch handler supaya ctx.command.name selalu tersedia
+            // 3. Daftarkan ke sistem berdasarkan tipe export filenya
+            if (typeof mod === 'function') {
+                // Jika file mengekspor fungsi langsung (Format Switch-Case Kamu)
+                for (const name of cmds) {
                     this.plugins[name] = (ctx) => mod(ctx);
                     loaded.push(name);
                 }
-
-            // ── Format LAMA: object of functions ─────────────────
             } else if (typeof mod === 'object') {
+                // Jika file berbentuk Object { ping: fungsi, menu: fungsi } (Format Lama)
                 for (const [name, fn] of Object.entries(mod)) {
                     if (typeof fn === 'function') {
                         this.plugins[name] = fn;
@@ -66,8 +80,9 @@ class PluginLoader {
                 return;
             }
 
+            // Simpan track file agar bisa di-unload/reload dengan bersih
             this.files[filePath] = loaded;
-            console.log(`✅ [Plugin] Loaded ${path.basename(filePath)} → [${loaded.join(', ')}]`);
+            console.log(`✅ [Plugin] Loaded ${path.basename(filePath)} → [${loaded.length} Commands Otomatis]`);
         } catch (err) {
             console.error(`❌ [Plugin] Gagal load ${path.basename(filePath)}:`, err.message);
         }
