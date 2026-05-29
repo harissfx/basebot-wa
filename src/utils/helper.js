@@ -1,6 +1,3 @@
-/**
- * Utility Helper Functions
- */
 
 /** Format detik ke string human-readable (1 hari 2 jam 3 menit) */
 function formatUptime(seconds) {

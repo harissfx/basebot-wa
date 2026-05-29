@@ -12,8 +12,6 @@ function buildInteractiveNodes(buttonType = 'mixed') {
     }];
 }
 
-// extra: object tambahan seperti { forwardingScore, isForwarded, mentionedJid }
-// semua field di extra akan di-merge ke contextInfo
 function buildContextInfo(quoted, extra = {}) {
     const base = {};
 
@@ -147,8 +145,6 @@ async function sendButtonWithImage(sock, jid, content) {
     }
 }
 
-// Foto + mixed interactive buttons (quick_reply, cta_url, cta_copy, cta_call, dll)
-// imageSource bisa Buffer (lokal) atau { url: '...' } (remote)
 async function sendInteractiveWithImage(sock, jid, content) {
     const { text, footer = '', buttons = [], imageSource, quoted, contextInfo: extra = {} } = content;
     const contextInfo = buildContextInfo(quoted, extra);

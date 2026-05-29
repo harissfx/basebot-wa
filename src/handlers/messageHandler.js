@@ -22,7 +22,6 @@ function extractMessageText(message) {
 function isGroup(jid)  { return jid.endsWith('@g.us'); }
 function isFromMe(msg) { return msg.key.fromMe; }
 
-// Exact match untuk hindari false positive
 function isOwner(sender) {
     const ownerNumber  = config.ownerNumber.replace(/\D/g, '');
     const senderNumber = sender.replace(/\D/g, '').replace(/@.+$/, '');

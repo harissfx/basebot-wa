@@ -3,16 +3,11 @@ const path = require('path');
 const axios = require('axios');
 const jwt = require('jsonwebtoken');
 
-// ─────────────────────────────────────────────────────────────
-//  INTERACTIVE COMMANDS
-//  Button, list, media, dan response handler klik button
-// ─────────────────────────────────────────────────────────────
-
 const handler = async (ctx) => {
     const { command } = ctx;
 
     switch (command.name) {
-        // ── Kirim button ──────────────────────────────────────
+
         case 'button':
             await ctx.sendButtons({
                 text: '🎛️ Silakan pilih salah satu:',
@@ -134,10 +129,9 @@ const handler = async (ctx) => {
                 text: '📞 Hubungi kami:',
                 footer: 'Customer Service',
                 quoted: ctx.msg,
-                buttons: [{
-                    name: 'cta_call',
-                    buttonParamsJson: JSON.stringify({ display_text: '📱 Telepon Sekarang', phone_number: '+6281234567890' })
-                }]
+                buttons: [{ name: 'cta_call', buttonParamsJson: JSON.stringify({ display_text: '📱 Telepon Sekarang', phone_number: '+6281234567890' })}
+
+                ]
             });
             break;
 

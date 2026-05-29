@@ -1,12 +1,6 @@
 const axios = require('axios');
 const config = require('../config');
 
-// ─────────────────────────────────────────────────────────────
-//  TOOLS COMMANDS
-//  Cuaca, quote, kurs, github, ipcheck, qrcode, translate, wiki, npm
-//  Semua no API key
-// ─────────────────────────────────────────────────────────────
-
 const handler = async (ctx) => {
     const { command } = ctx;
     let kota, geo, loc, data, response, username, ip, text, from, to, query, pkg, result, url, sections;
@@ -228,7 +222,6 @@ const handler = async (ctx) => {
             try {
                 const headers = { 'User-Agent': 'Mozilla/5.0 (compatible; WhatsAppBot/1.0; +https://github.com)' };
                 
-                // 1. Search dulu
                 const searchRes = await axios.get(
                     `https://id.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(query)}&srlimit=1&format=json&origin=*`,
                     { headers }
@@ -238,7 +231,6 @@ const handler = async (ctx) => {
                     return ctx.reply({ text: `❌ Tidak ada hasil untuk *${query}* di Wikipedia.` });
                 }
 
-                // 2. Ambil summary pakai title exact dari search
                 const exactTitle = searchResults[0].title;
                 response = await axios.get(
                     `https://id.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(exactTitle)}`,

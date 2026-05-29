@@ -1,4 +1,3 @@
-// Fake quoted message — pesan tampil seolah reply ke notifikasi Order WA
 const config = require('../config');
 const fakeOrder = {
 key: {

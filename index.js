@@ -18,7 +18,6 @@ function question(query) {
     return new Promise(resolve => rl.question(query, ans => { rl.close(); resolve(ans); }));
 }
 
-// PluginLoader diinit sekali di sini — chokidar akan auto-reload kalau ada file berubah
 plugins.init();
 
 let phoneNumber    = null;
@@ -53,8 +52,7 @@ async function startBot() {
     sock.ev.on('creds.update', saveCreds);
 
     sock.ev.on('messages.upsert', (m) => {
-        // messageHandler langsung pakai plugins yang sudah di-watch chokidar
-        // Tidak perlu clearCache / re-require setiap pesan
+
         require('./src/handlers/messageHandler')(sock, m);
     });
 
