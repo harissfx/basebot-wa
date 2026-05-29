@@ -1,22 +1,24 @@
 // Fake quoted message — pesan tampil seolah reply ke notifikasi Order WA
+const config = require('../config');
 const fakeOrder = {
-    key: {
-        remoteJid: '13135550002@s.whatsapp.net',
-        fromMe: false,
-        id: 'quoted-order',
-    },
-    message: {
-        orderMessage: {
-            orderId: '1234567890',
-            itemCount: 9999999999,
-            status: 1,
-            surface: 1,
-            message: '',
-            orderTitle: '',
-            sellerJid: '13135550002@s.whatsapp.net',
-            token: '',
-        }
-    }
+key: {
+participant: '0@s.whatsapp.net',
+},
+message: {
+requestPaymentMessage: 
+{
+currencyCodeIso4217: 'USD',
+amount1000: '1000000000',
+requestFrom: '6285731811079@s.whatsapp.net',
+noteMessage: {
+extendedTextMessage: {
+text: `*${config.botName}*`,
+}
+},
+expiryTimestamp: '0',
+amount: { value: '1000000000', offset: 1000, currencyCode: 'USD' }
+}
+}
 };
 
 module.exports = { fakeOrder };

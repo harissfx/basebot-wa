@@ -24,5 +24,5 @@ module.exports = {
     autoTyping: true,
 
     // Folder penyimpanan sesi login
-    authFolder: 'session',
+    authFolder: './src/database/session',
 };

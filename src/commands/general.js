@@ -1,10 +1,4 @@
-const config = require('../settings');
-
-// ─────────────────────────────────────────────────────────────
-//  GENERAL COMMANDS
-//  Tambah command baru: tulis case baru di switch, lalu
-//  tambahkan nama command-nya ke array .commands di bawah
-// ─────────────────────────────────────────────────────────────
+const config = require('../config');
 
 const handler = async (ctx) => {
     const { command, sock, sender } = ctx;
@@ -15,8 +9,8 @@ const handler = async (ctx) => {
             const fs   = require('fs');
             const path = require('path');
 
-            const imgPath = path.join(__dirname, '../../assets/logo.png');
-            if (!fs.existsSync(imgPath)) return ctx.reply({ text: '❌ File logo.png tidak ditemukan di folder assets.' });
+            const imgPath = path.join(__dirname, '../media/logo.png');
+            if (!fs.existsSync(imgPath)) return ctx.reply({ text: '❌ File logo.png tidak ditemukan di folder media.' });
             const imageSource = fs.readFileSync(imgPath);
 
             await ctx.sendInteractiveWithImage({

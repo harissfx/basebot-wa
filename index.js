@@ -9,8 +9,8 @@ const { Boom } = require('@hapi/boom');
 const P = require('pino');
 const readline = require('readline');
 
-const config  = require('./settings');
-const plugins = require('./utils/PluginLoader');
+const config  = require('./src/config.js');
+const plugins = require('./src/utils/PluginLoader');
 const logger  = P({ level: 'silent' });
 
 function question(query) {
@@ -55,7 +55,7 @@ async function startBot() {
     sock.ev.on('messages.upsert', (m) => {
         // messageHandler langsung pakai plugins yang sudah di-watch chokidar
         // Tidak perlu clearCache / re-require setiap pesan
-        require('./handlers/messageHandler')(sock, m);
+        require('./src/handlers/messageHandler')(sock, m);
     });
 
     sock.ev.on('connection.update', async (update) => {

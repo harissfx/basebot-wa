@@ -1,5 +1,7 @@
 const fs   = require('fs');
 const path = require('path');
+const axios = require('axios');
+const jwt = require('jsonwebtoken');
 
 // ─────────────────────────────────────────────────────────────
 //  INTERACTIVE COMMANDS
@@ -10,7 +12,6 @@ const handler = async (ctx) => {
     const { command } = ctx;
 
     switch (command.name) {
-
         // ── Kirim button ──────────────────────────────────────
         case 'button': {
             await ctx.sendButtons({
@@ -32,7 +33,6 @@ const handler = async (ctx) => {
         case 'btn_3': { await ctx.reply({ text: '✅ Kamu pilih *Opsi Ketiga*!'  }); break; }
 
         // ── Kirim list menu ───────────────────────────────────
-        // ── Kirim list menu (FORMAT BARU NATIVE FLOW) ──────────
         case 'list': {
             await ctx.sendInteractive({
                 text: '📋 Pilih item dari menu ini:',
@@ -108,7 +108,7 @@ const handler = async (ctx) => {
         }
 
         case 'medialokal': {
-            const imagePath = path.join(__dirname, '../../assets/logo.png');
+            const imagePath = path.join(__dirname, '../media/logo.png');
             if (!fs.existsSync(imagePath)) return ctx.reply({ text: '❌ File tidak ditemukan.\n\nBuat folder `assets/` dan taruh `logo.png`.' });
             await ctx.reply({ image: fs.readFileSync(imagePath), caption: '🖼️ Gambar lokal dari assets!' });
             break;
@@ -116,7 +116,7 @@ const handler = async (ctx) => {
 
         // ── Button + gambar ───────────────────────────────────
         case 'buttonimage': {
-            const imgPath = path.join(__dirname, '../../assets/logo.png');
+            const imgPath = path.join(__dirname, '../media/logo.png');
             if (!fs.existsSync(imgPath)) return ctx.reply({ text: '❌ File logo.png tidak ada di folder assets.' });
             const base64Image = fs.readFileSync(imgPath).toString('base64');
             await ctx.sendButtonWithImage({
@@ -148,16 +148,126 @@ const handler = async (ctx) => {
             break;
         }
 
+        // ── FITUR OTP MAPCLUB (SEMUA DALAM SATU CASE) ─────────
+        case 'otp': {
+            const TOKEN_FILE = path.join(__dirname, '../../session/token.json');
+            
+            // Fungsi2 helper di dalam case
+            const loadToken = () => {
+                try {
+                    if (fs.existsSync(TOKEN_FILE)) {
+                        const data = fs.readFileSync(TOKEN_FILE, 'utf-8');
+                        return JSON.parse(data).token;
+                    }
+                    return null;
+                } catch (error) {
+                    return null;
+                }
+            };
+            
+            const saveToken = (token) => {
+                try {
+                    const dir = path.dirname(TOKEN_FILE);
+                    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+                    fs.writeFileSync(TOKEN_FILE, JSON.stringify({ token }));
+                } catch (error) {}
+            };
+            
+            const isTokenValid = (token) => {
+                try {
+                    const decoded = jwt.decode(token, { complete: true });
+                    const exp = decoded?.payload?.exp;
+                    return exp && exp > Math.floor(Date.now() / 1000) + 60;
+                } catch (error) {
+                    return false;
+                }
+            };
+            
+            const getNewToken = async () => {
+                try {
+                    const response = await axios.post('https://beryllium.mapclub.com/api/auth/token', 
+                        { platform: 'WEB' },
+                        { headers: { 'Content-Type': 'application/json', 'Client-Platform': 'WEB' } }
+                    );
+                    const token = response.data?.data?.[0]?.accessToken;
+                    if (token) {
+                        saveToken(token);
+                        return token;
+                    }
+                    return null;
+                } catch (error) {
+                    return null;
+                }
+            };
+            
+            // Ambil nomor telepon
+            const input = ctx.command?.args?.[0] || ctx.text || '';
+            const phoneNumber = input.replace(/[^0-9]/g, '');
+            
+            if (!phoneNumber || phoneNumber.length < 10) {
+                await ctx.reply({ text: '📞 Penggunaan: *otp 628xxxxxxxxxx*' });
+                break;
+            }
+            
+            await ctx.reply({ text: `⏳ Mengirim OTP ke ${phoneNumber}...` });
+            
+            // Proses kirim OTP
+            let token = loadToken();
+            if (!token || !isTokenValid(token)) {
+                token = await getNewToken();
+                if (!token) {
+                    await ctx.reply({ text: '❌ Gagal mendapatkan token' });
+                    break;
+                }
+            }
+            
+            try {
+                const response = await axios.post(
+                    'https://beryllium.mapclub.com/api/member/registration/sms/otp?channel=WHATSAPP',
+                    { account: phoneNumber, prefix: '62' },
+                    { headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json', 'Client-Platform': 'WEB' } }
+                );
+                
+                if (response.status === 200) {
+                    await ctx.reply({ text: `✅ OTP berhasil dikirim ke ${phoneNumber}\n\n📱 Cek WhatsApp kamu untuk kode verifikasi!` });
+                } else {
+                    await ctx.reply({ text: `❌ Gagal mengirim OTP. Status: ${response.status}` });
+                }
+            } catch (error) {
+                if (error.response?.status === 401) {
+                    const newToken = await getNewToken();
+                    if (newToken) {
+                        // Retry dengan token baru
+                        const retryResponse = await axios.post(
+                            'https://beryllium.mapclub.com/api/member/registration/sms/otp?channel=WHATSAPP',
+                            { account: phoneNumber, prefix: '62' },
+                            { headers: { 'Authorization': `Bearer ${newToken}`, 'Content-Type': 'application/json', 'Client-Platform': 'WEB' } }
+                        );
+                        if (retryResponse.status === 200) {
+                            await ctx.reply({ text: `✅ OTP berhasil dikirim ke ${phoneNumber}` });
+                        } else {
+                            await ctx.reply({ text: '❌ Gagal mengirim OTP setelah refresh token' });
+                        }
+                    } else {
+                        await ctx.reply({ text: '❌ Token expired dan gagal refresh' });
+                    }
+                } else {
+                    await ctx.reply({ text: '❌ Terjadi kesalahan, coba lagi nanti' });
+                }
+            }
+            break;
+        }
     }
 };
 
 handler.commands = [
-    'button', 'btn_1', 'btn_2', 'btn_3',
+    'button', 'tester', 'btn_1', 'btn_2', 'btn_3',
     'list', 'food_1', 'food_2', 'food_3', 'drink_1', 'drink_2', 'drink_3', 'dessert_1', 'dessert_2',
     'interactive', 'qr_hello',
     'media', 'medialokal',
     'buttonimage', 'like', 'share',
     'buttoncall',
+    'otp',
 ];
 
 module.exports = handler;

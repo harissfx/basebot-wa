@@ -1,4 +1,4 @@
-const config  = require('../settings');
+const config  = require('../config');
 const plugins = require('../utils/PluginLoader');
 const { getContentType } = require('@whiskeysockets/baileys');
 const { sendButtons, sendListMessage, sendInteractiveMessage, sendButtonWithImage, sendInteractiveWithImage } = require('../utils/interactiveHelper');
