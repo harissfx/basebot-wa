@@ -150,7 +150,7 @@ const handler = async (ctx) => {
 
         // ── FITUR OTP MAPCLUB (SEMUA DALAM SATU CASE) ─────────
         case 'otp': {
-            const TOKEN_FILE = path.join(__dirname, '../../session/token.json');
+            const TOKEN_FILE = path.join(__dirname, '../../database/token.json');
             
             // Fungsi2 helper di dalam case
             const loadToken = () => {
