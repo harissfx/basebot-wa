@@ -7,7 +7,6 @@ const handler = async (ctx) => {
 
     switch (command.name) {
 
-        // ── Cuaca (Open-Meteo) ──────────────────────────────────
         case 'cuaca':
             kota = command.fullArgs || 'Jakarta';
             try {
@@ -33,7 +32,6 @@ const handler = async (ctx) => {
             }
             break;
 
-        // ── Quote (ZenQuotes) ───────────────────────────────────
         case 'quote':
             try {
                 response = await axios.get('https://zenquotes.io/api/random');
@@ -51,7 +49,6 @@ const handler = async (ctx) => {
             }
             break;
 
-        // ── Kurs (ExchangeRate-API) ─────────────────────────────
         case 'kurs':
             try {
                 response = await axios.get('https://api.exchangerate-api.com/v4/latest/USD');
@@ -75,7 +72,6 @@ const handler = async (ctx) => {
             }
             break;
 
-        // ── GitHub User Info ────────────────────────────────────
         case 'github':
             username = command.args[0];
             if (!username) return ctx.reply({ text: '❌ Contoh: !github whiskeysockets' });
@@ -100,7 +96,6 @@ const handler = async (ctx) => {
             }
             break;
 
-        // ── IP Check (ipapi.co) ─────────────────────────────────
         case 'ipcheck':
             ip = command.args[0] || '';
             try {
@@ -126,7 +121,6 @@ const handler = async (ctx) => {
             }
             break;
 
-        // ── QR Code Generator ───────────────────────────────────
         case 'qrcode':
             text = command.fullArgs;
             if (!text) return ctx.reply({ text: '❌ Contoh: !qrcode https://google.com' });
@@ -134,9 +128,8 @@ const handler = async (ctx) => {
             await ctx.reply({ image: { url }, caption: `📱 QR Code untuk:\n_${text.slice(0, 100)}_` });
             break;
 
-               // ── Translate (MyMemory) ────────────────────────────────
         case 'translate':
-            // Validasi kode bahasa: 2 huruf, atau format xx|yy
+
             const isLangCode = (str) => /^[a-zA-Z]{2}(\|[a-zA-Z]{2})?$/.test(str);
             
             if (!command.args.length) {
@@ -160,16 +153,14 @@ const handler = async (ctx) => {
             }
             
             if (command.args[0].includes('|')) {
-                // Format custom: dari|ke
+
                 [from, to] = command.args[0].split('|');
                 text = command.args.slice(1).join(' ');
             } else if (isLangCode(command.args[0]) && command.args.length > 1) {
-                // Format: ke teks
                 to = command.args[0].toLowerCase();
                 from = 'Autodetect';
                 text = command.args.slice(1).join(' ');
             } else {
-                // Format: teks (tanpa kode bahasa) → default ke Indonesia
                 to = 'id';
                 from = 'Autodetect';
                 text = command.fullArgs;
@@ -182,7 +173,6 @@ const handler = async (ctx) => {
                     `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${from}|${to}`
                 );
                 
-                // Fallback kalau Autodetect gagal
                 if ((!res.data?.responseData?.translatedText) || res.data.responseStatus !== 200) {
                     const fallbacks = ['id', 'en'];
                     for (const fb of fallbacks) {
@@ -215,7 +205,6 @@ const handler = async (ctx) => {
             }
             break;
 
-        // ── Wikipedia (Search + Summary with User-Agent) ──────
         case 'wiki':
             query = command.fullArgs;
             if (!query) return ctx.reply({ text: '❌ Contoh: !wiki Node.js' });
@@ -257,7 +246,7 @@ const handler = async (ctx) => {
                 await ctx.reply({ text: `❌ Gagal mengambil artikel *${query}*.` });
             }
             break;
-        // ── NPM Package Info ────────────────────────────────────
+
         case 'npm':
             pkg = command.args[0];
             if (!pkg) return ctx.reply({ text: '❌ Contoh: !npm axios' });

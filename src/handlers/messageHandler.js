@@ -1,8 +1,30 @@
 const config  = require('../config');
 const plugins = require('../utils/PluginLoader');
+const chalk   = require('chalk');
+const readline = require('readline');
 const { getContentType } = require('@whiskeysockets/baileys');
 const { sendButtons, sendListMessage, sendInteractiveMessage, sendButtonWithImage, sendInteractiveWithImage } = require('../utils/interactiveHelper');
 const { fakeOrder } = require('../utils/fquoted');
+
+// Cache LID owner yang di-resolve saat bot connect
+const ownerLidCache = new Set();
+
+// Dipanggil dari index.js setelah connection 'open'
+async function resolveOwnerLids(sock) {
+    const owners = [].concat(config.ownerNumber).map(n => n.replace(/\D/g, ''));
+    for (const nomor of owners) {
+        try {
+            const [result] = await sock.onWhatsApp(nomor);
+            if (result?.exists && result?.lid) {
+                const lidNum = result.lid.replace(/\D/g, '').replace(/@.+$/, '').split(':')[0];
+                ownerLidCache.add(lidNum);
+                console.log(chalk.cyan(`[OWNER-LID] ${nomor} -> ${lidNum}@lid`));
+            }
+        } catch (e) {
+            console.log(chalk.yellow(`[OWNER-LID] Gagal resolve ${nomor}: ${e.message}`));
+        }
+    }
+}
 
 function extractMessageText(message) {
     if (!message) return null;
@@ -22,10 +44,17 @@ function extractMessageText(message) {
 function isGroup(jid)  { return jid.endsWith('@g.us'); }
 function isFromMe(msg) { return msg.key.fromMe; }
 
-function isOwner(sender) {
-    const ownerNumber  = config.ownerNumber.replace(/\D/g, '');
-    const senderNumber = sender.replace(/\D/g, '').replace(/@.+$/, '');
-    return ownerNumber && ownerNumber === senderNumber;
+function isOwner(sender, msg) {
+    const owners = [].concat(config.ownerNumber).map(n => n.replace(/\D/g, ''));
+
+    const rawSender    = msg?.key?.participant || msg?.key?.remoteJid || sender || '';
+    const senderNumber = rawSender.replace(/\D/g, '').replace(/@.+$/, '').split(':')[0];
+
+    const matchNumber = owners.some(n => n === senderNumber);
+    const matchLid    = ownerLidCache.has(senderNumber);
+    const fromMe      = msg?.key?.fromMe || false;
+
+    return matchNumber || matchLid || fromMe;
 }
 
 function parseCommand(text) {
@@ -47,19 +76,30 @@ function parseCommand(text) {
     return null;
 }
 
-async function handleMessages(sock, m) {
+async function handleMessages(sock, m, isMain = true) {
     for (const msg of m.messages) {
         if (!msg.message) continue;
 
         const fromMe = isFromMe(msg);
         const sender = msg.key.remoteJid;
 
-        if (!fromMe && config.botMode === 'self' && !isOwner(sender)) continue;
+        const checkOwner = isOwner(sender, msg);
+
+        if (!fromMe && config.botMode === 'self' && !checkOwner) continue;
 
         const text = extractMessageText(msg.message);
         if (!text) continue;
 
-        console.log(`📩 ${sender}: ${text}`);
+        if (!fromMe) {
+            readline.clearLine(process.stdout, 0);
+            readline.cursorTo(process.stdout, 0);
+            
+            console.log(
+                chalk.blue(`[INBOUND] `) + 
+                chalk.cyan(sender) + 
+                chalk.white(`: ${text}`)
+            );
+        }
 
         if (config.autoRead)   await sock.readMessages([msg.key]);
         if (config.autoTyping && !isGroup(sender)) await sock.sendPresenceUpdate('composing', sender);
@@ -70,14 +110,24 @@ async function handleMessages(sock, m) {
             const handler = plugins.get(command.name);
 
             if (handler) {
-                console.log(`⚡ ${command.name}${command.args.length ? ' ' + command.args.join(' ') : ''}`);
+                const cmdArgs = command.args.length ? ' ' + command.args.join(' ') : '';
+                
+                readline.clearLine(process.stdout, 0);
+                readline.cursorTo(process.stdout, 0);
+
+                console.log(
+                    chalk.green(`[EXECUTE] `) + 
+                    chalk.yellow(`${command.name}${cmdArgs}`)
+                );
+
                 try {
                     await handler({
                         sock, msg, sender,
                         isGroup:                     isGroup(sender),
-                        isOwner:                     isOwner(sender),
+                        isOwner:                     checkOwner,
                         command, text,
                         fakeOrder,
+                        isMain,
                         reply:                       (content) => sock.sendMessage(sender, content, { quoted: msg }),
                         replyFake:                   (content) => sock.sendMessage(sender, content, { quoted: fakeOrder }),
                         send:                        (content) => sock.sendMessage(sender, content),
@@ -89,10 +139,26 @@ async function handleMessages(sock, m) {
                         react:               (emoji)   => sock.sendMessage(sender, { react: { text: emoji, key: msg.key } }),
                     });
                 } catch (err) {
-                    console.error(`❌ Error [${command.name}]:`, err.message);
+                    readline.clearLine(process.stdout, 0);
+                    readline.cursorTo(process.stdout, 0);
+
+                    console.error(
+                        chalk.red(`[RUN-ERROR] `) + 
+                        chalk.yellow(`[${command.name}]: `) + 
+                        chalk.red(err.message)
+                    );
                     await sock.sendMessage(sender, { text: '❌ Terjadi kesalahan saat menjalankan perintah.' });
                 }
             } else {
+                readline.clearLine(process.stdout, 0);
+                readline.cursorTo(process.stdout, 0);
+
+                console.log(
+                    chalk.magenta(`[NOT-FOUND] `) + 
+                    chalk.white(`Command `) + 
+                    chalk.yellow(`*${command.name}*`) + 
+                    chalk.white(` tidak terdaftar.`)
+                );
                 await sock.sendMessage(sender, { text: `❓ Command *${command.name}* tidak ditemukan.` });
             }
         }
@@ -102,3 +168,4 @@ async function handleMessages(sock, m) {
 }
 
 module.exports = handleMessages;
+module.exports.resolveOwnerLids = resolveOwnerLids;

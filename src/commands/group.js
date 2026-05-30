@@ -112,6 +112,7 @@ const handler = async (ctx) => {
                 await ctx.reply({ text: '❌ Gagal revoke link invite.' });
             }
             break;
+
         case 'link':
             try {
                 code = await sock.groupInviteCode(sender);

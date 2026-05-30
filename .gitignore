@@ -1,5 +1,6 @@
 node_modules/
 session/
+jadibot/
 .env
 *.log
 package-lock.json

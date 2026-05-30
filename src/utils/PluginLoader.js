@@ -1,26 +1,28 @@
 const path     = require('path');
 const fs       = require('fs');
 const chokidar = require('chokidar');
+const chalk    = require('chalk'); 
+const readline = require('readline');
 
 /**
  * PluginLoader — support DUA format export:
  *
  * Format LAMA (object of functions):
- *   module.exports = { ping: async (ctx) => {...}, menu: async (ctx) => {...} }
+ * module.exports = { ping: async (ctx) => {...}, menu: async (ctx) => {...} }
  *
  * Format BARU (switch case):
- *   module.exports = async (ctx) => {
- *       switch (ctx.command.name) {
- *           case 'ping': ...; break;
- *           case 'menu': ...; break;
- *       }
- *   }
- *   module.exports.commands = ['ping', 'menu']  // daftar command yang di-handle
+ * module.exports = async (ctx) => {
+ * switch (ctx.command.name) {
+ * case 'ping': ...; break;
+ * case 'menu': ...; break;
+ * }
+ * }
+ * module.exports.commands = ['ping', 'menu']  
  */
 class PluginLoader {
     constructor() {
-        this.plugins = {};   // { 'nama-command': handlerFn }
-        this.files   = {};   // { '/abs/path/file.js': ['cmd1', 'cmd2'] }
+        this.plugins = {};
+        this.files   = {};
         this.folder  = path.join(__dirname, '..', 'commands');
     }
 
@@ -49,7 +51,6 @@ class PluginLoader {
             let match;
 
             while ((match = caseRegex.exec(fileContent)) !== null) {
-
                 if (!autoCommands.includes(match[1])) {
                     autoCommands.push(match[1]);
                 }
@@ -71,14 +72,22 @@ class PluginLoader {
                     }
                 }
             } else {
-                console.warn(`⚠️  [PluginLoader] Format tidak dikenal: ${path.basename(filePath)}`);
+                console.warn(chalk.yellow(`[WARN] Format tidak dikenal pada file: ${path.basename(filePath)}`));
                 return;
             }
 
             this.files[filePath] = loaded;
-            console.log(`✅ [Plugin] Loaded ${path.basename(filePath)} → [${loaded.length} Commands Otomatis]`);
+            console.log(
+                chalk.green(`[SUCCESS] Loaded `) + 
+                chalk.cyan(path.basename(filePath)) + 
+                chalk.green(` -> [${loaded.length} Commands Otomatis]`)
+            );
         } catch (err) {
-            console.error(`❌ [Plugin] Gagal load ${path.basename(filePath)}:`, err.message);
+            console.error(
+                chalk.red(`[ERROR] Gagal memuat file `) + 
+                chalk.cyan(path.basename(filePath)) + 
+                chalk.red(`: ${err.message}`)
+            );
         }
     }
 
@@ -87,7 +96,11 @@ class PluginLoader {
             const removed = this.files[filePath];
             removed.forEach(cmd => delete this.plugins[cmd]);
             delete this.files[filePath];
-            console.log(`🗑️  [Plugin] Unloaded ${path.basename(filePath)} → [${removed.join(', ')}]`);
+            console.log(
+                chalk.gray(`[-] Unloaded `) + 
+                chalk.cyan(path.basename(filePath)) + 
+                chalk.gray(` -> [${removed.join(', ')}]`)
+            );
         }
     }
 
@@ -95,8 +108,8 @@ class PluginLoader {
         const files = this._scanFiles();
         for (const f of files) this._loadFile(f);
 
-        console.log(`👀 [PluginLoader] Watching: ${this.folder}`);
-        console.log(`📦 [PluginLoader] Total command aktif: ${Object.keys(this.plugins).length}`);
+        console.log(chalk.blue(`[WATCHER] Monitoring folder: ${this.folder}`));
+        console.log(chalk.blue(`[LOADER] Total command aktif: ${Object.keys(this.plugins).length} fitur`));
 
         const watcher = chokidar.watch(this.folder, {
             persistent: true,
@@ -104,18 +117,22 @@ class PluginLoader {
             awaitWriteFinish: { stabilityThreshold: 300, pollInterval: 100 }
         });
 
-        watcher
-            .on('change', (filePath) => {
-                if (!filePath.endsWith('.js')) return;
-                console.log(`\n🔄 [Plugin] File berubah: ${path.basename(filePath)}`);
-                this._loadFile(filePath);
-            })
+watcher
+    .on('change', (filePath) => {
+        if (!filePath.endsWith('.js')) return;
+        
+        readline.clearLine(process.stdout, 0);
+        readline.cursorTo(process.stdout, 0);
+
+        console.log(chalk.red(`\n[UPDATE]`) + chalk.yellow(` File berubah: `) + chalk.cyan(path.basename(filePath)));
+        this._loadFile(filePath);
+    })
             .on('add', (filePath) => {
                 if (!filePath.endsWith('.js')) return;
-                console.log(`\n➕ [Plugin] File baru: ${path.basename(filePath)}`);
+                console.log(chalk.green(`\n[+] File baru terdeteksi: `) + chalk.cyan(path.basename(filePath)));
                 this._loadFile(filePath);
-            })
-            .on('unlink', (filePath) => {
+            }) 
+            .on('unlink', (filePath) => { 
                 if (!filePath.endsWith('.js')) return;
                 this._unloadFile(filePath);
             });

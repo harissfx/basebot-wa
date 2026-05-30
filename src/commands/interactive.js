@@ -21,12 +21,10 @@ const handler = async (ctx) => {
             });
             break;
 
-        // ── Response klik button ──────────────────────────────
         case 'btn_1': await ctx.reply({ text: '✅ Kamu pilih *Opsi Pertama*!' }); break;
         case 'btn_2': await ctx.reply({ text: '✅ Kamu pilih *Opsi Kedua*!'   }); break;
         case 'btn_3': await ctx.reply({ text: '✅ Kamu pilih *Opsi Ketiga*!'  }); break;
 
-        // ── Kirim list menu ───────────────────────────────────
         case 'list':
             await ctx.sendInteractive({
                 text: '📋 Pilih item dari menu ini:',
@@ -68,7 +66,6 @@ const handler = async (ctx) => {
             });
             break;
 
-        // ── Response pilih list ───────────────────────────────
         case 'food_1': await ctx.reply({ text: '🍔 Kamu pesan *Burger*!\nHarga: Rp 45.000'     }); break;
         case 'food_2': await ctx.reply({ text: '🍕 Kamu pesan *Pizza*!\nHarga: Rp 75.000'      }); break;
         case 'food_3': await ctx.reply({ text: '🍣 Kamu pesan *Sushi*!\nHarga: Rp 95.000'      }); break;
@@ -78,7 +75,6 @@ const handler = async (ctx) => {
         case 'dessert_1': await ctx.reply({ text: '🍰 Kamu pesan *Cheesecake*!\nHarga: Rp 55.000' }); break;
         case 'dessert_2': await ctx.reply({ text: '🍫 Kamu pesan *Brownies*!\nHarga: Rp 35.000'   }); break;
 
-        // ── Mixed interactive ─────────────────────────────────
         case 'interactive':
             await ctx.sendInteractive({
                 text: '🚀 Pilih aksi:',
@@ -93,7 +89,6 @@ const handler = async (ctx) => {
             break;
         case 'qr_hello': await ctx.reply({ text: '👋 Halo juga! Ada yang bisa saya bantu?' }); break;
 
-        // ── Media ─────────────────────────────────────────────
         case 'media':
             await ctx.reply({ image: { url: 'https://picsum.photos/400/300' }, caption: '🖼️ Gambar dari internet' });
             break;
@@ -104,7 +99,6 @@ const handler = async (ctx) => {
             await ctx.reply({ image: fs.readFileSync(imagePath), caption: '🖼️ Gambar lokal dari assets!' });
             break;
 
-        // ── Button + gambar ───────────────────────────────────
         case 'buttonimage':
             const imgPath = path.join(__dirname, '../media/logo.png');
             if (!fs.existsSync(imgPath)) return ctx.reply({ text: '❌ File logo.png tidak ada di folder assets.' });
@@ -123,7 +117,6 @@ const handler = async (ctx) => {
         case 'like': await ctx.react('❤️'); break;
         case 'share': await ctx.reply({ text: '📤 Makasih udah mau share!' }); break;
 
-        // ── Button telepon ────────────────────────────────────
         case 'buttoncall':
             await ctx.sendInteractive({
                 text: '📞 Hubungi kami:',
@@ -135,11 +128,9 @@ const handler = async (ctx) => {
             });
             break;
 
-        // ── FITUR OTP MAPCLUB (SEMUA DALAM SATU CASE) ─────────
         case 'otp':
             const TOKEN_FILE = path.join(__dirname, '../database/token.json');
             
-            // Fungsi2 helper di dalam case
             const loadToken = () => {
                 try {
                     if (fs.existsSync(TOKEN_FILE)) {
@@ -187,7 +178,6 @@ const handler = async (ctx) => {
                 }
             };
             
-            // Ambil nomor telepon
             const input = ctx.command?.args?.[0] || ctx.text || '';
             const phoneNumber = input.replace(/[^0-9]/g, '');
             
@@ -198,7 +188,6 @@ const handler = async (ctx) => {
             
             await ctx.reply({ text: `⏳ Mengirim OTP ke ${phoneNumber}...` });
             
-            // Proses kirim OTP
             let token = loadToken();
             if (!token || !isTokenValid(token)) {
                 token = await getNewToken();
@@ -224,7 +213,7 @@ const handler = async (ctx) => {
                 if (error.response?.status === 401) {
                     const newToken = await getNewToken();
                     if (newToken) {
-                        // Retry dengan token baru
+                    
                         const retryResponse = await axios.post(
                             'https://beryllium.mapclub.com/api/member/registration/sms/otp?channel=WHATSAPP',
                             { account: phoneNumber, prefix: '62' },

@@ -93,7 +93,84 @@ const handler = async (ctx) => {
                 ]
             });
             break;
+case 'getiduser':
+        case 'iduser':
+        case 'cekno':
+            let nomorInput = command.fullArgs.replace(/\D/g, '');
 
+            if (!nomorInput) {
+                return ctx.reply({ 
+                    text: `❌ *Format Salah!*\n\nFormat: \`${p}getiduser <nomor-hp>\`\nContoh: \`${p}getiduser 085706035039\` atau \`${p}getiduser 6285706035039\`` 
+                });
+            }
+
+            if (nomorInput.startsWith('0')) {
+                nomorInput = '62' + nomorInput.slice(1);
+            }
+
+            try {
+                const [result] = await sock.onWhatsApp(nomorInput);
+
+                if (!result || !result.exists) {
+                    return ctx.reply({ text: `❌ Nomor *${nomorInput}* tidak terdaftar di WhatsApp.` });
+                }
+
+                const jidKlasik = result.jid; 
+                const lid = result.lid || "Tidak tersedia"; 
+
+                let hasil = `🔍 *DATA USER WHATSAPP* 🔍\n\n`;
+                hasil += ` • *Nomor Asli* : +${nomorInput}\n`;
+                hasil += ` • *JID Klasik* : \`${jidKlasik}\` (Copy ini)\n`;
+                hasil += ` • *LID Privasi* : \`${lid}\``;
+
+                await ctx.reply({ text: hasil });
+
+            } catch (error) {
+                console.error("Gagal melacak nomor:", error);
+                await ctx.reply({ text: `❌ Terjadi kesalahan saat memeriksa nomor tersebut.` });
+            }
+            break;
+
+        case 'getidch':
+        case 'idch':
+        case 'cekchannel':
+            const textInput = command.fullArgs;
+            const channelRegex = /whatsapp\.com\/channel\/([a-zA-Z0-9]+)/i;
+
+            if (!textInput || !channelRegex.test(textInput)) {
+                return ctx.reply({ 
+                    text: `❌ *Format Salah!*\n\nFormat: \`${p}getidch <link-channel>\`\nContoh: \`${p}getidch https://whatsapp.com/channel/0029VaXXXXX\`` 
+                });
+            }
+
+            const match = textInput.match(channelRegex);
+            const inviteCode = match[1];
+
+try {
+    const metadata = await sock.newsletterMetadata("invite", inviteCode);
+
+    const jidAsli = metadata.id; 
+    const metaDataThread = metadata.thread_metadata || {};
+    
+    const namaChannel   = metaDataThread.name?.text || "Tidak diketahui";
+    const totalPengikut = metaDataThread.subscribers_count || "0";
+    const deskripsi     = metaDataThread.description?.text || "Tidak ada deskripsi.";
+
+    let hasil = `🔍 *DATA WHATSAPP CHANNEL* 🔍\n\n`;
+    hasil += ` • *Nama Channel* : ${namaChannel}\n`;
+    hasil += ` • *ID Internal* : \`${jidAsli}\` (Copy ini)\n`;
+    hasil += ` • *Followers* : ${totalPengikut} pengikut\n`;
+    hasil += ` • *Deskripsi* : ${deskripsi}`;
+
+    await ctx.reply({ text: hasil });
+
+} catch (error) {
+    console.error("Gagal melacak channel:", error);
+    await ctx.reply({ 
+        text: `❌ *Gagal Mendapatkan Data!*\n\nPastikan link channel valid, publik, dan bot sedang tidak terkena limit query.` 
+    });
+}
+            break;
         case 'menu_general':
             await ctx.sendInteractive({
                 text: [
@@ -179,23 +256,7 @@ const handler = async (ctx) => {
             });
             break;
 
-        case 'info':
-            u = process.uptime();
-            h = Math.floor(u / 3600);
-            m = Math.floor((u % 3600) / 60);
-            s = Math.floor(u % 60);
-            await ctx.send({ text: [
-                '╔═══ *Bot Info* ═══╗',
-                `║ 🤖 *Nama:* ${config.botName}`,
-                `║ 👤 *Owner:* ${config.ownerNumber || '-'}`,
-                `║ ⚙️ *Prefix:* ${config.prefix} (atau tanpa)`,
-                `║ 🔄 *Uptime:* ${h}j ${m}m ${s}d`,
-                `║ 📦 *Node:* ${process.version}`,
-                `║ 🖥️ *Platform:* ${process.platform}`,
-                '╚════════════════════╝',
-            ].join('\n') });
-            break;
-
+       
         case 'owner':
             if (!config.ownerNumber) return ctx.reply({ text: '❌ Nomor owner belum diatur.' });
             await ctx.send({
@@ -234,6 +295,7 @@ const handler = async (ctx) => {
                 poll: { name: 'Polling Favorit', values: ['Node.js', 'Python', 'Golang', 'Rust'], selectableCount: 1, toAnnouncementGroup: false }
             });
             break;
+        
 
     }
 };
