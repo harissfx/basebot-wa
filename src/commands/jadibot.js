@@ -7,7 +7,6 @@ const handler = async (ctx) => {
 
     if (!isOwner) return ctx.reply({ text: '❌ Perintah ini khusus untuk Owner Bot!' });
 
-    // Semua fitur jadibot hanya bisa dijalankan dari bot UTAMA, bukan clone bot
     if (!isMain) {
         return ctx.reply({ text: '❌ Fitur ini hanya bisa digunakan melalui *Bot Utama*, bukan dari clone bot!' });
     }
@@ -25,7 +24,6 @@ const handler = async (ctx) => {
                 nomorTarget = '62' + nomorTarget.slice(1);
             }
 
-            // === CEK APAKAH NOMOR TERDAFTAR DI WHATSAPP ===
             await ctx.reply({ text: `🔍 Memeriksa nomor +${nomorTarget} di WhatsApp...` });
 
             try {
@@ -42,11 +40,9 @@ const handler = async (ctx) => {
             try {
                 const pairingCode = await global.createNewBotInstance(nomorTarget);
 
-                // Tentukan JID owner (pengirim perintah) dan JID target
                 const ownerJid  = sender;
                 const targetJid = `${nomorTarget}@s.whatsapp.net`;
 
-                // === KIRIM KE NOMOR TARGET ===
                 try {
                     await sendInteractiveMessage(sock, targetJid, {
                         text:
@@ -70,7 +66,6 @@ const handler = async (ctx) => {
                     console.error('[JADIBOT] Gagal kirim pesan ke nomor target:', sendErr.message);
                 }
 
-                // === KIRIM KE OWNER ===
                 await ctx.sendInteractive({
                     text:
                         `✅ *BERHASIL GENERATE CLONE BOT*\n\n` +
