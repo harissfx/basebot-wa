@@ -6,10 +6,8 @@ const { getContentType } = require('@whiskeysockets/baileys');
 const { sendButtons, sendListMessage, sendInteractiveMessage, sendButtonWithImage, sendInteractiveWithImage } = require('../utils/interactiveHelper');
 const { fakeOrder } = require('../utils/fquoted');
 
-// Cache LID owner yang di-resolve saat bot connect
 const ownerLidCache = new Set();
 
-// Dipanggil dari index.js setelah connection 'open'
 async function resolveOwnerLids(sock) {
     const owners = [].concat(config.ownerNumber).map(n => n.replace(/\D/g, ''));
     for (const nomor of owners) {

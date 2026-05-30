@@ -18,7 +18,7 @@ const Spinnies = require('spinnies');
 const config  = require('./src/config.js');
 const plugins = require('./src/utils/PluginLoader');
 const logger  = P({ level: 'silent' });
-// Suppress Closing session log dari libsignal (muncul saat jadibot aktif)
+
 const _origConsoleLog = console.log;
 console.log = function(...args) {
     const str = args[0];
@@ -160,7 +160,7 @@ async function startBot(authFolder = config.authFolder, isMain = true, customPho
                 spinnies.add("waiting", { text: "Menunggu Pesan..." });
 
                 autoLoadJadibot();
-                // Auto-resolve ownerNumber ke LID supaya owner dikenali via linked device
+
                 messageHandler.resolveOwnerLids(sock).catch(() => {});
             } else {
                 console.log(chalk.green(`\n[JADIBOT] Clone Bot +${instanceKey} Berhasil Terhubung!`));
