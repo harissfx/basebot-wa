@@ -203,12 +203,16 @@ async function startBot(authFolder = config.authFolder, isMain = true, customPho
                 try {
                     await delay(3000);
                     const code = await sock.requestPairingCode(customPhone);
-                    if (pairingRequests[customPhone]) {
-                        pairingRequests[customPhone](code);
+                    if (pairingRequests[customPhone]?.resolve) {
+                        const cb = pairingRequests[customPhone];
+                        delete pairingRequests[customPhone];
+                        cb.resolve(code);
                     }
                 } catch (err) {
-                    if (pairingRequests[customPhone]) {
-                        pairingRequests[customPhone](Reflect.reject(err));
+                    if (pairingRequests[customPhone]?.reject) {
+                        const cb = pairingRequests[customPhone];
+                        delete pairingRequests[customPhone];
+                        cb.reject(err);
                     }
                 }
             }, 1000);
@@ -235,10 +239,7 @@ global.createNewBotInstance = async (targetPhone) => {
 
     return new Promise((resolve, reject) => {
 
-        pairingRequests[targetPhone] = (code) => {
-            delete pairingRequests[targetPhone];
-            resolve(code);
-        };
+        pairingRequests[targetPhone] = { resolve, reject };
 
         startBot(sessionPath, false, targetPhone).catch(err => {
             delete pairingRequests[targetPhone];

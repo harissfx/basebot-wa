@@ -1,8 +1,9 @@
 const config = require('../config');
+const { sendInteractiveMessage } = require('../utils/interactiveHelper');
 
 const handler = async (ctx) => {
 
-    const { command, isOwner, isMain } = ctx;
+    const { command, isOwner, isMain, sock, sender } = ctx;
 
     if (!isOwner) return ctx.reply({ text: '❌ Perintah ini khusus untuk Owner Bot!' });
 
@@ -24,13 +25,59 @@ const handler = async (ctx) => {
                 nomorTarget = '62' + nomorTarget.slice(1);
             }
 
+            // === CEK APAKAH NOMOR TERDAFTAR DI WHATSAPP ===
+            await ctx.reply({ text: `🔍 Memeriksa nomor +${nomorTarget} di WhatsApp...` });
+
+            try {
+                const [checkResult] = await sock.onWhatsApp(`${nomorTarget}@s.whatsapp.net`);
+                if (!checkResult?.exists) {
+                    return ctx.reply({ text: `❌ *Nomor +${nomorTarget} tidak terdaftar di WhatsApp!*\n\nPastikan nomor sudah benar dan aktif di WhatsApp.` });
+                }
+            } catch (err) {
+                return ctx.reply({ text: `❌ Gagal memeriksa nomor: ${err.message}` });
+            }
+
             await ctx.reply({ text: `⏳ Sedang menginisialisasi sesi baru dan meminta Pairing Code untuk +${nomorTarget}...` });
 
             try {
                 const pairingCode = await global.createNewBotInstance(nomorTarget);
 
+                // Tentukan JID owner (pengirim perintah) dan JID target
+                const ownerJid  = sender;
+                const targetJid = `${nomorTarget}@s.whatsapp.net`;
+
+                // === KIRIM KE NOMOR TARGET ===
+                try {
+                    await sendInteractiveMessage(sock, targetJid, {
+                        text:
+                            `🤖 *Halo! Kamu sedang didaftarkan sebagai Clone Bot.*\n\n` +
+                            `• *Pairing Code* : *${pairingCode}*\n\n` +
+                            `👉 Buka WhatsApp kamu → *Linked Devices* → *Link with phone number*\n` +
+                            `Lalu masukkan kode di atas.\n\n` +
+                            `⚠️ Kode ini hanya berlaku beberapa menit!`,
+                        footer: `${config.botName}`,
+                        buttons: [
+                            {
+                                name: 'cta_copy',
+                                buttonParamsJson: JSON.stringify({
+                                    display_text: '📋 Copy Kode Pairing',
+                                    copy_code: pairingCode
+                                })
+                            }
+                        ]
+                    });
+                } catch (sendErr) {
+                    console.error('[JADIBOT] Gagal kirim pesan ke nomor target:', sendErr.message);
+                }
+
+                // === KIRIM KE OWNER ===
                 await ctx.sendInteractive({
-                    text: `✅ *BERHASIL GENERATE CLONE BOT*\n\n• *Nomor Bot* : +${nomorTarget}\n• *Pairing Code* : *${pairingCode}*\n\n👉 Silakan klik tombol di bawah untuk menyalin kode pairing, lalu masukkan pada menu *Linked Devices -> Link with phone number* pada WhatsApp nomor tersebut.`,
+                    text:
+                        `✅ *BERHASIL GENERATE CLONE BOT*\n\n` +
+                        `• *Nomor Bot* : +${nomorTarget}\n` +
+                        `• *Pairing Code* : *${pairingCode}*\n\n` +
+                        `📨 Pairing code sudah dikirim langsung ke nomor *+${nomorTarget}*.\n\n` +
+                        `👉 Atau klik tombol di bawah untuk menyalin kode, lalu masukkan pada menu *Linked Devices → Link with phone number*.`,
                     footer: `${config.botName}`,
                     quoted: ctx.msg,
                     buttons: [
@@ -45,7 +92,7 @@ const handler = async (ctx) => {
                 });
 
             } catch (error) {
-                console.error("Gagal kloning bot:", error);
+                console.error('Gagal kloning bot:', error);
                 await ctx.reply({ text: `❌ Gagal membuat clone bot: ${error.message}` });
             }
             break;
