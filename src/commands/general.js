@@ -42,7 +42,7 @@ const handler = async (ctx) => {
 │›⟩ ∘ 𝘓𝘢𝘯𝘨𝘶𝘢𝘨𝘦: 𝘑𝘢𝘷𝘢𝘚𝘤𝘳𝘪𝘱𝘵
 │›⟩ ∘ 𝘚𝘤𝘳𝘪𝘱𝘵?: 𝘎𝘬 𝘥𝘪 𝘫𝘶𝘢𝘭 ( ͡° ͜ʖ ͡°)
 ├───────────────
-│✑ 𝖢𝗈𝗉𝗒𝗋𝗂𝗀𝗁𝗍 𝖧𝖺𝗇𝗓 𝖮𝖿𝖼
+│✑ 𝖢𝗈𝗉𝗒𝗋𝗂𝗀𝗁𝗍 Haris Syc
 └━━━━━━━━━━━━━━━┈ ❋ཻུ۪۪⸙`
             await ctx.sendInteractiveWithImage({
                 imageSource,
