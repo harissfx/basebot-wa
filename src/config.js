@@ -9,7 +9,7 @@ module.exports = {
     ownerName: 'Haris s',
 
     // Nama bot
-    botName: 'WhatsApp Bot Ringan',
+    botName: 'WhatsApp Bot',
 
     footerTxt: 'Powered by ẉHarisSyc.com',
     
