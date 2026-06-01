@@ -251,7 +251,7 @@ try {
             start = Date.now();
             sent  = await ctx.reply({ text: '🏓 Pong!' });
             await sock.sendMessage(sender, {
-                text: `🏓 *Pong!*\n\n⏱️ Latency: *${Date.now() - start}ms*`,
+                text: `🏓 *aktif!*\n\n⏱️ Latency: *${Date.now() - start}ms*`,
                 edit: sent.key
             });
             break;

@@ -8,15 +8,7 @@ const handler = async (ctx) => {
 
     switch (command.name) {
 
-        case 'ping': {
-            const start = Date.now();
-            const sent = await ctx.reply({ text: '🏓 Pong!' });
-            await sock.sendMessage(sender, {
-                text: `🏓 *Pong!*\n\n⏱️ Latency: *${Date.now() - start}ms*`,
-                edit: sent.key
-            });
-            break;
-        }
+      
 
         case 'info': {
             const u = process.uptime();
