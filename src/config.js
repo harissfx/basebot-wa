@@ -17,7 +17,7 @@ module.exports = {
     prefix: '!',
 
     // Nomor owner (format: 628xxxxxxxxxx, tanpa + atau spasi)
-    ownerNumber: '6287855060868',
+    ownerNumber: ['6287855060868', '6281234567890'],
     
     // Mode bot: 'public' → semua orang | 'self' → hanya owner
     botMode: 'public',
