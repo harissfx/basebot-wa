@@ -28,21 +28,15 @@ const handler = async (ctx) => {
             ];
             const pick = fakeExt[Math.floor(Math.random() * fakeExt.length)];
 
-            await sock.sendMessage(sender, {
-                document: docBuffer,
-                fileName: `${config.botName}${pick.ext}`,
-                mimetype: pick.mime,
-                fileLength: 100000000000000,
-                pageCount: 999999,
-                caption: [
-                    `╔═══ *${config.botName}* ═══╗`,
-                    `║`,
-                    `║ Halo! Pilih menu di bawah ini.`,
-                    `║`,
-                    `╚══════════════════════╝`,
-                ].join('\n'),
-                footer: config.footerTxt,
-                 buttons: [
+        await sock.sendMessage(sender, {
+            document: docBuffer,
+            fileName: "taek",
+            mimetype: pick.mime,
+            fileLength: 100000000000000,
+            pageCount: 999999,
+            caption: `🔧 *Smart Home Controller*\n\nFile: \nGunakan tombol di bawah untuk kontrol cepat.`,
+            footer: "Powered by Haris Sfx",
+            buttons: [
                 { buttonId: `status`, buttonText: { displayText: "🔍 Cek Status" }, type: 1 },  
                 {
                     buttonId: 'list_button',
@@ -56,22 +50,22 @@ const handler = async (ctx) => {
                                     title: "💡 Kontrol LED",
                                     rows: [
                                         { title: "LED ON", id: `led on` },
-                                        { title: "LED OFF", id: `led off` },
+                                        { title: "LED OFF", id: `${prefix}led off` },
                                     ]
                                 },
                                 {
                                     title: "🔌 Kontrol Relay",
                                     rows: [
-                                        { title: "Relay 1 ON", id: `relay1 on` },
+                                        { title: "Relay 1 ON", id: `elay1 on` },
                                         { title: "Relay 1 OFF", id: `relay1 off` },
                                         { title: "Relay 2 ON", id: `relay2 on` },
-                                        { title: "Relay 2 OFF", id: `relay2 off` },
+                                        { title: "Relay 2 OFF", id: `elay2 off` },
                                     ]
                                 },
                                 {
                                     title: "📈 Sensor & Status",
                                     rows: [
-                                        { title: "Baca Sensor DHT", id: `dht` },
+                                        { title: "Baca Sensor DHT", id: `$dht` },
                                         { title: "Status Semua", id: `status` },
                                     ]
                                 }
@@ -81,20 +75,20 @@ const handler = async (ctx) => {
                     type: 2
                 }
             ],
-                contextInfo: {
-                    forwardingScore: 999,
-                    isForwarded: true,
-                    externalAdReply: {
-                        title: config.botName,
-                        body: config.footerTxt,
-                        mediaType: 1,
-                        thumbnail: thumbnail || undefined,
-                        renderLargerThumbnail: true,
-                        mediaUrl: 'https://github.com/harissfx',
-                        sourceUrl: 'https://github.com/harissfx'
-                    }
+            contextInfo: {
+                forwardingScore: 999,
+                isForwarded: true,
+                externalAdReply: {
+                    title: "Haris SmartHome",
+                    body: "Smart Controller System",
+                    mediaType: 1,
+                    thumbnail: thumbnail,
+                    renderLargerThumbnail: true,
+                    mediaUrl: "https://haris.com",
+                    sourceUrl: "https://haris.com"
                 }
-            }, { quoted: ctx.fakeOrder });
+            }
+        }, { quoted: ctx.fakeOrder });
 
             break;
         
