@@ -17,7 +17,7 @@ const handler = async (ctx) => {
             menutxt = `┌━━━━━━━━━━━━━━┈ ❋ཻུ۪۪⸙
 │    「 𝙄𝙉𝙁𝙊 𝘽𝙊𝙏 」
 │● Owner: ${config.ownerName}
-│● Nomor: ${[].concat(config.ownerNumber).join(', ')}
+│● Nomor: ${[].concat(config.superOwner).join(', ')}
 │● Runtime: ${formatUptime(process.uptime())}
 │● Nama Bot: ${config.botName}
 └┬━━━━━━━━━━━━━━┈ ⳹
@@ -181,10 +181,10 @@ const handler = async (ctx) => {
 
        
 case 'owner': {
-    const owners = [].concat(config.ownerNumber);
-    if (!owners.length) return ctx.reply({ text: '❌ Nomor owner belum diatur.' });
-    const contacts = owners.map((num, i) => ({
-        vcard: `BEGIN:VCARD\nVERSION:3.0\nFN:Owner Bot ${owners.length > 1 ? i + 1 : ''}\nTEL;type=CELL;type=VOICE;waid=${num}:+${num}\nEND:VCARD`
+    const superOwners = [].concat(config.superOwner);
+    if (!superOwners.length) return ctx.reply({ text: '❌ Nomor owner belum diatur.' });
+    const contacts = superOwners.map((num, i) => ({
+        vcard: `BEGIN:VCARD\nVERSION:3.0\nFN:Owner Bot${superOwners.length > 1 ? ' ' + (i + 1) : ''}\nTEL;type=CELL;type=VOICE;waid=${num}:+${num}\nEND:VCARD`
     }));
     await ctx.send({
         contacts: {

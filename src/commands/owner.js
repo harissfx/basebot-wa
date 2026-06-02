@@ -2,9 +2,16 @@ const config = require('../config');
 const { formatUptime } = require('../utils/helper');
 
 const handler = async (ctx) => {
-    const { command, sock, isOwner, sender } = ctx;
+    const { command, sock, isOwner, isSuperOwner, sender } = ctx;
 
+    // Semua command di file ini minimal butuh akses owner (super atau co)
     if (!isOwner) return ctx.reply({ text: '❌ Perintah ini khusus untuk Owner Bot!' });
+
+    // Command khusus super owner saja
+    const superOwnerOnly = ['otp'];
+    if (superOwnerOnly.includes(command.name) && !isSuperOwner) {
+        return ctx.reply({ text: '❌ Perintah ini hanya untuk Super Owner!' });
+    }
 
     switch (command.name) {
 case 'otp':
@@ -197,7 +204,7 @@ try {
             await ctx.send({ text: [
                 '╔═══ *Bot Info* ═══╗',
                 `║ 🤖 *Nama:* ${config.botName}`,
-                `║ 👤 *Owner:* ${[].concat(config.ownerNumber).join(', ')}`,
+                `║ 👤 *Owner:* ${[].concat(config.superOwner).join(', ')}`,
                 `║ ⚙️ *Prefix:* ${config.prefix}`,
                 `║ 🔄 *Uptime:* ${h}j ${m}m ${s}d`,
                 `║ 📦 *Node:* ${process.version}`,

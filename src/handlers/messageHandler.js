@@ -9,7 +9,10 @@ const { fakeOrder } = require('../utils/fquoted');
 const ownerLidCache = new Set();
 
 async function resolveOwnerLids(sock) {
-    const owners = [].concat(config.ownerNumber).map(n => n.replace(/\D/g, ''));
+    const owners = [
+        ...[].concat(config.superOwner),
+        ...[].concat(config.coOwner || [])
+    ].map(n => n.replace(/\D/g, ''));
     for (const nomor of owners) {
         try {
             const [result] = await sock.onWhatsApp(nomor);
@@ -42,17 +45,26 @@ function extractMessageText(message) {
 function isGroup(jid)  { return jid.endsWith('@g.us'); }
 function isFromMe(msg) { return msg.key.fromMe; }
 
+function getSenderNumber(sender, msg) {
+    const raw = msg?.key?.participant || msg?.key?.remoteJid || sender || '';
+    return raw.replace(/\D/g, '').replace(/@.+$/, '').split(':')[0];
+}
+
+function isSuperOwner(sender, msg) {
+    const superOwners = [].concat(config.superOwner).map(n => n.replace(/\D/g, ''));
+    const senderNumber = getSenderNumber(sender, msg);
+    const fromMe = msg?.key?.fromMe || false;
+    return superOwners.some(n => n === senderNumber) || ownerLidCache.has(senderNumber) || fromMe;
+}
+
+function isCoOwner(sender, msg) {
+    const coOwners = [].concat(config.coOwner || []).map(n => n.replace(/\D/g, ''));
+    const senderNumber = getSenderNumber(sender, msg);
+    return coOwners.some(n => n === senderNumber);
+}
+
 function isOwner(sender, msg) {
-    const owners = [].concat(config.ownerNumber).map(n => n.replace(/\D/g, ''));
-
-    const rawSender    = msg?.key?.participant || msg?.key?.remoteJid || sender || '';
-    const senderNumber = rawSender.replace(/\D/g, '').replace(/@.+$/, '').split(':')[0];
-
-    const matchNumber = owners.some(n => n === senderNumber);
-    const matchLid    = ownerLidCache.has(senderNumber);
-    const fromMe      = msg?.key?.fromMe || false;
-
-    return matchNumber || matchLid || fromMe;
+    return isSuperOwner(sender, msg) || isCoOwner(sender, msg);
 }
 
 function parseCommand(text) {
@@ -81,7 +93,9 @@ async function handleMessages(sock, m, isMain = true) {
         const fromMe = isFromMe(msg);
         const sender = msg.key.remoteJid;
 
-        const checkOwner = isOwner(sender, msg);
+        const checkOwner      = isOwner(sender, msg);
+        const checkSuperOwner = isSuperOwner(sender, msg);
+        const checkCoOwner    = isCoOwner(sender, msg);
 
         if (!fromMe && config.botMode === 'self' && !checkOwner) continue;
 
@@ -123,6 +137,8 @@ async function handleMessages(sock, m, isMain = true) {
                         sock, msg, sender,
                         isGroup:                     isGroup(sender),
                         isOwner:                     checkOwner,
+                        isSuperOwner:                checkSuperOwner,
+                        isCoOwner:                   checkCoOwner,
                         command, text,
                         fakeOrder,
                         isMain,

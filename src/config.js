@@ -13,11 +13,17 @@ module.exports = {
 
     footerTxt: 'Powered by ẉHarisSyc.com',
     
-    // Prefix command (contoh: ! . /)
+    // Prefix command (contoh: ! . /)\
     prefix: '!',
 
-    // Nomor owner (format: 628xxxxxxxxxx, tanpa + atau spasi)
-    ownerNumber: ['6287855060868', '6285124014109'],
+    // Super Owner — hanya 1 nomor, akses penuh termasuk manage co-owner
+    superOwner: '6287855060868',
+
+    // Co-Owner — bisa lebih dari satu, akses owner biasa
+    coOwner: [
+            '6281234567890',
+        // '6289999999999',
+    ],
     
     // Mode bot: 'public' → semua orang | 'self' → hanya owner
     botMode: 'public',
