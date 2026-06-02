@@ -93,7 +93,39 @@ const handler = async (ctx) => {
                 ]
             });
             break;
+case 'grouplabel':
+case 'setlabel': {
+   
+    const labelText = command.fullArgs;
+    if (!labelText) return ctx.reply({ text: `❌ Penggunaan: \`${p}setlabel <teks>\`\nMaks 30 karakter.` });
 
+    try {
+        await sock.relayMessage(sender, {
+            protocolMessage: {
+                type: 30,
+                memberLabel: {
+                    label: labelText.slice(0, 30)
+                }
+            }
+        }, {
+            additionalNodes: [
+                {
+                    tag: 'meta',
+                    attrs: {
+                        tag_reason: 'user_update',
+                        appdata: 'member_tag'
+                    },
+                    content: undefined
+                }
+            ]
+        });
+
+        await ctx.reply({ text: `✅ Label grup berhasil diset: *${labelText.slice(0, 30)}*` });
+    } catch (e) {
+        await ctx.reply({ text: `❌ Gagal set label: ${e.message}` });
+    }
+    break;
+}
         case 'menu_general':
             await ctx.sendInteractive({
                 text: [
