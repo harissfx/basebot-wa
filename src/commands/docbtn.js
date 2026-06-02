@@ -50,7 +50,7 @@ const handler = async (ctx) => {
                                     title: "💡 Kontrol LED",
                                     rows: [
                                         { title: "LED ON", id: `led on` },
-                                        { title: "LED OFF", id: `${prefix}led off` },
+                                        { title: "LED OFF", id: `led off` },
                                     ]
                                 },
                                 {
