@@ -43,7 +43,7 @@ const handler = async (ctx) => {
                 ].join('\n'),
                 footer: config.footerTxt,
                  buttons: [
-                { buttonId: `${prefix}status`, buttonText: { displayText: "🔍 Cek Status" }, type: 1 },  
+                { buttonId: `status`, buttonText: { displayText: "🔍 Cek Status" }, type: 1 },  
                 {
                     buttonId: 'list_button',
                     buttonText: { displayText: '📋 Menu Lengkap' },
