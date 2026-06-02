@@ -21,7 +21,7 @@ module.exports = {
 
     // Co-Owner — bisa lebih dari satu, akses owner biasa
     coOwner: [
-            '6281234567890',
+            '6285124014109',
         // '6289999999999',
     ],
     
