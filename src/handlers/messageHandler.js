@@ -6,23 +6,26 @@ const { getContentType } = require('@whiskeysockets/baileys');
 const { sendButtons, sendListMessage, sendInteractiveMessage, sendButtonWithImage, sendInteractiveWithImage } = require('../utils/interactiveHelper');
 const { fakeOrder } = require('../utils/fquoted');
 
-const ownerLidCache = new Set();
+const superOwnerLidCache = new Set();
+const coOwnerLidCache = new Set();
 
 async function resolveOwnerLids(sock) {
-    const owners = [
-        ...[].concat(config.superOwner),
-        ...[].concat(config.coOwner || [])
-    ].map(n => n.replace(/\D/g, ''));
-    for (const nomor of owners) {
-        try {
-            const [result] = await sock.onWhatsApp(nomor);
-            if (result?.exists && result?.lid) {
-                const lidNum = result.lid.replace(/\D/g, '').replace(/@.+$/, '').split(':')[0];
-                ownerLidCache.add(lidNum);
-                console.log(chalk.cyan(`[OWNER-LID] ${nomor} -> ${lidNum}@lid`));
+    const resolveList = [
+        { numbers: [].concat(config.superOwner), cache: superOwnerLidCache, label: 'SUPER' },
+        { numbers: [].concat(config.coOwner || []), cache: coOwnerLidCache, label: 'CO' },
+    ];
+    for (const { numbers, cache, label } of resolveList) {
+        for (const nomor of numbers.map(n => n.replace(/\D/g, ''))) {
+            try {
+                const [result] = await sock.onWhatsApp(nomor);
+                if (result?.exists && result?.lid) {
+                    const lidNum = result.lid.replace(/\D/g, '').replace(/@.+$/, '').split(':')[0];
+                    cache.add(lidNum);
+                    console.log(chalk.cyan(`[${label}-OWNER-LID] ${nomor} -> ${lidNum}@lid`));
+                }
+            } catch (e) {
+                console.log(chalk.yellow(`[${label}-OWNER-LID] Gagal resolve ${nomor}: ${e.message}`));
             }
-        } catch (e) {
-            console.log(chalk.yellow(`[OWNER-LID] Gagal resolve ${nomor}: ${e.message}`));
         }
     }
 }
@@ -54,13 +57,13 @@ function isSuperOwner(sender, msg) {
     const superOwners = [].concat(config.superOwner).map(n => n.replace(/\D/g, ''));
     const senderNumber = getSenderNumber(sender, msg);
     const fromMe = msg?.key?.fromMe || false;
-    return superOwners.some(n => n === senderNumber) || ownerLidCache.has(senderNumber) || fromMe;
+    return superOwners.some(n => n === senderNumber) || superOwnerLidCache.has(senderNumber) || fromMe;
 }
 
 function isCoOwner(sender, msg) {
     const coOwners = [].concat(config.coOwner || []).map(n => n.replace(/\D/g, ''));
     const senderNumber = getSenderNumber(sender, msg);
-    return coOwners.some(n => n === senderNumber);
+    return coOwners.some(n => n === senderNumber) || coOwnerLidCache.has(senderNumber);
 }
 
 function isOwner(sender, msg) {
