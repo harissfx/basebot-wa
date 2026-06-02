@@ -42,49 +42,45 @@ const handler = async (ctx) => {
                     `╚══════════════════════╝`,
                 ].join('\n'),
                 footer: config.footerTxt,
-                buttons: [
-                    {
-                        buttonId: `${p}menu`,
-                        buttonText: { displayText: '📋 Menu Utama' },
-                        type: 1
+                 buttons: [
+                { buttonId: `${prefix}status`, buttonText: { displayText: "🔍 Cek Status" }, type: 1 },  
+                {
+                    buttonId: 'list_button',
+                    buttonText: { displayText: '📋 Menu Lengkap' },
+                    nativeFlowInfo: {
+                        name: 'single_select',
+                        paramsJson: JSON.stringify({
+                            title: '📋 Pilihan Kontrol SmartHome',
+                            sections: [
+                                {
+                                    title: "💡 Kontrol LED",
+                                    rows: [
+                                        { title: "LED ON", id: `led on` },
+                                        { title: "LED OFF", id: `led off` },
+                                    ]
+                                },
+                                {
+                                    title: "🔌 Kontrol Relay",
+                                    rows: [
+                                        { title: "Relay 1 ON", id: `relay1 on` },
+                                        { title: "Relay 1 OFF", id: `relay1 off` },
+                                        { title: "Relay 2 ON", id: `relay2 on` },
+                                        { title: "Relay 2 OFF", id: `relay2 off` },
+                                    ]
+                                },
+                                {
+                                    title: "📈 Sensor & Status",
+                                    rows: [
+                                        { title: "Baca Sensor DHT", id: `dht` },
+                                        { title: "Status Semua", id: `status` },
+                                    ]
+                                }
+                            ]
+                        })
                     },
-                    {
-                        buttonId: `${p}ping`,
-                        buttonText: { displayText: '🏓 Ping Bot' },
-                        type: 1
-                    },
-                    {
-                        buttonId: 'list_button',
-                        buttonText: { displayText: '📂 Pilih Menu' },
-                        nativeFlowInfo: {
-                            name: 'single_select',
-                            paramsJson: JSON.stringify({
-                                title: '📂 Pilih Menu',
-                                sections: [
-                                    {
-                                        title: '⚙️ Umum',
-                                        rows: [
-                                            { title: 'Menu Utama',  id: `${p}menu`  },
-                                            { title: 'Info Bot',    id: `${p}info`  },
-                                            { title: 'Ping',        id: `${p}ping`  },
-                                            { title: 'Kontak Owner',id: `${p}owner` },
-                                        ]
-                                    },
-                                    {
-                                        title: '🎮 Fun',
-                                        rows: [
-                                            { title: 'Dadu',   id: `${p}dice`    },
-                                            { title: 'Koin',   id: `${p}coin`    },
-                                            { title: '8Ball',  id: `${p}8ball`   },
-                                            { title: 'Lelucon',id: `${p}joke`    },
-                                        ]
-                                    }
-                                ]
-                            })
-                        },
-                        type: 2
-                    }
-                ],
+                    type: 2
+                }
+            ],
                 contextInfo: {
                     forwardingScore: 999,
                     isForwarded: true,
