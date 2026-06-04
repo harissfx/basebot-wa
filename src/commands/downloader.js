@@ -84,7 +84,7 @@ function fileSizeMB(filePath) {
 
 // ─── Handler ──────────────────────────────────────────────────────────────────
 const handler = async (ctx) => {
-    const { command, sock, sender, msg } = ctx;
+    const { command, sock, sender, msg, pushname, senderNumber } = ctx;
     const url = command.fullArgs?.trim();
     const p = config.prefix;
 
@@ -92,11 +92,11 @@ const handler = async (ctx) => {
 
         case 'downloadmenu':
             let menu = `┌─❖「 𝗜𝗡𝗙𝗢 𝗨𝗦𝗘𝗥 」
-│● 𝘕𝘢𝘮𝘢: 
-│● 𝘕𝘰𝘮𝘰𝘳: 
+│● 𝘕𝘢𝘮𝘢: ${pushname}
+│● 𝘕𝘰𝘮𝘰𝘳: ${senderNumber}
 │
 └┬❖ 
-┌┤𝖧𝖺𝗒 𝗄𝖺𝗄 👋
+┌┤𝖧𝖺𝗒 𝗄𝖺𝗄 ${pushname} 👋
 │└────────────┈ ⳹
 │「 𝗗𝗢𝗪𝗡𝗟𝗢𝗔𝗗 𝗠𝗘𝗡𝗨 」       
 │
