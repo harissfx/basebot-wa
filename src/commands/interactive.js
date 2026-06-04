@@ -60,7 +60,9 @@ case 'downloadmenu':
     });
 break;
 case 'test':
-
+ imgPath = path.join(__dirname, '../media/logo.png');
+            if (!fs.existsSync(imgPath)) return ctx.reply({ text: '❌ File logo.png tidak ditemukan di folder media.' });
+            imageSource = fs.readFileSync(imgPath);
 hanzt = `┌━━━━━━━━━━━━━━┈ ❋ཻུ۪۪⸙
 │    「 𝙄𝙉𝙁𝙊 𝘽𝙊𝙏 」
 │● 𝘖𝘸𝘯𝘦𝘳: ẉHanzOfc.to
@@ -101,7 +103,7 @@ isForwarded: true,
 "renderLargerThumbnail": true,
 "title": `Hay Kak ${pushname} 👋 Selamat ${salam}`,
 "mediaType": 1, 
-"thumbnail": fs.readFileSync('./src/media/logo.png'),
+"thumbnail": imageSource,
 "mediaUrl": `https://whatsapp.com/channel/0029Va9311BFy72KkrEY5v3K`,
 "sourceUrl": `https://whatsapp.com/channel/0029Va9311BFy72KkrEY5v3K`
 }
