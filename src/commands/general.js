@@ -2,27 +2,41 @@ const fs = require('fs');
 const path = require('path');
 const config = require('../config');
 const { formatUptime } = require('../utils/helper');
+const { getDevice } = require('@whiskeysockets/baileys');
 
 const handler = async (ctx) => {
-    const { command, sock, sender } = ctx;
+    const { command, sock, sender, msg, pushname, isOwner, isGroup } = ctx;
     const p = config.prefix;
     let imgPath, imageSource, start, sent, u, h, m, s;
 
     switch (command.name) {
         case 'generalmenu':
-            let menu = `
-╭──❍『𝑫𝒐𝒘𝒏𝒍𝒐𝒂𝒅𝒆𝒓 𝑴𝒆𝒏𝒖』
+            const device = getDevice(msg.key.id);
+            const role = isOwner ? 'Owner 👑' : 'User 👤';
+            const chatType = isGroup ? 'Grup 👥' : 'Pribadi 💬';
+            const time = new Date().toLocaleTimeString('id-ID', { timeZone: 'Asia/Jakarta', hour: '2-digit', minute: '2-digit' }) + ' WIB';
+            let menu = `┌─❖「 𝗜𝗡𝗙𝗢 𝗨𝗦𝗘𝗥 」
+│● 𝘕𝘢𝘮𝘢: ${pushname}
+│● 𝘚𝘵𝘢𝘵𝘶𝘴: ${role}
+│● 𝘗𝘦𝘳𝘢𝘯𝘨𝘬𝘢𝘵: ${device} 📱
+│● 𝘛𝘪𝘱𝘦 𝘊𝘩𝘢𝘵: ${chatType}
+│● 𝘞𝘢𝘬𝘵𝘶: ${time}
 │
-│⭔ ${p}ytmp3 [url]
-│⭔ ${p}ytmp4 [url]
-│⭔ ${p}tiktok [url]
-│⭔ ${p}twiter [url]
-│⭔ ${p}facebook [url]
-│⭔ ${p}pinterest [url]
-│⭔ ${p}instagram [url]
+└┬❖ 
+┌┤𝖧𝖺𝗒 𝗄𝖺𝗄 ${pushname} 👋
+│└────────────┈ ⳹
+│「 𝗚𝗘𝗡𝗘𝗥𝗔𝗟 𝗠𝗘𝗡𝗨 」
 │
-╰────❍
-`
+│⪩ ${p}𝗆𝖾𝗇𝗎
+│⪩ ${p}𝗉𝗂𝗇𝗀
+│⪩ ${p}𝗈𝗐𝗇𝖾𝗋
+│⪩ ${p}𝗅𝗈𝖼𝖺𝗍𝗂𝗈𝗇
+│⪩ ${p}𝖼𝗈𝗇𝗍𝖺𝖼𝗍
+│⪩ ${p}𝗋𝖾𝖺𝖼𝗍
+│⪩ ${p}𝗊𝗎𝗈𝗍𝖾
+│⪩ ${p}𝗉𝗈𝗅𝗅
+│
+└────────────┈ ⳹`
             await ctx.sendInteractive({
                 text: menu,
                 footer: config.botName,

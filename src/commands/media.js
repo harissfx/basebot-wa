@@ -17,7 +17,7 @@ const path = require('path');
 const os = require('os');
 const config = require('../config');
 const { TextEncoder } = require('util');
-const { downloadContentFromMessage } = require('@whiskeysockets/baileys');
+const { downloadContentFromMessage, getDevice } = require('@whiskeysockets/baileys');
 
 // ─── Inject metadata ke WebP pakai node-webpmux (cara yang benar) ─────────────
 // Format byte EXIF ini IDENTIK dengan yang dipakai wa-sticker-formatter.
@@ -100,26 +100,34 @@ function cleanTmp(...paths) {
 
 // ─── Handler ──────────────────────────────────────────────────────────────────
 const handler = async (ctx) => {
-    const { command, msg, sock, sender } = ctx;
+    const { command, msg, sock, sender, pushname, isOwner, isGroup } = ctx;
     const p = config.prefix;
     const quotedMsg = msg.message?.extendedTextMessage?.contextInfo?.quotedMessage
         || msg.message;
 
     switch (command.name) {
         case 'ffmpegmenu':
-            let menu = `
-╭──❍『𝑫𝒐𝒘𝒏𝒍𝒐𝒂𝒅𝒆𝒓 𝑴𝒆𝒏𝒖』
+            const device = getDevice(msg.key.id);
+            const role = isOwner ? 'Owner 👑' : 'User 👤';
+            const chatType = isGroup ? 'Grup 👥' : 'Pribadi 💬';
+            const time = new Date().toLocaleTimeString('id-ID', { timeZone: 'Asia/Jakarta', hour: '2-digit', minute: '2-digit' }) + ' WIB';
+            let menu = `┌─❖「 𝗜𝗡𝗙𝗢 𝗨𝗦𝗘𝗥 」
+│● 𝘕𝘢𝘮𝘢: ${pushname}
+│● 𝘚𝘵𝘢𝘵𝘶𝘴: ${role}
+│● 𝘗𝘦𝘳𝘢𝘯𝘨𝘬𝘢𝘵: ${device} 📱
+│● 𝘛𝘪𝘱𝒆 𝘊𝘩𝘢𝘵: ${chatType}
+│● 𝘞𝘢𝘬𝘵𝘶: ${time}
 │
-│⭔ ${p}ytmp3 [url]
-│⭔ ${p}ytmp4 [url]
-│⭔ ${p}tiktok [url]
-│⭔ ${p}twiter [url]
-│⭔ ${p}facebook [url]
-│⭔ ${p}pinterest [url]
-│⭔ ${p}instagram [url]
+└┬❖ 
+┌┤𝖧𝖺𝗒 𝗄𝖺𝗄 ${pushname} 👋
+│└────────────┈ ⳹
+│「 𝗠𝗘𝗗𝗜𝗔 𝗠𝗘𝗡𝗨 」
 │
-╰────❍
-`
+│⪩ ${p}𝗌𝗍𝗂𝖼𝗄𝖾𝗋 (𝗋𝖾𝗉𝗅𝗒 𝖿𝗈𝗍𝗈/𝗏𝗂𝖽𝖾𝗈)
+│⪩ ${p}𝗍𝗈𝗂𝗆𝗀 (𝗋𝖾𝗉𝗅𝗒 𝗌𝗍𝗂𝗄𝖾𝗋)
+│⪩ ${p}𝗍𝗈𝗀𝗂𝖿 (𝗋𝖾𝗉𝗅𝗒 𝗌𝗍𝗂𝗄𝖾𝗋)
+│
+└────────────┈ ⳹`
             await ctx.sendInteractive({
                 text: menu,
                 footer: config.botName,

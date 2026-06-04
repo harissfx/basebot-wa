@@ -1,9 +1,10 @@
 const config = require('../config');
 const { sendInteractiveMessage } = require('../utils/interactiveHelper');
+const { getDevice } = require('@whiskeysockets/baileys');
 
 const handler = async (ctx) => {
 
-    const { command, isOwner, isMain, sock, sender } = ctx;
+    const { command, isOwner, isMain, sock, sender, msg, pushname, isGroup } = ctx;
     const p = config.prefix;
     if (!isOwner) return ctx.reply({ text: '❌ Perintah ini khusus untuk Owner Bot!' });
 
@@ -13,19 +14,27 @@ const handler = async (ctx) => {
 
     switch (command.name) {
         case 'jadibotmenu':
-            let menu = `
-        ╭──❍『𝑫𝒐𝒘𝒏𝒍𝒐𝒂𝒅𝒆𝒓 𝑴𝒆𝒏𝒖』
-        │
-        │⭔ ${p}ytmp3 [url]
-        │⭔ ${p}ytmp4 [url]
-        │⭔ ${p}tiktok [url]
-        │⭔ ${p}twiter [url]
-        │⭔ ${p}facebook [url]
-        │⭔ ${p}pinterest [url]
-        │⭔ ${p}instagram [url]
-        │
-        ╰────❍
-        `
+            const device = getDevice(msg.key.id);
+            const role = isOwner ? 'Owner 👑' : 'User 👤';
+            const chatType = isGroup ? 'Grup 👥' : 'Pribadi 💬';
+            const time = new Date().toLocaleTimeString('id-ID', { timeZone: 'Asia/Jakarta', hour: '2-digit', minute: '2-digit' }) + ' WIB';
+            let menu = `┌─❖「 𝗜𝗡𝗙𝗢 𝗨𝗦𝗘𝗥 」
+│● 𝘕𝘢𝘮𝘢: ${pushname}
+│● 𝘚𝘵𝘢𝘵𝘶𝘴: ${role}
+│● 𝘗𝘦𝘳𝘢𝘯𝘨𝘬𝘢𝘵: ${device} 📱
+│● 𝘛𝘪𝘱𝘦 𝘊𝘩𝘢𝘵: ${chatType}
+│● 𝘞𝘢𝘬𝘵𝘶: ${time}
+│
+└┬❖ 
+┌┤𝖧𝖺𝗒 𝗄𝖺𝗄 ${pushname} 👋
+│└────────────┈ ⳹
+│「 𝗝𝗔𝗗𝗜𝗕𝗢𝗧 𝗠𝗘𝗡𝗨 」
+│
+│⪩ ${p}𝗃𝖺𝖽𝗂𝖻𝗈𝗍 (𝗇𝗈𝗆𝗈𝗋)
+│⪩ ${p}𝗅𝗂𝗌𝗍𝖻𝗈𝗍
+│⪩ ${p}𝗌𝗍𝗈𝗉𝖻𝗈𝗍 (𝗇𝗈𝗆𝗈𝗋)
+│
+└────────────┈ ⳹`
             await ctx.sendInteractive({
                 text: menu,
                 footer: config.botName,

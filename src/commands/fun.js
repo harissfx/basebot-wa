@@ -1,28 +1,41 @@
 const { delay } = require('../utils/helper');
 const config = require('../config');
+const { getDevice } = require('@whiskeysockets/baileys');
 
 const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
 const handler = async (ctx) => {
-    const { command, sock, sender } = ctx;
+    const { command, sock, sender, msg, pushname, isOwner, isGroup } = ctx;
     const p = config.prefix;
     let max, answers, jokes, fortunes;
 
     switch (command.name) {
         case 'funmenu':
-            let menu = `
-╭──❍『𝑫𝒐𝒘𝒏𝒍𝒐𝒂𝒅𝒆𝒓 𝑴𝒆𝒏𝒖』
+            const device = getDevice(msg.key.id);
+            const role = isOwner ? 'Owner 👑' : 'User 👤';
+            const chatType = isGroup ? 'Grup 👥' : 'Pribadi 💬';
+            const time = new Date().toLocaleTimeString('id-ID', { timeZone: 'Asia/Jakarta', hour: '2-digit', minute: '2-digit' }) + ' WIB';
+            let menu = `┌─❖「 𝗜𝗡𝗙𝗢 𝗨𝗦𝗘𝗥 」
+│● 𝘕𝘢𝘮𝘢: ${pushname}
+│● 𝘚𝘵𝘢𝘵𝘶𝘴: ${role}
+│● 𝘗𝘦𝘳𝘢𝘯𝘨𝘬𝘢𝘵: ${device} 📱
+│● 𝘛𝘪𝘱𝘦 𝘊𝘩𝘢𝘵: ${chatType}
+│● 𝘞𝘢𝘬𝘵𝘶: ${time}
 │
-│⭔ ${p}ytmp3 [url]
-│⭔ ${p}ytmp4 [url]
-│⭔ ${p}tiktok [url]
-│⭔ ${p}twiter [url]
-│⭔ ${p}facebook [url]
-│⭔ ${p}pinterest [url]
-│⭔ ${p}instagram [url]
+└┬❖ 
+┌┤𝖧𝖺𝗒 𝗄𝖺𝗄 ${pushname} 👋
+│└────────────┈ ⳹
+│「 𝗙𝗨𝗡 𝗠𝗘𝗡𝗨 」
 │
-╰────❍
-`
+│⪩ ${p}𝖽𝗂𝖼𝖾
+│⪩ ${p}𝖼𝗈𝗂𝗇
+│⪩ ${p}𝗋𝖺𝗇𝖽𝗈𝗆
+│⪩ ${p}8𝖻𝖺𝗅𝗅
+│⪩ ${p}𝗃𝗈𝗄𝖾
+│⪩ ${p}𝖿𝗈𝗋𝗍𝗎𝗇𝖾
+│⪩ ${p}𝗍𝗒𝗉𝗂𝗇𝗀
+│
+└────────────┈ ⳹`
             await ctx.sendInteractive({
                 text: menu,
                 footer: config.botName,

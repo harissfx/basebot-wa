@@ -1,26 +1,41 @@
 const axios = require('axios');
 const config = require('../config');
+const { getDevice } = require('@whiskeysockets/baileys');
 
 const handler = async (ctx) => {
-    const { command } = ctx;
+    const { command, msg, sock, sender, pushname, isOwner, isGroup } = ctx;
     let kota, geo, loc, data, response, username, ip, text, from, to, query, pkg, result, url, sections;
     const p = config.prefix;
     switch (command.name) {
 
         case 'toolsmenu':
-            let menu = `
-╭──❍『𝑫𝒐𝒘𝒏𝒍𝒐𝒂𝒅𝒆𝒓 𝑴𝒆𝒏𝒖』
+            const device = getDevice(msg.key.id);
+            const role = isOwner ? 'Owner 👑' : 'User 👤';
+            const chatType = isGroup ? 'Grup 👥' : 'Pribadi 💬';
+            const time = new Date().toLocaleTimeString('id-ID', { timeZone: 'Asia/Jakarta', hour: '2-digit', minute: '2-digit' }) + ' WIB';
+            let menu = `┌─❖「 𝗜𝗡𝗙𝗢 𝗨𝗦𝗘𝗥 」
+│● 𝘕𝘢𝘮𝘢: ${pushname}
+│● 𝘚𝘵𝘢𝘵𝘶𝘴: ${role}
+│● 𝘗𝘦𝘳𝘢𝘯𝘨𝘬𝘢𝘵: ${device} 📱
+│● 𝘛𝘪𝘱𝒆 𝘊𝘩𝖺𝘵: ${chatType}
+│● 𝘞𝘢𝘬𝘵𝘶: ${time}
 │
-│⭔ ${p}ytmp3 [url]
-│⭔ ${p}ytmp4 [url]
-│⭔ ${p}tiktok [url]
-│⭔ ${p}twiter [url]
-│⭔ ${p}facebook [url]
-│⭔ ${p}pinterest [url]
-│⭔ ${p}instagram [url]
+└┬❖ 
+┌┤𝖧𝖺𝗒 𝗄𝖺𝗄 ${pushname} 👋
+│└────────────┈ ⳹
+│「 𝗧𝗢𝗢𝗟𝗦 𝗠𝗘𝗡𝗨 」
 │
-╰────❍
-`
+│⪩ ${p}𝖼𝗎𝖺𝖼𝖺 (𝗄𝗈𝗍𝖺)
+│⪩ ${p}𝗊𝗎𝗈𝗍𝖾
+│⪩ ${p}𝗄𝗎𝗋𝗌
+│⪩ ${p}𝗀𝗂𝗍𝗁𝗎𝖻 (𝗎𝗌𝖾𝗋𝗇𝖺𝗆𝖾)
+│⪩ ${p}𝗂𝗉𝖼𝗁𝖾𝖼𝗄 (𝗂𝗉)
+│⪩ ${p}𝗊𝗋𝖼𝗈𝖽𝖾 (𝗍𝖾𝗄𝗌)
+│⪩ ${p}𝗍𝗋𝖺𝗇𝗌𝗅𝖺𝗍𝖾 (𝗍𝖾𝗄𝗌)
+│⪩ ${p}𝗐𝗂𝗄𝗂 (𝗊𝗎𝖾𝗋𝗒)
+│⪩ ${p}𝗇𝗉𝗆 (𝗉𝖺𝖼𝗄𝖺𝗀𝖾)
+│
+└────────────┈ ⳹`
             await ctx.sendInteractive({
                 text: menu,
                 footer: config.botName,
