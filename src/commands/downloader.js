@@ -110,10 +110,9 @@ case 'downloadmenu':
     footer: config.botName,
     quoted: ctx.msg,
     contextInfo: {
-    mentionedJid: ["0@s.whatsapp.net"],
-    forwardingScore: 111,
-    isForwarded: true
-    },
+    externalAdReply: {
+    showAdAttribution: true,
+    }},
     buttons: [
         { name: 'quick_reply', buttonParamsJson: JSON.stringify({ display_text: 'Kembali ke Menu', id: 'menu' }) },
         { name: 'single_select',buttonParamsJson: JSON.stringify({ title: '『 Simpel Menu 』',
@@ -144,6 +143,7 @@ case 'downloadmenu':
         }]
     });
 break;
+
         // ── !ytmp3 ── YouTube → Audio MP3 ─────────────────────────────────────
         case 'ytmp3': {
             if (!url) return ctx.reply({ text: '❌ Contoh: `!ytmp3 https://youtu.be/xxx`' });
