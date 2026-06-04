@@ -3,7 +3,7 @@ const plugins = require('../utils/PluginLoader');
 const chalk   = require('chalk');
 const readline = require('readline');
 const { getContentType } = require('@whiskeysockets/baileys');
-const { sendButtons, sendListMessage, sendInteractiveMessage, sendButtonWithImage, sendInteractiveWithImage, sendFakeOrder } = require('../utils/interactiveHelper');
+const { sendButtons, sendListMessage, sendInteractiveMessage, sendButtonWithImage, sendInteractiveWithImage } = require('../utils/interactiveHelper');
 const { fakeOrder } = require('../utils/fquoted');
 
 const superOwnerLidCache = new Set();
@@ -153,7 +153,6 @@ async function handleMessages(sock, m, isMain = true) {
                         sendInteractive:     (content) => sendInteractiveMessage(sock, sender, content),
                         sendButtonWithImage:         (content) => sendButtonWithImage(sock, sender, content),
                         sendInteractiveWithImage:    (content) => sendInteractiveWithImage(sock, sender, content),
-                        sendFakeOrder:               (content) => sendFakeOrder(sock, sender, content),
                         react:               (emoji)   => sock.sendMessage(sender, { react: { text: emoji, key: msg.key } }),
                     });
                 } catch (err) {

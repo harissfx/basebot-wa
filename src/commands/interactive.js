@@ -117,43 +117,6 @@ const handler = async (ctx) => {
         case 'like': await ctx.react('❤️'); break;
         case 'share': await ctx.reply({ text: '📤 Makasih udah mau share!' }); break;
 
-        case 'fakeorder':
-        case 'orderdummy':
-        case 'taeek': {
-            const { sendFakeOrder } = require('../utils/interactiveHelper');
-            const adjectives = ['Premium', 'Exclusive', 'Limited', 'Special', 'VIP', 'Ultimate'];
-            const nouns      = ['Package', 'Bundle', 'Deal', 'Order', 'Box', 'Collection'];
-            const rand       = (arr) => arr[Math.floor(Math.random() * arr.length)];
-            const randRef    = () => {
-                const c = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-                let r = '';
-                for (let i = 0; i < 8; i++) r += c[Math.floor(Math.random() * c.length)];
-                return `ORD-${r}-${Date.now().toString(36).toUpperCase()}`;
-            };
-
-            const itemName = ctx.command.fullArgs?.trim() || `${rand(adjectives)} ${rand(nouns)}`;
-            const ref      = randRef();
-
-            let thumbnail = null;
-            const thumbPath = require('path').join(__dirname, '../media/logo.png');
-            if (require('fs').existsSync(thumbPath)) thumbnail = require('fs').readFileSync(thumbPath);
-
-            await sendFakeOrder(ctx.sock, ctx.sender, {
-                quoted:      ctx.msg,
-                thumbnail,
-                currency:    'USD',
-                totalAmount: 100_000_000,
-                offset:      2,
-                referenceId: ref,
-                description: itemName,
-                itemName:    `${itemName} - ${ref}`,
-                quantity:    '999',
-                paymentNote: `Pembayaran untuk ${itemName}`,
-                paymentUrl:  'https://example.com/pay',
-            });
-            break;
-        }
-
         case 'buttoncall':
             await ctx.sendInteractive({
                 text: '📞 Hubungi kami:',
@@ -165,9 +128,72 @@ const handler = async (ctx) => {
             });
             break;
 
-        
+        // ─── PAYMENT BUTTON ─────────────────────────────────────────────────────
+        case 'pay': {
+            const { generateWAMessageFromContent, proto, isJidGroup } = require('@whiskeysockets/baileys');
+
+            const jid      = ctx.msg.key.remoteJid;
+            const currency = 'IDR';
+            const items    = [
+                { id: 'ITEM-001', name: 'Paket Premium',  price: 50000, quantity: 1 },
+                { id: 'ITEM-002', name: 'Paket Tambahan', price: 25000, quantity: 2 },
+            ];
+
+            const mappedItems = items.map(i => ({
+                retailer_id: String(i.id),
+                product_id:  String(i.id),
+                name:        i.name,
+                amount:      { value: i.price * 100, offset: 100 },
+                quantity:    i.quantity
+            }));
+
+            const subtotal = mappedItems.reduce((s, i) => s + i.amount.value * i.quantity, 0);
+
+            const buttonParamsJson = JSON.stringify({
+                currency,
+                external_payment_configurations: [{
+                    uri:                 '',
+                    type:                'payment_instruction',
+                    payment_instruction: 'Pembayaran via WhatsApp Pay'
+                }],
+                payment_configuration: '',
+                payment_type:          '',
+                total_amount:          { value: subtotal, offset: 100 },
+                reference_id:          'ORDER-' + Date.now(),
+                type:                  'physical-goods',
+                order: {
+                    status:      'pending',
+                    description: 'Pembelian produk bot',
+                    subtotal:    { value: subtotal, offset: 100 },
+                    items:       mappedItems
+                }
+            });
+
+            const interactiveMsg = proto.Message.InteractiveMessage.fromObject({
+                body:   { text: '🛍️ Konfirmasi pesanan kamu di bawah ini:' },
+                footer: { text: 'Powered by WhatsApp Bot' },
+                header: { hasMediaAttachment: false },
+                nativeFlowMessage: {
+                    buttons: [{ name: 'review_and_pay', buttonParamsJson }],
+                    messageParamsJson: ''
+                }
+            });
+
+            const waMsg = generateWAMessageFromContent(jid, proto.Message.fromObject({
+                viewOnceMessage: {
+                    message: {
+                        messageContextInfo: { deviceListMetadata: {}, deviceListMetadataVersion: 2 },
+                        interactiveMessage: interactiveMsg
+                    }
+                }
+            }), { userJid: jid });
+
+            const additionalNodes = [{ tag: 'biz', attrs: {}, content: [{ tag: 'interactive', attrs: { type: 'native_flow', v: '1' }, content: [{ tag: 'native_flow', attrs: { v: '9', name: 'review_and_pay' } }] }] }];
+            if (!isJidGroup(jid)) additionalNodes.push({ tag: 'bot', attrs: { biz_bot: '1' } });
+
+            await ctx.sock.relayMessage(jid, waMsg.message, { messageId: waMsg.key.id, additionalNodes });
+            break;
+        }
+
     }
 };
-
-
-module.exports = handler;
