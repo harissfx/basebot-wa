@@ -1,7 +1,5 @@
 const fs   = require('fs');
 const path = require('path');
-const axios = require('axios');
-const jwt = require('jsonwebtoken');
 const config = require('../config');
 
 const handler = async (ctx) => {
@@ -94,12 +92,12 @@ hanzt = `┌━━━━━━━━━━━━━━┈ ❋ཻུ۪۪⸙
 ├───────────────
 │✑ 𝖢𝗈𝗉𝗒𝗋𝗂𝗀𝗁𝗍 𝖧𝖺𝗇𝗓 𝖮𝖿𝖼
 └━━━━━━━━━━━━━━━┈ ❋ཻུ۪۪⸙`
-await sock.sendMessage(from, {
+await sock.sendMessage(sender, {
 text: hanzt,
 contextInfo:{
 mentionedJid:[senderJid],
-"forwardingScore": 111,
-"isForwarded": true,
+forwardingScore: 111,
+isForwarded: true,
 "renderLargerThumbnail": true,
 "title": `Hay Kak ${pushname} 👋 Selamat ${salam}`,
 "containsAutoReply": true,
