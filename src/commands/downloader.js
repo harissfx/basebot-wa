@@ -19,6 +19,7 @@ const path = require('path');
 const os = require('os');
 const { execFile } = require('child_process');
 const config = require('../config');
+const { getDevice } = require('@whiskeysockets/baileys');
 
 const YTDLP_PATH = '/usr/local/bin/yt-dlp';
 const MAX_SIZE_MB = 90; // batas ukuran file sebelum ditolak
@@ -84,16 +85,23 @@ function fileSizeMB(filePath) {
 
 // ─── Handler ──────────────────────────────────────────────────────────────────
 const handler = async (ctx) => {
-    const { command, sock, sender, msg, pushname } = ctx;
+    const { command, sock, sender, msg, pushname, isOwner, isGroup } = ctx;
     const url = command.fullArgs?.trim();
     const p = config.prefix;
 
     switch (command.name) {
 
         case 'downloadmenu':
+            const device = getDevice(msg.key.id);
+            const role = isOwner ? 'Owner 👑' : 'User 👤';
+            const chatType = isGroup ? 'Grup 👥' : 'Pribadi 💬';
+            const time = new Date().toLocaleTimeString('id-ID', { timeZone: 'Asia/Jakarta', hour: '2-digit', minute: '2-digit' }) + ' WIB';
             let menu = `┌─❖「 𝗜𝗡𝗙𝗢 𝗨𝗦𝗘𝗥 」
 │● 𝘕𝘢𝘮𝘢: ${pushname}
-│● 𝘕𝘰𝘮𝘰𝘳: 
+│● 𝘚𝘵𝘢𝘵𝘶𝘴: ${role}
+│● 𝘗𝘦𝘳𝘢𝘯𝘨𝘬𝘢𝘵: ${device} 📱
+│● 𝘛𝘪𝘱𝘦 𝘊𝘩𝘢𝘵: ${chatType}
+│● 𝘞𝘢𝘬𝘵𝘶: ${time}
 │
 └┬❖ 
 ┌┤𝖧𝖺𝗒 𝗄𝖺𝗄 ${pushname} 👋
