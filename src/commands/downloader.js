@@ -113,21 +113,24 @@ case 'menudownloader':
         { name: 'quick_reply', buttonParamsJson: JSON.stringify({ display_text: 'Kembali ke Menu', id: 'menu' }) },
         { name: 'single_select',buttonParamsJson: JSON.stringify({ title: 'Simpel Menu',
             sections: [{
-            title: '🍔 Makanan',
+            title: 'Simpel Menu',
             highlight_label: "",
-                rows: [{ title: "[ General Menu ]", description: "Select to display general menu", id: "generalmenu" }]
+                rows: [{ title: "『General Menu』", description: "Select to display general menu", id: "generalmenu" }]
                         }, {
-            highlight_label: "!! RXHL ⸮¿ ØFFICIAL !!",
-                rows: [{ title: "[ Owner Menu ]", description: "Select to display owner menu", id: "ownermenu" }]
+            highlight_label: "",
+                rows: [{ title: "『Owner Menu』", description: "Select to display owner menu", id: "ownermenu" }]
                         }, {
-            highlight_label: "!! RXHL ⸮¿ ØFFICIAL !!",
-                rows: [{ title: "[ Bug Menu ]", description: "Select to display bug menu", id: "bugmenu" }]
+            highlight_label: "",
+                rows: [{ title: "『Ffmpeg Menu』", description: "Select to display bug menu", id: "bugmenu" }]
                         }, {
-            highlight_label: "!! RXHL ⸮¿ ØFFICIAL !!",
-                rows: [{ title: "[ Owner Both ]", description: "Select to display information owner bot", id: "ownerboth" }]
+            highlight_label: "",
+                rows: [{ title: "『Tools Menu』", description: "Select to display information owner bot", id: "ownerboth" }]
                         }, {
-            highlight_label: "!! RXHL ⸮¿ ØFFICIAL !!",
-                rows: [{ title: "[ Thanks To ]", description: "Select to display Thank-you note ", id: "tqto" }]
+            highlight_label: "Khusus Owner Utama",
+                rows: [{ title: "『JadiBot Menu』", description: "Select to display owner menu", id: "ownermenu" }]
+                        }, {
+            highlight_label: "",
+                rows: [{ title: "『Group Menu』", description: "Select to display Thank-you note ", id: "tqto" }]
                 },]
             })
         }]
