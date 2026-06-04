@@ -22,7 +22,7 @@ const config = require('../config');
 const { getDevice } = require('@whiskeysockets/baileys');
 
 const YTDLP_PATH = '/usr/local/bin/yt-dlp';
-const MAX_SIZE_MB = 90; // batas ukuran file sebelum ditolak
+const MAX_SIZE_MB = 90;
 
 // ─── Jalankan yt-dlp ─────────────────────────────────────────────────────────
 function runYtDlp(args) {
@@ -166,7 +166,6 @@ const handler = async (ctx) => {
             await ctx.react('⏳');
             let filePath;
             try {
-                // Ambil info dulu
                 await ctx.reply({ text: '🔍 Mengambil info lagu...' });
                 const info = await getInfo(url);
 
@@ -282,7 +281,6 @@ const handler = async (ctx) => {
                 await ctx.reply({ text: '⬇️ Mendownload video TikTok...' });
 
                 filePath = await download(url, [
-                    // Format tanpa watermark (h264 dari aweme, bukan watermarked)
                     '-f', 'download_addr-0/bestvideo+bestaudio/best',
                     '--merge-output-format', 'mp4',
                 ], 'mp4');

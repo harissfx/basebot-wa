@@ -6,10 +6,8 @@ const { getDevice } = require('@whiskeysockets/baileys');
 const handler = async (ctx) => {
     const { command, sock, isOwner, isSuperOwner, msg, pushname, isGroup } = ctx;
     const p = config.prefix;
-    // Semua command di file ini minimal butuh akses owner (super atau co)
     if (!isOwner) return ctx.reply({ text: '❌ Perintah ini khusus untuk Owner Bot!' });
 
-    // Command khusus super owner saja
     const superOwnerOnly = [''];
     if (superOwnerOnly.includes(command.name) && !isSuperOwner) {
         return ctx.reply({ text: '❌ Perintah ini hanya untuk Super Owner!' });

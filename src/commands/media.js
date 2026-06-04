@@ -19,9 +19,6 @@ const config = require('../config');
 const { TextEncoder } = require('util');
 const { downloadContentFromMessage, getDevice } = require('@whiskeysockets/baileys');
 
-// ─── Inject metadata ke WebP pakai node-webpmux (cara yang benar) ─────────────
-// Format byte EXIF ini IDENTIK dengan yang dipakai wa-sticker-formatter.
-// WhatsApp hanya baca metadata kalau byte header-nya benar.
 async function injectStickerMetadata(webpBuffer, packName, authorName) {
     try {
         const { Image } = require('node-webpmux');
@@ -33,7 +30,6 @@ async function injectStickerMetadata(webpBuffer, packName, authorName) {
             'emojis': ['🤖'],
         });
 
-        // Header byte ini HARUS persis — sama persis dengan wa-sticker-formatter
         const exif = Buffer.concat([
             Buffer.from([
                 0x49, 0x49, 0x2a, 0x00, 0x08, 0x00, 0x00, 0x00,
@@ -42,16 +38,15 @@ async function injectStickerMetadata(webpBuffer, packName, authorName) {
             ]),
             Buffer.from(data, 'utf-8'),
         ]);
-        // Tulis panjang JSON ke offset 14 (4 byte LE)
         exif.writeUIntLE(new TextEncoder().encode(data).length, 14, 4);
 
         const img = new Image();
         await img.load(webpBuffer);
         img.exif = exif;
-        return await img.save(null); // null = kembalikan sebagai Buffer
+        return await img.save(null);
     } catch (e) {
         console.warn('[STICKER META] Gagal inject metadata:', e.message);
-        return webpBuffer; // fallback, stiker tetap terkirim tanpa metadata
+        return webpBuffer;
     }
 }
 
@@ -192,7 +187,6 @@ const handler = async (ctx) => {
                 || (mediaType === 'image' && quotedMsg?.imageMessage?.mimetype === 'image/gif')
                 || (mediaType === 'sticker' && quotedMsg?.stickerMessage?.isAnimated);
 
-            // Parse "NamaPaket|Author" dari args
             const rawArgs = (command.fullArgs || '').trim();
             const [packName, authorName] = rawArgs
                 ? rawArgs.split('|').map(s => s.trim())
@@ -221,7 +215,6 @@ const handler = async (ctx) => {
                     });
                     stickerBuffer = fs.readFileSync(outputPath);
                 } else {
-                    // Foto → WebP statis
                     try {
                         const sharp = require('sharp');
                         stickerBuffer = await sharp(buffer)
@@ -241,7 +234,6 @@ const handler = async (ctx) => {
                     }
                 }
 
-                // ✅ Inject metadata nama & author yang benar
                 stickerBuffer = await injectStickerMetadata(stickerBuffer, packName, authorName);
 
                 await sock.sendMessage(sender, { sticker: stickerBuffer, isAnimated }, { quoted: msg });
