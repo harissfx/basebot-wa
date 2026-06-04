@@ -44,6 +44,7 @@ function uploadTelegraPh(filePath) {
     });
 }
 
+
 // Upload file (video/dokumen/dll) ke uguu.se → URL publik
 function uploadUguu(filePath) {
     return new Promise(async (resolve, reject) => {
