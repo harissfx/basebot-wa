@@ -60,7 +60,7 @@ const handler = async (ctx) => {
                                 rows: [{ title: "Owner Menu", description: "Select to display owner menu", id: "ownermenu" }]
                             }, {
                                 highlight_label: "",
-                                rows: [{ title: "Ffmpeg Menu", description: "Select to display ffmpeg menu", id: "ffmpeg" }]
+                                rows: [{ title: "Ffmpeg Menu", description: "Select to display ffmpeg menu", id: "ffmpegmenu" }]
                             }, {
                                 highlight_label: "",
                                 rows: [{ title: "Downloader Menu", description: "Select to display downloader menu", id: "downloadmenu" }]
