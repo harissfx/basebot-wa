@@ -98,8 +98,8 @@ await sock.sendMessage(from, {
 text: hanzt,
 contextInfo:{
 mentionedJid:[senderJid],
-forwardingScore: 111,
-isForwarded: true,
+"forwardingScore": 111,
+"isForwarded": true,
 "renderLargerThumbnail": true,
 "title": `Hay Kak ${pushname} 👋 Selamat ${salam}`,
 "containsAutoReply": true,
