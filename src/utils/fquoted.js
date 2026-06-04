@@ -4,8 +4,7 @@ const config = require('../config');
             imageSource = fs.readFileSync(imgPath);
 const fakeOrder = {
 key: {
-fromMe: [], 
-participant: `0@s.whatsapp.net`, ...(m.chat ? { remoteJid: "0@s.whatsapp.net" } : {}) 
+participant: '0@s.whatsapp.net',
 },
 
 'message': {
