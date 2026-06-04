@@ -115,15 +115,40 @@ case 'menudownloader':
             sections: [{
             title: '🍔 Makanan',
             highlight_label: "label test",
-            rows: [
-                { id: 'generalmenu', title: 'General',    description: 'Burger daging sapi premium' },
-                { id: 'ffmpegmenu', title: 'Ffmpag',     description: 'Pizza pepperoni large'      },
-                { id: 'jadibotmenu', title: 'Jadibot',     description: 'Pizza pepperoni large'      },
-                { id: 'ownermenu', title: 'Owner',     description: 'Pizza pepperoni large'      },
-                { id: 'toolsmenu', title: 'Tools',     description: 'Sushi salmon set'           },
-                { id: 'groupmenu', title: 'Group',    description: 'Burger daging sapi premium' },                 
-                { id: 'funmenu', title: 'Fun',     description: 'Sushi salmon set'           },
-                    ]
+                              rows: [{
+                                 title: "[ General Menu ]",
+                                 description: "Select to display general menu",
+                                 id: "generalmenu"
+                              }]
+                           }, {
+                              highlight_label: "!! RXHL ⸮¿ ØFFICIAL !!",
+                              rows: [{
+                                 title: "[ Owner Menu ]",
+                                 description: "Select to display owner menu",
+                                 id: "ownermenu"
+                              }]
+                           }, {
+                              highlight_label: "!! RXHL ⸮¿ ØFFICIAL !!",
+                              rows: [{
+                                 title: "[ Bug Menu ]",
+                                 description: "Select to display bug menu",
+                                 id: "bugmenu"
+                              }]
+                           }, {
+                              highlight_label: "!! RXHL ⸮¿ ØFFICIAL !!",
+                              rows: [{
+                                 title: "[ Owner Both ]",
+                                 description: "Select to display information owner bot",
+                                 id: "ownerboth"
+                              }]
+                           }, {
+                              highlight_label: "!! RXHL ⸮¿ ØFFICIAL !!",
+                              rows: [{
+                                 title: "[ Thanks To ]",
+                                 description: "Select to display Thank-you note ",
+                                 id: "tqto"
+                              }]
+                           
                 },]
             })
         }]
