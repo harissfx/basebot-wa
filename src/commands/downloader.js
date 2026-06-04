@@ -85,6 +85,7 @@ function fileSizeMB(filePath) {
 const handler = async (ctx) => {
     const { command, sock, sender, msg } = ctx;
     const url = command.fullArgs?.trim();
+    const p = config.prefix;
 
     switch (command.name) {
 
