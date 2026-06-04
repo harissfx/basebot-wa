@@ -8,7 +8,7 @@ const fakeOrder = {
         {
             currencyCodeIso4217: 'USD',
             amount1000: '1000000000',
-            requestFrom: '6285731811079@s.whatsapp.net',
+            requestFrom: '999999999999@s.whatsapp.net',
             noteMessage: {
                 extendedTextMessage: {
                     text: `*${config.botName}*`,
