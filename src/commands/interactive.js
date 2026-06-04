@@ -174,7 +174,7 @@ const handler = async (ctx) => {
             interactiveMessage: {
                 header: {
                     hasMediaAttachment: [],
-                    jpegThumbnail: thumbnail,
+                    jpegThumbnail: fs.readFileSync(imagePathh),
                 },
                 nativeFlowMessage: {
                     buttons: [
