@@ -88,6 +88,32 @@ const handler = async (ctx) => {
 
     switch (command.name) {
 
+case 'menudownloader':
+    menu = `
+╭──❍『𝑫𝒐𝒘𝒏𝒍𝒐𝒂𝒅𝒆𝒓 𝑴𝒆𝒏𝒖』
+│
+│⭔ ${prefix}ytmp3 [url]
+│⭔ ${prefix}ytmp4 [url]
+│⭔ ${prefix}twiter [url]
+│⭔ ${prefix}umma [url]
+│⭔ ${prefix}mediafire [url]
+│⭔ ${prefix}gitclone [url]
+│⭔ ${prefix}facebook [url]
+│⭔ ${prefix}tiktok [url]
+│
+╰────❍
+`
+            await ctx.sendInteractive({
+                
+                text: menu,
+                footer: config.botName,
+                quoted: ctx.msg,
+                buttons: [
+                    { name: 'quick_reply', buttonParamsJson: JSON.stringify({ display_text: '⬅️ Kembali ke Menu', id: 'menu' }) },
+                    { name: 'quick_reply', buttonParamsJson: JSON.stringify({ display_text: '🎛️ Interactive', id: 'menu_interactive' }) },
+                ]
+            });
+            break;
         // ── !ytmp3 ── YouTube → Audio MP3 ─────────────────────────────────────
         case 'ytmp3': {
             if (!url) return ctx.reply({ text: '❌ Contoh: `!ytmp3 https://youtu.be/xxx`' });
@@ -279,7 +305,7 @@ const handler = async (ctx) => {
             }
             break;
         }
-        
+
                 // ── !igdl ── Instagram ──────────────────────────────────────────────
         case 'igdl': {
             if (!url) return ctx.reply({ text: '❌ Contoh: `!igdl https://www.instagram.com/reel/...`' });
