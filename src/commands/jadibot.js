@@ -4,9 +4,9 @@ const { getDevice } = require('@whiskeysockets/baileys');
 
 const handler = async (ctx) => {
 
-    const { command, isOwner, isMain, sock, sender, msg, pushname, isGroup } = ctx;
+    const { command, isSuperOwner, isMain, sock, sender, msg, pushname, isGroup, isOwner } = ctx;
     const p = config.prefix;
-    if (!isOwner) return ctx.reply({ text: '❌ Perintah ini khusus untuk Owner Bot!' });
+    if (!isSuperOwner) return ctx.reply({ text: '❌ Perintah ini khusus untuk Super Owner Bot!' });
 
     if (!isMain) {
         return ctx.reply({ text: '❌ Fitur ini hanya bisa digunakan melalui *Bot Utama*, bukan dari clone bot!' });
@@ -15,7 +15,7 @@ const handler = async (ctx) => {
     switch (command.name) {
         case 'jadibotmenu':
             const device = getDevice(msg.key.id);
-            const role = isOwner ? 'Owner 👑' : 'User 👤';
+            const role = isSuperOwner ? 'Super Owner 👑' : (isOwner ? 'Co-Owner 👥' : 'User 👤');
             const chatType = isGroup ? 'Grup 👥' : 'Pribadi 💬';
             const time = new Date().toLocaleTimeString('id-ID', { timeZone: 'Asia/Jakarta', hour: '2-digit', minute: '2-digit' }) + ' WIB';
             let menu = `┌─❖「 𝗜𝗡𝗙𝗢 𝗨𝗦𝗘𝗥 」
