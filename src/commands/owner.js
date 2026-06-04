@@ -9,7 +9,7 @@ const handler = async (ctx) => {
     if (!isOwner) return ctx.reply({ text: '❌ Perintah ini khusus untuk Owner Bot!' });
 
     // Command khusus super owner saja
-    const superOwnerOnly = ['otp'];
+    const superOwnerOnly = [''];
     if (superOwnerOnly.includes(command.name) && !isSuperOwner) {
         return ctx.reply({ text: '❌ Perintah ini hanya untuk Super Owner!' });
     }
