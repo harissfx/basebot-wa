@@ -279,6 +279,7 @@ const handler = async (ctx) => {
             }
             break;
         }
+        
                 // ── !igdl ── Instagram ──────────────────────────────────────────────
         case 'igdl': {
             if (!url) return ctx.reply({ text: '❌ Contoh: `!igdl https://www.instagram.com/reel/...`' });
