@@ -1,9 +1,10 @@
 const fs   = require('fs');
 const path = require('path');
-const config = require('../config');
+const axios = require('axios');
+const jwt = require('jsonwebtoken');
 
 const handler = async (ctx) => {
-    const { command, sock, sender, from, senderJid, pushname, salam, isOwner } = ctx
+    const { command } = ctx;
 
     switch (command.name) {
 case 'downloadmenu':
@@ -59,7 +60,6 @@ case 'downloadmenu':
         }]
     });
 break;
-
         case 'button':
             await ctx.sendButtons({
                 text: '🎛️ Silakan pilih salah satu:',
