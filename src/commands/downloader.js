@@ -112,6 +112,25 @@ case 'menudownloader':
                 quoted: ctx.msg,
                 buttons: [
                     { name: 'quick_reply', buttonParamsJson: JSON.stringify({ display_text: 'Kembali ke Menu', id: 'menu' }) },
+                    {
+                        name: "single_select",
+                        buttonParamsJson: JSON.stringify({
+                           icon: "REVIEW",
+                           has_multiple_buttons: true
+                        })
+                     }, {
+                        name: "galaxy_message",
+                        buttonParamsJson: JSON.stringify({
+                           icon: "GIFT",
+                           flow_cta: "╭────────「  S E L E C T  」────────╮",
+                           flow_message_version: "3"
+                        })
+                     }, {
+                        name: "call_permission_request",
+                        buttonParamsJson: JSON.stringify({
+                           has_multiple_buttons: true
+                        })
+                     }, 
                     { name: 'single_select',buttonParamsJson: JSON.stringify({ title: '📂 Buka Menu',
                         sections: [{
                             title: '🍔 Makanan',
