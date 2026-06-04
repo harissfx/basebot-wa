@@ -96,12 +96,11 @@ case 'downloadmenu':
 │
 │⭔ ${p}ytmp3 [url]
 │⭔ ${p}ytmp4 [url]
-│⭔ ${p}twiter [url]
-│⭔ ${p}umma [url]
-│⭔ ${p}mediafire [url]
-│⭔ ${p}gitclone [url]
-│⭔ ${p}facebook [url]
 │⭔ ${p}tiktok [url]
+│⭔ ${p}twiter [url]
+│⭔ ${p}facebook [url]
+│⭔ ${p}pinterest [url]
+│⭔ ${p}instagram [url]
 │
 ╰────❍
 `
@@ -299,7 +298,9 @@ break;
 
         // ── !xdl ── Twitter/X video ────────────────────────────────────────────
         case 'xdl':
-        case 'twdl': {
+        case 'twdl':
+        case 'twiter':
+                {
             if (!url) return ctx.reply({ text: '❌ Contoh: `!xdl https://x.com/xxx/status/xxx`' });
 
             await ctx.react('⏳');
@@ -338,7 +339,9 @@ break;
         }
 
                 // ── !igdl ── Instagram ──────────────────────────────────────────────
-        case 'igdl': {
+        case 'instagram':
+            case 'igdl':
+                    {
             if (!url) return ctx.reply({ text: '❌ Contoh: `!igdl https://www.instagram.com/reel/...`' });
 
             await ctx.react('⏳');
@@ -387,7 +390,10 @@ break;
         }
 
         // ── !fbdl ── Facebook ───────────────────────────────────────────────
-        case 'fbdl': {
+        case 'fb':
+            case 'fbdl':
+                case 'facebook':
+            {
             if (!url) return ctx.reply({ text: '❌ Contoh: `!fbdl https://facebook.com/...`' });
 
             await ctx.react('⏳');
@@ -436,6 +442,7 @@ break;
         }
 
         // ── !pindl ── Pinterest Video ───────────────────────────────────────
+        case 'pinterest':
         case 'pindl':
         case 'pin': {
             if (!url) return ctx.reply({ text: '❌ Contoh: `!pindl https://pin.it/...`' });
