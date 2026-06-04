@@ -129,7 +129,7 @@ const handler = async (ctx) => {
             break;
 
         // ─── PAYMENT BUTTON ─────────────────────────────────────────────────────
-        case 'pay': {
+        case 'pay':
             const { generateWAMessageFromContent, proto, isJidGroup } = require('@whiskeysockets/baileys');
 
             const jid      = ctx.msg.key.remoteJid;
@@ -193,7 +193,16 @@ const handler = async (ctx) => {
 
             await ctx.sock.relayMessage(jid, waMsg.message, { messageId: waMsg.key.id, additionalNodes });
             break;
-        }
 
     }
 };
+
+module.exports.commands = [
+    'button', 'btn_1', 'btn_2', 'btn_3',
+    'list', 'food_1', 'food_2', 'food_3', 'drink_1', 'drink_2', 'drink_3', 'dessert_1', 'dessert_2',
+    'interactive', 'qr_hello',
+    'media', 'medialokal',
+    'buttonimage', 'like', 'share',
+    'buttoncall',
+    'pay'
+];
