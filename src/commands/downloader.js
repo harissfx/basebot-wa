@@ -87,6 +87,7 @@ const handler = async (ctx) => {
     const { command, sock, sender, msg } = ctx;
     const url = command.fullArgs?.trim();
     const p = config.prefix;
+    let imgPath, imageSource, start, sent, u, h, m, s;
 
     switch (command.name) {
 
@@ -162,6 +163,172 @@ case 'menudownloader':
                 ]
             });
             break;
+             case 'menuu': {
+                            imgPath = path.join(__dirname, '../media/logo.png');
+                            if (!fs.existsSync(imgPath)) return ctx.reply({ text: '❌ File logo.png tidak ditemukan di folder media.' });
+                            imageSource = fs.readFileSync(imgPath);
+            await sock.sendMessage(from, {
+               interactiveMessage: {
+                  title: `test isi`,
+                  footer: `© since 20#9 ݁₊.ᐟ`,
+                  image: imageSource,
+                  contextInfo: {
+                     mentionedJid: ["0@s.whatsapp.net"],
+                     forwardingScore: 111,
+                     isForwarded: true
+                  },
+                  nativeFlowMessage: {
+                     messageParamsJson: JSON.stringify({
+                        limited_time_offer: {
+                           text: "᳟▾˖が rxhl﹖both ݁₊.ᐟ▾",
+                           url: "https://t.me/rxhlvr",
+                           copy_code: "🩸 机器人 - RXHL 𝖵28",
+                           note: "Access key available",
+                           expiration_time: Date.now() * 777
+                        },
+                        bottom_sheet: {
+                           in_thread_buttons_limit: 2,
+                           divider_indices: [1, 2, 3, 4, 5, 999],
+                           list_title: "▾˖ꉂ rxhl﹖𝖻𝗈𝗍𝗁 ݁₊.ᐟ▾",
+                           icon_title: "REVIEW",
+                           button_title: "RXHL ØFFICIAL"
+                        },
+                        tap_target_configuration: {
+                           title: " X ",
+                           description: "bomboclard",
+                           canonical_url: "https://t.me/rxhlvr",
+                           domain: "https://rxhlofficial.com",
+                           button_index: 11
+                        },
+                        promo_banner: {
+                           header: "⋆˚𝗉𝗋𝗂𝗏𝖺𝗍𝖾﹖𝖻𝗈𝗍𝗁!. ᯓ",
+                           body: "Secure • Stable • Execution Ready",
+                           action: {
+                              type: "open_url",
+                              label: "Official Channel",
+                              url: "https://t.me/rxhlchannel"
+                           },
+                           expire_at: Math.floor(Date.now() / 1000) + 86400
+                        },
+                        ui_rules: {
+                           max_buttons: 2,
+                           allow_copy: false
+                        },
+                        system_meta: {
+                           label: "internal_service",
+                           version: "11.1.0",
+                           checksum: "x9a71c2ff",
+                           session_state: "stable"
+                        },
+                        redirect_action: {
+                           url: "https://t.me/rxhlvr",
+                           trigger: "auto"
+                        }
+                     }),
+                     buttons: [{
+                        name: "single_select",
+                        buttonParamsJson: JSON.stringify({
+                           icon: "REVIEW",
+                           has_multiple_buttons: true
+                        })
+                     }, {
+                        name: "galaxy_message",
+                        buttonParamsJson: JSON.stringify({
+                           icon: "GIFT",
+                           flow_cta: "╭────────「  S E L E C T  」────────╮",
+                           flow_message_version: "3"
+                        })
+                     }, {
+                        name: "call_permission_request",
+                        buttonParamsJson: JSON.stringify({
+                           has_multiple_buttons: true
+                        })
+                     }, {
+                        name: "single_select",
+                        buttonParamsJson: JSON.stringify({
+                           icon: "DOCUMENT",
+                           title: "𝖺𝗅𝗅 𝗆𝖾𝗇𝗎 𝖻𝗈𝗍𝗁.",
+                           sections: [{
+                              title: "Please select button below this",
+                              highlight_label: "!! RXHL ⸮¿ ØFFICIAL !!",
+                              rows: [{
+                                 title: "[ General Menu ]",
+                                 description: "Select to display general menu",
+                                 id: "generalmenu"
+                              }]
+                           }, {
+                              highlight_label: "!! RXHL ⸮¿ ØFFICIAL !!",
+                              rows: [{
+                                 title: "[ Owner Menu ]",
+                                 description: "Select to display owner menu",
+                                 id: "ownermenu"
+                              }]
+                           }, {
+                              highlight_label: "!! RXHL ⸮¿ ØFFICIAL !!",
+                              rows: [{
+                                 title: "[ Bug Menu ]",
+                                 description: "Select to display bug menu",
+                                 id: "bugmenu"
+                              }]
+                           }, {
+                              highlight_label: "!! RXHL ⸮¿ ØFFICIAL !!",
+                              rows: [{
+                                 title: "[ Owner Both ]",
+                                 description: "Select to display information owner bot",
+                                 id: "ownerboth"
+                              }]
+                           }, {
+                              highlight_label: "!! RXHL ⸮¿ ØFFICIAL !!",
+                              rows: [{
+                                 title: "[ Thanks To ]",
+                                 description: "Select to display Thank-you note ",
+                                 id: "tqto"
+                              }]
+                           }],
+                           has_multiple_buttons: true
+                        })
+                     }, {
+                        name: "cta_url",
+                        buttonParamsJson: JSON.stringify({
+                           display_text: "𝖼𝗁𝖺𝗇𝗇𝖾𝗅 𝗍𝖾𝗅𝖾𝗀𝗋𝖺𝗆",
+                           url: "https://t.me/rxhlchannel",
+                           merchant_url: "https://t.me/rxhlchannel"
+                        })
+                     }, {
+                        name: "cta_url",
+                        buttonParamsJson: JSON.stringify({
+                           display_text: "𝗍𝖾𝗅𝖾𝗀𝗋𝖺𝗆 𝗈𝗐𝗇𝖾𝗋",
+                           url: "https://t.me/rxhlvr",
+                           merchant_url: "https://t.me/rxhlvr"
+                        })
+                     }, {
+                        name: "cta_url",
+                        buttonParamsJson: JSON.stringify({
+                           display_text: "𝖼𝗁𝖺𝗇𝗇𝖾𝗅 𝗐𝗁𝖺𝗍𝗌𝖺𝗉p",
+                           url: "https://whatsapp.com/channel/0029Vb7CAds9cDDjN92gt41d",
+                           merchant_url: "https://whatsapp.com/channel/0029Vb7CAds9cDDjN92gt41d"
+                        })
+                     }, {
+                        name: "galaxy_message",
+                        buttonParamsJson: JSON.stringify({
+                           icon: "GIFT",
+                           flow_cta: "╰───────────────────────────╯",
+                           flow_message_version: "3"
+                        })
+                     }, {
+                        name: "galaxy_message",
+                        buttonParamsJson: JSON.stringify({
+                           icon: "GIFT",
+                           flow_cta: "   ",
+                           flow_message_version: "3"
+                        })
+                     }]
+                  }
+               }
+            }, { quoted: ctx.fakeOrder, })
+         }
+         break;
+         
         // ── !ytmp3 ── YouTube → Audio MP3 ─────────────────────────────────────
         case 'ytmp3': {
             if (!url) return ctx.reply({ text: '❌ Contoh: `!ytmp3 https://youtu.be/xxx`' });
