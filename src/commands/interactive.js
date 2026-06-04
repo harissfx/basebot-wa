@@ -97,16 +97,16 @@ await sock.sendMessage(from, {
 text: hanzt,
 contextInfo:{
 mentionedJid:[senderJid],
-"externalAdReply": {
-"showAdAttribution": true,
+forwardingScore: 111,
+isForwarded: true,
 "renderLargerThumbnail": true,
 "title": `Hay Kak ${pushname} 👋 Selamat ${salam}`,
 "containsAutoReply": true,
 "mediaType": 1, 
- "thumbnail": fs.readFileSync('./src/media/logo.png'),
+"thumbnail": fs.readFileSync('./src/media/logo.png'),
 "mediaUrl": `https://whatsapp.com/channel/0029Va9311BFy72KkrEY5v3K`,
 "sourceUrl": `https://whatsapp.com/channel/0029Va9311BFy72KkrEY5v3K`
-}
+
 }
 }, { quoted: msg })
 break
