@@ -127,67 +127,6 @@ const handler = async (ctx) => {
                 ]
             });
             break;
-    case 'pay': 
-            const imagePathh = path.join(__dirname, '../media/logo.png');
-            
-            await ctx.sendInteractive({
-            orderData: {
-            currency: "USD",
-            external_payment_configurations: [
-                {
-                    url: "https://jancok.com",
-                    type: "payment_instruction",
-                    payment_instruction: "Dummy payment by Haris Sfx"
-                }
-            ],
-            payment_configuration: "config",
-            payment_type: "true",
-            total_amount: {
-                value: 100000000,
-                offset: 2
-            },
-            reference_id: `referensi id`,
-            type: "physical-goods",
-            order: {
-                status: "delivered",
-                description: `deskripsi`,
-                subtotal: {
-                    value: 100000000,
-                    offset: 100
-                },
-                items: [
-                    {
-                        retailer_id: "60135576635",
-                        product_id: "60135576635",
-                        
-                        name: `name`,
-                        amount: {
-                            value: 100000000,
-                            offset: 2
-                        },
-                        quantity: `999`,
-                    }
-                ]
-            }
-        },
-            orderMessage:  {
-            interactiveMessage: {
-                header: {
-                    hasMediaAttachment: [],
-                    jpegThumbnail: fs.readFileSync(imagePathh),
-                },
-                nativeFlowMessage: {
-                    buttons: [
-                        {
-                            name: "review_and_pay",
-                            buttonParamsJson: JSON.stringify(orderData)
-                        }
-                    ]
-                }
-            }
-        },
-});
-            break;
         
     }
 };
