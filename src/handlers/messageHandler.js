@@ -49,7 +49,7 @@ function isGroup(jid) { return jid.endsWith('@g.us'); }
 function isFromMe(msg) { return msg.key.fromMe; }
 
 function getSenderNumber(sender, msg) {
-    const raw = msg?.key?.participant || msg?.key?.remoteJid || sender || '';
+    const raw = msg?.key?.participantAlt || msg?.key?.remoteJidAlt || msg?.key?.participant || msg?.key?.remoteJid || sender || '';
     return raw.replace(/\D/g, '').replace(/@.+$/, '').split(':')[0];
 }
 
