@@ -279,6 +279,153 @@ const handler = async (ctx) => {
             }
             break;
         }
+                // ── !igdl ── Instagram ──────────────────────────────────────────────
+        case 'igdl': {
+            if (!url) return ctx.reply({ text: '❌ Contoh: `!igdl https://www.instagram.com/reel/...`' });
+
+            await ctx.react('⏳');
+            let filePath;
+
+            try {
+                await ctx.reply({ text: '⬇️ Mendownload Instagram...' });
+
+                filePath = await download(url, [
+                    '-f', 'best',
+                    '--merge-output-format', 'mp4',
+                ], 'mp4');
+
+                const sizeMB = fileSizeMB(filePath);
+
+                if (sizeMB > MAX_SIZE_MB) {
+                    cleanTmp(filePath);
+                    await ctx.react('❌');
+                    return ctx.reply({
+                        text: `❌ File terlalu besar (${sizeMB.toFixed(1)} MB).`
+                    });
+                }
+
+                let info;
+                try { info = await getInfo(url); } catch {}
+
+                await sock.sendMessage(sender, {
+                    video: fs.readFileSync(filePath),
+                    mimetype: 'video/mp4',
+                    caption: info?.title || '✅ Instagram Downloaded!'
+                }, { quoted: msg });
+
+                cleanTmp(filePath);
+                await ctx.react('✅');
+
+            } catch (err) {
+                cleanTmp(filePath);
+                console.error('[IGDL ERROR]', err.message);
+
+                await ctx.react('❌');
+                await ctx.reply({
+                    text: `❌ Gagal download Instagram.\nError: ${err.message.slice(0, 200)}`
+                });
+            }
+            break;
+        }
+
+        // ── !fbdl ── Facebook ───────────────────────────────────────────────
+        case 'fbdl': {
+            if (!url) return ctx.reply({ text: '❌ Contoh: `!fbdl https://facebook.com/...`' });
+
+            await ctx.react('⏳');
+            let filePath;
+
+            try {
+                await ctx.reply({ text: '⬇️ Mendownload Facebook...' });
+
+                filePath = await download(url, [
+                    '-f', 'best',
+                    '--merge-output-format', 'mp4',
+                ], 'mp4');
+
+                const sizeMB = fileSizeMB(filePath);
+
+                if (sizeMB > MAX_SIZE_MB) {
+                    cleanTmp(filePath);
+                    await ctx.react('❌');
+                    return ctx.reply({
+                        text: `❌ File terlalu besar (${sizeMB.toFixed(1)} MB).`
+                    });
+                }
+
+                let info;
+                try { info = await getInfo(url); } catch {}
+
+                await sock.sendMessage(sender, {
+                    video: fs.readFileSync(filePath),
+                    mimetype: 'video/mp4',
+                    caption: info?.title || '✅ Facebook Downloaded!'
+                }, { quoted: msg });
+
+                cleanTmp(filePath);
+                await ctx.react('✅');
+
+            } catch (err) {
+                cleanTmp(filePath);
+                console.error('[FBDL ERROR]', err.message);
+
+                await ctx.react('❌');
+                await ctx.reply({
+                    text: `❌ Gagal download Facebook.\nError: ${err.message.slice(0, 200)}`
+                });
+            }
+            break;
+        }
+
+        // ── !pindl ── Pinterest Video ───────────────────────────────────────
+        case 'pindl':
+        case 'pin': {
+            if (!url) return ctx.reply({ text: '❌ Contoh: `!pindl https://pin.it/...`' });
+
+            await ctx.react('⏳');
+            let filePath;
+
+            try {
+                await ctx.reply({ text: '⬇️ Mendownload Pinterest...' });
+
+                filePath = await download(url, [
+                    '-f', 'best',
+                    '--merge-output-format', 'mp4',
+                ], 'mp4');
+
+                const sizeMB = fileSizeMB(filePath);
+
+                if (sizeMB > MAX_SIZE_MB) {
+                    cleanTmp(filePath);
+                    await ctx.react('❌');
+                    return ctx.reply({
+                        text: `❌ File terlalu besar (${sizeMB.toFixed(1)} MB).`
+                    });
+                }
+
+                let info;
+                try { info = await getInfo(url); } catch {}
+
+                await sock.sendMessage(sender, {
+                    video: fs.readFileSync(filePath),
+                    mimetype: 'video/mp4',
+                    caption: info?.title || '✅ Pinterest Downloaded!'
+                }, { quoted: msg });
+
+                cleanTmp(filePath);
+                await ctx.react('✅');
+
+            } catch (err) {
+                cleanTmp(filePath);
+                console.error('[PINDL ERROR]', err.message);
+
+                await ctx.react('❌');
+                await ctx.reply({
+                    text: `❌ Gagal download Pinterest.\nError: ${err.message.slice(0, 200)}`
+                });
+            }
+            break;
+        }
 
     }
 };
