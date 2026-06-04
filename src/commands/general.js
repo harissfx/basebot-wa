@@ -39,7 +39,7 @@ const handler = async (ctx) => {
 └────────────┈ ⳹`
             await ctx.sendInteractive({
                 text: menu,
-                footer: config.botName,
+                footer: config.footerTxt,
                 quoted: ctx.fakeOrder,
                 contextInfo: {
                     mentionedJid: ["0@s.whatsapp.net"],
@@ -115,7 +115,7 @@ const handler = async (ctx) => {
             await ctx.sendInteractiveWithImage({
                 imageSource,
                 text: menutxt,
-                footer: `${config.footerTxt}`,
+                footer: config.footerTxt,
                 quoted: ctx.fakeOrder,
                 contextInfo: {
                     mentionedJid: ['0@s.whatsapp.net'],
@@ -158,82 +158,6 @@ const handler = async (ctx) => {
                             ]
                         })
                     }
-                ]
-            });
-            break;
-
-        case 'menu_general':
-            await ctx.sendInteractive({
-                text: [
-                    '📋 *General Commands*',
-                    '',
-                    `• \`${p}menu\` — Menu utama`,
-                    `• \`${p}ping\` — Latency bot`,
-                    `• \`${p}info\` — Info bot`,
-                    `• \`${p}owner\` — Kontak owner`,
-                    `• \`${p}location\` — Kirim lokasi`,
-                    `• \`${p}contact\` — Kirim kontak`,
-                    `• \`${p}poll\` — Polling`,
-                ].join('\n'),
-                footer: config.botName,
-                quoted: ctx.msg,
-                buttons: [
-                    { name: 'quick_reply', buttonParamsJson: JSON.stringify({ display_text: '⬅️ Kembali ke Menu', id: 'menu' }) },
-                    { name: 'quick_reply', buttonParamsJson: JSON.stringify({ display_text: '🎛️ Interactive', id: 'menu_interactive' }) },
-                ]
-            });
-            break;
-
-        case 'menu_interactive':
-            await ctx.sendInteractive({
-                text: [
-                    '🎛️ *Interactive Commands*',
-                    '',
-                    `• \`${p}button\` — Quick reply buttons`,
-                    `• \`${p}list\` — List menu makanan`,
-                    `• \`${p}interactive\` — Mixed buttons`,
-                    `• \`${p}buttonimage\` — Button + gambar`,
-                    `• \`${p}buttoncall\` — Button telepon`,
-                    `• \`${p}poll\` — Polling`,
-                ].join('\n'),
-                footer: config.botName,
-                quoted: ctx.msg,
-                buttons: [
-                    { name: 'quick_reply', buttonParamsJson: JSON.stringify({ display_text: '⬅️ Kembali ke Menu', id: 'menu' }) },
-                    { name: 'quick_reply', buttonParamsJson: JSON.stringify({ display_text: '🖼️ Media & Fun', id: 'menu_media' }) },
-                    {
-                        name: 'cta_url',
-                        buttonParamsJson: JSON.stringify({ display_text: '📖 Docs Baileys', url: 'https://github.com/whiskeysockets/baileys' })
-                    },
-                ]
-            });
-            break;
-
-        case 'menu_media':
-            await ctx.sendInteractive({
-                text: [
-                    '🖼️ *Media Commands*',
-                    `• \`${p}media\` — Gambar dari URL`,
-                    `• \`${p}medialokal\` — Gambar lokal`,
-                    '',
-                    '😄 *Fun Commands*',
-                    `• \`${p}dice\` — Lempar dadu`,
-                    `• \`${p}coin\` — Coin flip`,
-                    `• \`${p}random\` — Angka random`,
-                    `• \`${p}8ball\` — Bola ajaib`,
-                    `• \`${p}joke\` — Lelucon`,
-                    `• \`${p}fortune\` — Ramalan`,
-                    '',
-                    '👥 *Group Commands*',
-                    `• \`${p}tagall\` — Tag semua member`,
-                    `• \`${p}groupinfo\` — Info grup`,
-                    `• \`${p}kick/add/promote/demote/link\``,
-                ].join('\n'),
-                footer: config.botName,
-                quoted: ctx.msg,
-                buttons: [
-                    { name: 'quick_reply', buttonParamsJson: JSON.stringify({ display_text: '⬅️ Kembali ke Menu', id: 'menu' }) },
-                    { name: 'quick_reply', buttonParamsJson: JSON.stringify({ display_text: '📋 General', id: 'menu_general' }) },
                 ]
             });
             break;

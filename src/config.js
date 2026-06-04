@@ -12,7 +12,7 @@ module.exports = {
     botName: 'WhatsApp Bot',
 
     footerTxt: 'Powered by ẉHarisSyc.com',
-    
+
     // Prefix command (contoh: ! . /)\
     prefix: '!',
 
@@ -21,10 +21,10 @@ module.exports = {
 
     // Co-Owner — bisa lebih dari satu, akses owner biasa
     coOwner: [
-            '6285124014109',
+        '6285124014109',
         // '6289999999999',
     ],
-    
+
     // Mode bot: 'public' → semua orang | 'self' → hanya owner
     botMode: 'public',
 

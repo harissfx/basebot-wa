@@ -39,7 +39,7 @@ const handler = async (ctx) => {
 └────────────┈ ⳹`
             await ctx.sendInteractive({
                 text: menu,
-                footer: config.botName,
+                footer: config.footerTxt,
                 quoted: ctx.fakeOrder,
                 contextInfo: {
                     mentionedJid: ["0@s.whatsapp.net"],

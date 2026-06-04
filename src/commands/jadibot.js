@@ -37,7 +37,7 @@ const handler = async (ctx) => {
 └────────────┈ ⳹`
             await ctx.sendInteractive({
                 text: menu,
-                footer: config.botName,
+                footer: config.footerTxt,
                 quoted: ctx.fakeOrder,
                 contextInfo: {
                     mentionedJid: ["0@s.whatsapp.net"],
@@ -116,7 +116,7 @@ const handler = async (ctx) => {
                             `👉 Buka WhatsApp kamu → *Linked Devices* → *Link with phone number*\n` +
                             `Lalu masukkan kode di atas.\n\n` +
                             `⚠️ Kode ini hanya berlaku beberapa menit!`,
-                        footer: `${config.botName}`,
+                        footer: config.footerTxt,
                         buttons: [
                             {
                                 name: 'cta_copy',
@@ -138,7 +138,7 @@ const handler = async (ctx) => {
                         `• *Pairing Code* : *${pairingCode}*\n\n` +
                         `📨 Pairing code sudah dikirim langsung ke nomor *+${nomorTarget}*.\n\n` +
                         `👉 Atau klik tombol di bawah untuk menyalin kode, lalu masukkan pada menu *Linked Devices → Link with phone number*.`,
-                    footer: `${config.botName}`,
+                    footer: config.footerTxt,
                     quoted: ctx.msg,
                     buttons: [
                         {
