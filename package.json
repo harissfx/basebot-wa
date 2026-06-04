@@ -4,7 +4,7 @@
   "description": "Base bot WhatsApp dengan Node.js & Baileys - Support Button, List, Media, Poll",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
+    "start": "npm install --omit=dev && node index.js",
     "dev": "node index.js",
     "postinstall": "sed -i '/console.info.*Closing session/d' node_modules/libsignal/src/session_record.js"
   },
@@ -14,10 +14,12 @@
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
     "axios": "^1.7.2",
     "chalk": "^4.1.2",
+    "cheerio": "^1.0.0",
     "chokidar": "^3.6.0",
     "dotenv": "^16.4.5",
     "figlet": "^1.7.0",
     "fluent-ffmpeg": "^2.1.3",
+    "form-data": "^4.0.0",
     "jsonwebtoken": "^9.0.2",
     "node-webpmux": "^3.1.9",
     "pino": "^9.0.0",
