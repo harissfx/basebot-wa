@@ -129,7 +129,9 @@ const handler = async (ctx) => {
             break;
     case 'pay': 
             const imagePathh = path.join(__dirname, '../media/logo.png');
-                    const orderData = {
+            
+            await ctx.sendInteractive({
+            orderData: {
             currency: "USD",
             external_payment_configurations: [
                 {
@@ -167,9 +169,7 @@ const handler = async (ctx) => {
                     }
                 ]
             }
-        };
-            await ctx.sendInteractive({
-                        // Ini payload mentah untuk relayMessage
+        },
             orderMessage:  {
             interactiveMessage: {
                 header: {
