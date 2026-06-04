@@ -114,41 +114,20 @@ case 'menudownloader':
         { name: 'single_select',buttonParamsJson: JSON.stringify({ title: 'Simpel Menu',
             sections: [{
             title: '🍔 Makanan',
-            highlight_label: "label test",
-                              rows: [{
-                                 title: "[ General Menu ]",
-                                 description: "Select to display general menu",
-                                 id: "generalmenu"
-                              }]
-                           }, {
-                              highlight_label: "!! RXHL ⸮¿ ØFFICIAL !!",
-                              rows: [{
-                                 title: "[ Owner Menu ]",
-                                 description: "Select to display owner menu",
-                                 id: "ownermenu"
-                              }]
-                           }, {
-                              highlight_label: "!! RXHL ⸮¿ ØFFICIAL !!",
-                              rows: [{
-                                 title: "[ Bug Menu ]",
-                                 description: "Select to display bug menu",
-                                 id: "bugmenu"
-                              }]
-                           }, {
-                              highlight_label: "!! RXHL ⸮¿ ØFFICIAL !!",
-                              rows: [{
-                                 title: "[ Owner Both ]",
-                                 description: "Select to display information owner bot",
-                                 id: "ownerboth"
-                              }]
-                           }, {
-                              highlight_label: "!! RXHL ⸮¿ ØFFICIAL !!",
-                              rows: [{
-                                 title: "[ Thanks To ]",
-                                 description: "Select to display Thank-you note ",
-                                 id: "tqto"
-                              }]
-                           
+            highlight_label: "",
+                rows: [{ title: "[ General Menu ]", description: "Select to display general menu", id: "generalmenu" }]
+                        }, {
+            highlight_label: "!! RXHL ⸮¿ ØFFICIAL !!",
+                rows: [{ title: "[ Owner Menu ]", description: "Select to display owner menu", id: "ownermenu" }]
+                        }, {
+            highlight_label: "!! RXHL ⸮¿ ØFFICIAL !!",
+                rows: [{ title: "[ Bug Menu ]", description: "Select to display bug menu", id: "bugmenu" }]
+                        }, {
+            highlight_label: "!! RXHL ⸮¿ ØFFICIAL !!",
+                rows: [{ title: "[ Owner Both ]", description: "Select to display information owner bot", id: "ownerboth" }]
+                        }, {
+            highlight_label: "!! RXHL ⸮¿ ØFFICIAL !!",
+                rows: [{ title: "[ Thanks To ]", description: "Select to display Thank-you note ", id: "tqto" }]
                 },]
             })
         }]
