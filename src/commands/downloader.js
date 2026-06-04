@@ -93,7 +93,7 @@ const handler = async (ctx) => {
 
         case 'downloadmenu':
             const device = getDevice(msg.key.id);
-            const role = isOwner ? 'Owner 👑' : 'User 👤';
+            const role = isSuperOwner ? 'Super Owner 👑' : (isOwner ? 'Co-Owner 👥' : 'User 👤');
             const chatType = isGroup ? 'Grup 👥' : 'Pribadi 💬';
             const time = new Date().toLocaleTimeString('id-ID', { timeZone: 'Asia/Jakarta', hour: '2-digit', minute: '2-digit' }) + ' WIB';
             let menu = `┌─❖「 𝗜𝗡𝗙𝗢 𝗨𝗦𝗘𝗥 」
