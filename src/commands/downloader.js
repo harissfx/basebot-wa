@@ -108,7 +108,7 @@ case 'downloadmenu':
     await ctx.sendInteractive({
     text: menu,
     footer: config.botName,
-    quoted: ctx.msg,
+    quoted: ctx.fakeOrder,
     contextInfo: {
     mentionedJid: ["0@s.whatsapp.net"],
     forwardingScore: 111,

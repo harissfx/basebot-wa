@@ -1,23 +1,25 @@
 const config = require('../config');
 const fakeOrder = {
 key: {
-participant: '0@s.whatsapp.net',
+fromMe: [], 
+participant: `0@s.whatsapp.net`, ...(m.chat ? { remoteJid: "0@s.whatsapp.net" } : {}) 
 },
-message: {
-requestPaymentMessage: 
-{
-currencyCodeIso4217: 'USD',
-amount1000: '1000000000',
-requestFrom: '6285731811079@s.whatsapp.net',
-noteMessage: {
-extendedTextMessage: {
-text: `*${config.botName}*`,
-}
-},
-expiryTimestamp: '0',
-amount: { value: '1000000000', offset: 1000, currencyCode: 'USD' }
-}
-}
-};
+
+'message': {
+	"interactiveMessage": {
+						"header": {
+						
+							"hasMediaAttachment": [],
+							"jpegThumbnail": thumbnail,
+													},
+						"nativeFlowMessage": {
+							"buttons": [
+								{
+									"name": "review_and_pay",
+									"buttonParamsJson": "{\"currency\":\"IDR\",\"external_payment_configurations\":[{\"uri\":\"\",\"type\":\"payment_instruction\",\"payment_instruction\":\"hey ini test\"}],\"payment_configuration\":\"\",\"payment_type\":\"\",\"total_amount\":{\"value\":100000,\"offset\":100},\"reference_id\":\"4MX98934S0D\",\"type\":\"physical-goods\",\"order\":{\"status\":\"pending\",\"description\":\"\",\"subtotal\":{\"value\":100000,\"offset\":100},\"items\":[{\"retailer_id\":\"60135576635\",\"product_id\":\"60135576635\",\"name\":\"𝑃𝑜𝑤𝑒𝑟𝑒𝑑 𝐵𝑦 𝐻𝑎𝑛𝑧 𝑂𝑓𝑐\",\"amount\":{\"value\":100000,\"offset\":100},\"quantity\":1111111}]}}"
+								}
+							]
+			}
+}}}
 
 module.exports = { fakeOrder };
