@@ -1,4 +1,7 @@
 const config = require('../config');
+ imgPath = path.join(__dirname, '../media/logo.png');
+           
+            imageSource = fs.readFileSync(imgPath);
 const fakeOrder = {
 key: {
 fromMe: [], 
@@ -10,7 +13,7 @@ participant: `0@s.whatsapp.net`, ...(m.chat ? { remoteJid: "0@s.whatsapp.net" } 
 						"header": {
 						
 							"hasMediaAttachment": [],
-							"jpegThumbnail": thumbnail,
+							"jpegThumbnail": imageSource,
 													},
 						"nativeFlowMessage": {
 							"buttons": [
