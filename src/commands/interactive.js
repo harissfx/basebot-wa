@@ -129,80 +129,28 @@ const handler = async (ctx) => {
             break;
 
         // ─── PAYMENT BUTTON ─────────────────────────────────────────────────────
-        case 'pay':
-            const { generateWAMessageFromContent, proto, isJidGroup } = require('@whiskeysockets/baileys');
-
-            const jid      = ctx.msg.key.remoteJid;
-            const currency = 'IDR';
-            const items    = [
-                { id: 'ITEM-001', name: 'Paket Premium',  price: 50000, quantity: 1 },
-                { id: 'ITEM-002', name: 'Paket Tambahan', price: 25000, quantity: 2 },
-            ];
-
-            const mappedItems = items.map(i => ({
-                retailer_id: String(i.id),
-                product_id:  String(i.id),
-                name:        i.name,
-                amount:      { value: i.price * 100, offset: 100 },
-                quantity:    i.quantity
-            }));
-
-            const subtotal = mappedItems.reduce((s, i) => s + i.amount.value * i.quantity, 0);
-
-            const buttonParamsJson = JSON.stringify({
-                currency,
-                external_payment_configurations: [{
-                    uri:                 '',
-                    type:                'payment_instruction',
-                    payment_instruction: 'Pembayaran via WhatsApp Pay'
-                }],
-                payment_configuration: '',
-                payment_type:          '',
-                total_amount:          { value: subtotal, offset: 100 },
-                reference_id:          'ORDER-' + Date.now(),
-                type:                  'physical-goods',
-                order: {
-                    status:      'pending',
-                    description: 'Pembelian produk bot',
-                    subtotal:    { value: subtotal, offset: 100 },
-                    items:       mappedItems
-                }
-            });
-
-            const interactiveMsg = proto.Message.InteractiveMessage.fromObject({
-                body:   { text: '🛍️ Konfirmasi pesanan kamu di bawah ini:' },
-                footer: { text: 'Powered by WhatsApp Bot' },
-                header: { hasMediaAttachment: false },
-                nativeFlowMessage: {
-                    buttons: [{ name: 'review_and_pay', buttonParamsJson }],
-                    messageParamsJson: ''
-                }
-            });
-
-            const waMsg = generateWAMessageFromContent(jid, proto.Message.fromObject({
-                viewOnceMessage: {
-                    message: {
-                        messageContextInfo: { deviceListMetadata: {}, deviceListMetadataVersion: 2 },
-                        interactiveMessage: interactiveMsg
-                    }
-                }
-            }), { userJid: jid });
-
-            const additionalNodes = [{ tag: 'biz', attrs: {}, content: [{ tag: 'interactive', attrs: { type: 'native_flow', v: '1' }, content: [{ tag: 'native_flow', attrs: { v: '9', name: 'review_and_pay' } }] }] }];
-            if (!isJidGroup(jid)) additionalNodes.push({ tag: 'bot', attrs: { biz_bot: '1' } });
-
-            await ctx.sock.relayMessage(jid, waMsg.message, { messageId: waMsg.key.id, additionalNodes });
+        case 'pay': {
+            const imagePath = path.join(__dirname, '../media/logo.png');
+            await ctx.sendInteractive({
+    'message': {
+	"interactiveMessage": {
+						"header": {
+						
+							"hasMediaAttachment": [],
+							"jpegThumbnail": fs.readFileSync(imagePath),
+													},
+						"nativeFlowMessage": {
+							"buttons": [
+								{
+									"name": "review_and_pay",
+									"buttonParamsJson": "{\"currency\":\"IDR\",\"external_payment_configurations\":[{\"uri\":\"\",\"type\":\"payment_instruction\",\"payment_instruction\":\"hey ini test\"}],\"payment_configuration\":\"\",\"payment_type\":\"\",\"total_amount\":{\"value\":100000,\"offset\":100},\"reference_id\":\"4MX98934S0D\",\"type\":\"physical-goods\",\"order\":{\"status\":\"pending\",\"description\":\"\",\"subtotal\":{\"value\":100000,\"offset\":100},\"items\":[{\"retailer_id\":\"60135576635\",\"product_id\":\"60135576635\",\"name\":\"𝑃𝑜𝑤𝑒𝑟𝑒𝑑 𝐵𝑦 𝐻𝑎𝑛𝑧 𝑂𝑓𝑐\",\"amount\":{\"value\":100000,\"offset\":100},\"quantity\":1111111}]}}"
+								}
+							]
+			}
+}}
+});
             break;
+        }
 
     }
 };
-
-module.exports.commands = [
-    'button', 'btn_1', 'btn_2', 'btn_3',
-    'list', 'food_1', 'food_2', 'food_3', 'drink_1', 'drink_2', 'drink_3', 'dessert_1', 'dessert_2',
-    'interactive', 'qr_hello',
-    'media', 'medialokal',
-    'buttonimage', 'like', 'share',
-    'buttoncall',
-    'pay'
-];
