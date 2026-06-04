@@ -1,6 +1,6 @@
 const config = require('../config');
 const dummyThumbnail = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==";
-            imageSource = fs.readFileSync(imgPath);
+
 const fakeOrder = {
 key: {
 participant: '0@s.whatsapp.net',
