@@ -166,7 +166,7 @@ const handler = async (ctx) => {
             start = Date.now();
             sent = await ctx.reply({ text: '🏓 Pong!' });
             await sock.sendMessage(sender, {
-                text: `🏓 *Pong!*\n\n⏱️ Latency: *${Date.now() - start}ms*`,
+                text: `🏓 *Pong!*\n\n⏱️ Latency: \`*${formatUptime(process.uptime())}*\``,
                 edit: sent.key
             });
             break;
