@@ -90,7 +90,7 @@ const handler = async (ctx) => {
 
     switch (command.name) {
 
-case 'dwnloadermenu':
+case 'downloadmenu':
     let menu = `
 ╭──❍『𝑫𝒐𝒘𝒏𝒍𝒐𝒂𝒅𝒆𝒓 𝑴𝒆𝒏𝒖』
 │
@@ -124,7 +124,7 @@ case 'dwnloadermenu':
                 rows: [{ title: "Ffmpeg Menu", description: "Select to display ffmpeg menu", id: "ffmpeg" }]
                         }, {
             highlight_label: "",
-                rows: [{ title: "Downloader Menu", description: "Select to display downloader menu", id: "dwnloadermenu" }]
+                rows: [{ title: "Downloader Menu", description: "Select to display downloader menu", id: "downloadmenu" }]
                         }, {
             highlight_label: "",
                 rows: [{ title: "Tools Menu", description: "Select to display tools menu", id: "toolsmenu" }]
