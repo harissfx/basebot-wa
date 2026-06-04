@@ -56,9 +56,7 @@ function download(url, extraArgs, ext) {
         ];
         execFile(YTDLP_PATH, args, { maxBuffer: 10 * 1024 * 1024, timeout: 3 * 60 * 1000 }, (err, stdout, stderr) => {
             if (err) return reject(new Error(stderr || err.message));
-            // yt-dlp kadang tambah ekstensi sendiri, cari file yang cocok
             if (fs.existsSync(outPath)) return resolve(outPath);
-            // Cari file dengan nama yang mirip di tmpdir
             const tmpFiles = fs.readdirSync(os.tmpdir())
                 .filter(f => f.startsWith(`wbot_dl_`) && f.endsWith(`.${ext}`))
                 .map(f => ({ f, t: fs.statSync(path.join(os.tmpdir(), f)).mtimeMs }))
