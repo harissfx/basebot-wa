@@ -112,11 +112,8 @@ case 'downloadmenu':
 contextInfo: {
     externalAdReply: {
         showAdAttribution: true
-    },
-    mentionedJid: ["0@s.whatsapp.net"],
-    forwardingScore: 111,
-    isForwarded: true
-},
+    }
+}
     buttons: [
         { name: 'quick_reply', buttonParamsJson: JSON.stringify({ display_text: 'Kembali ke Menu', id: 'menu' }) },
         { name: 'single_select',buttonParamsJson: JSON.stringify({ title: '『 Simpel Menu 』',
