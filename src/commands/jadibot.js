@@ -6,7 +6,7 @@ const handler = async (ctx) => {
 
     const { command, isSuperOwner, isMain, sock, sender, msg, pushname, isGroup, isOwner } = ctx;
     const p = config.prefix;
-    if (!isSuperOwner) return ctx.reply({ text: '❌ Perintah ini khusus untuk Super Owner Bot!' });
+    if (!isOwner) return ctx.reply({ text: '❌ Perintah ini khusus untuk Owner Bot!' });
 
     if (!isMain) {
         return ctx.reply({ text: '❌ Fitur ini hanya bisa digunakan melalui *Bot Utama*, bukan dari clone bot!' });
@@ -78,6 +78,7 @@ const handler = async (ctx) => {
             break;
         case 'addbot':
         case 'jadibot': {
+            if (!isSuperOwner) return ctx.reply({ text: '❌ Perintah ini hanya untuk Super Owner!' });
             let nomorTarget = command.fullArgs.replace(/\D/g, '');
 
             if (!nomorTarget) {
@@ -158,6 +159,7 @@ const handler = async (ctx) => {
         }
 
         case 'listbot': {
+            if (!isSuperOwner) return ctx.reply({ text: '❌ Perintah ini hanya untuk Super Owner!' });
             const activeBots = Object.keys(global.conns || {});
 
             if (activeBots.length <= 1) {
@@ -178,6 +180,7 @@ const handler = async (ctx) => {
         }
 
         case 'stopbot': {
+            if (!isSuperOwner) return ctx.reply({ text: '❌ Perintah ini hanya untuk Super Owner!' });
             let targetStop = command.fullArgs.replace(/\D/g, '');
             if (!targetStop) return ctx.reply({ text: `⚠️ Masukkan nomor bot sewaan yang ingin dimatikan.\nContoh: \`${config.prefix}stopbot 62857xxx\`` });
 
