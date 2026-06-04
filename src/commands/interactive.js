@@ -3,7 +3,7 @@ const path = require('path');
 const config = require('../config');
 
 const handler = async (ctx) => {
-    const { command, sock, sender, from, senderJid, pushname, salam, isOwner } = ctx
+    const { command } = ctx
 
     switch (command.name) {
 

@@ -1,6 +1,6 @@
-const config  = require('../config');
+const config = require('../config');
 const plugins = require('../utils/PluginLoader');
-const chalk   = require('chalk');
+const chalk = require('chalk');
 const readline = require('readline');
 const { getContentType } = require('@whiskeysockets/baileys');
 const { sendButtons, sendListMessage, sendInteractiveMessage, sendButtonWithImage, sendInteractiveWithImage } = require('../utils/interactiveHelper');
@@ -34,18 +34,18 @@ function extractMessageText(message) {
     if (!message) return null;
     const type = getContentType(message);
     switch (type) {
-        case 'conversation':               return message.conversation;
-        case 'extendedTextMessage':        return message.extendedTextMessage?.text;
-        case 'imageMessage':               return message.imageMessage?.caption;
-        case 'videoMessage':               return message.videoMessage?.caption;
-        case 'buttonsResponseMessage':     return message.buttonsResponseMessage?.selectedButtonId;
-        case 'listResponseMessage':        return message.listResponseMessage?.singleSelectReply?.selectedRowId;
+        case 'conversation': return message.conversation;
+        case 'extendedTextMessage': return message.extendedTextMessage?.text;
+        case 'imageMessage': return message.imageMessage?.caption;
+        case 'videoMessage': return message.videoMessage?.caption;
+        case 'buttonsResponseMessage': return message.buttonsResponseMessage?.selectedButtonId;
+        case 'listResponseMessage': return message.listResponseMessage?.singleSelectReply?.selectedRowId;
         case 'templateButtonReplyMessage': return message.templateButtonReplyMessage?.selectedId;
-        default:                           return null;
+        default: return null;
     }
 }
 
-function isGroup(jid)  { return jid.endsWith('@g.us'); }
+function isGroup(jid) { return jid.endsWith('@g.us'); }
 function isFromMe(msg) { return msg.key.fromMe; }
 
 function getSenderNumber(sender, msg) {
@@ -80,7 +80,7 @@ function parseCommand(text) {
     }
 
     const words = text.trim().split(/ +/);
-    const name  = words[0].toLowerCase();
+    const name = words[0].toLowerCase();
     if (plugins.has(name)) {
         const args = words.slice(1);
         return { name, args, fullArgs: args.join(' '), raw: text, hasPrefix: false };
@@ -93,24 +93,12 @@ async function handleMessages(sock, m, isMain = true) {
     for (const msg of m.messages) {
         if (!msg.message) continue;
 
-        const fromMe    = isFromMe(msg);
-        const from      = msg.key.remoteJid;                                      // tujuan chat (grup/private) — sama kayak "from" di HanzOfc
-        const sender    = msg.key.remoteJid;                                      // tetap ada biar kode lama gak rusak
-        const senderJid = isGroup(from)                                           // siapa yang ngirim (penting di grup)
-            ? (msg.key.participant || '')
-            : from;
-        const pushname  = msg.pushName || 'Pengguna';                             // nama kontak pengirim
-        const salam     = (() => {                                                 // sapaan berdasarkan waktu
-            const jam = new Date().getHours();
-            if (jam >= 4  && jam < 11) return 'Pagi';
-            if (jam >= 11 && jam < 15) return 'Siang';
-            if (jam >= 15 && jam < 18) return 'Sore';
-            return 'Malam';
-        })();
+        const fromMe = isFromMe(msg);
+        const sender = msg.key.remoteJid;
 
-        const checkOwner      = isOwner(sender, msg);
+        const checkOwner = isOwner(sender, msg);
         const checkSuperOwner = isSuperOwner(sender, msg);
-        const checkCoOwner    = isCoOwner(sender, msg);
+        const checkCoOwner = isCoOwner(sender, msg);
 
         if (!fromMe && config.botMode === 'self' && !checkOwner) continue;
 
@@ -120,15 +108,15 @@ async function handleMessages(sock, m, isMain = true) {
         if (!fromMe) {
             readline.clearLine(process.stdout, 0);
             readline.cursorTo(process.stdout, 0);
-            
+
             console.log(
-                chalk.blue(`[INBOUND] `) + 
-                chalk.cyan(sender) + 
+                chalk.blue(`[INBOUND] `) +
+                chalk.cyan(sender) +
                 chalk.white(`: ${text}`)
             );
         }
 
-        if (config.autoRead)   await sock.readMessages([msg.key]);
+        if (config.autoRead) await sock.readMessages([msg.key]);
         if (config.autoTyping && !isGroup(sender)) await sock.sendPresenceUpdate('composing', sender);
 
         const command = parseCommand(text);
@@ -138,46 +126,42 @@ async function handleMessages(sock, m, isMain = true) {
 
             if (handler) {
                 const cmdArgs = command.args.length ? ' ' + command.args.join(' ') : '';
-                
+
                 readline.clearLine(process.stdout, 0);
                 readline.cursorTo(process.stdout, 0);
 
                 console.log(
-                    chalk.green(`[EXECUTE] `) + 
+                    chalk.green(`[EXECUTE] `) +
                     chalk.yellow(`${command.name}${cmdArgs}`)
                 );
 
                 try {
                     await handler({
                         sock, msg, sender,
-                        from,                                                      // tujuan chat — pakai untuk sock.sendMessage(from, ...)
-                        senderJid,                                                 // JID siapa yang ngirim (di grup = member, bukan grup)
-                        pushname,                                                  // nama kontak pengirim
-                        salam,                                                     // 'Pagi' | 'Siang' | 'Sore' | 'Malam'
-                        isGroup:                     isGroup(sender),
-                        isOwner:                     checkOwner,
-                        isSuperOwner:                checkSuperOwner,
-                        isCoOwner:                   checkCoOwner,
+                        isGroup: isGroup(sender),
+                        isOwner: checkOwner,
+                        isSuperOwner: checkSuperOwner,
+                        isCoOwner: checkCoOwner,
                         command, text,
                         fakeOrder,
                         isMain,
-                        reply:                       (content) => sock.sendMessage(sender, content, { quoted: msg }),
-                        replyFake:                   (content) => sock.sendMessage(sender, content, { quoted: fakeOrder }),
-                        send:                        (content) => sock.sendMessage(sender, content),
-                        sendButtons:         (content) => sendButtons(sock, sender, content),
-                        sendList:            (content) => sendListMessage(sock, sender, content),
-                        sendInteractive:     (content) => sendInteractiveMessage(sock, sender, content),
-                        sendButtonWithImage:         (content) => sendButtonWithImage(sock, sender, content),
-                        sendInteractiveWithImage:    (content) => sendInteractiveWithImage(sock, sender, content),
-                        react:               (emoji)   => sock.sendMessage(sender, { react: { text: emoji, key: msg.key } }),
+                        reply: (content) => sock.sendMessage(sender, content, { quoted: msg }),
+                        replyFake: (content) => sock.sendMessage(sender, content, { quoted: fakeOrder }),
+                        send: (content) => sock.sendMessage(sender, content),
+                        sendButtons: (content) => sendButtons(sock, sender, content),
+                        sendList: (content) => sendListMessage(sock, sender, content),
+                        sendInteractive: (content) => sendInteractiveMessage(sock, sender, content),
+                        sendButtonWithImage: (content) => sendButtonWithImage(sock, sender, content),
+                        sendInteractiveWithImage: (content) => sendInteractiveWithImage(sock, sender, content),
+                        react: (emoji) => sock.sendMessage(sender, { react: { text: emoji, key: msg.key } }),
                     });
                 } catch (err) {
                     readline.clearLine(process.stdout, 0);
                     readline.cursorTo(process.stdout, 0);
 
                     console.error(
-                        chalk.red(`[RUN-ERROR] `) + 
-                        chalk.yellow(`[${command.name}]: `) + 
+                        chalk.red(`[RUN-ERROR] `) +
+                        chalk.yellow(`[${command.name}]: `) +
                         chalk.red(err.message)
                     );
                     await sock.sendMessage(sender, { text: '❌ Terjadi kesalahan saat menjalankan perintah.' });
@@ -187,9 +171,9 @@ async function handleMessages(sock, m, isMain = true) {
                 readline.cursorTo(process.stdout, 0);
 
                 console.log(
-                    chalk.magenta(`[NOT-FOUND] `) + 
-                    chalk.white(`Command `) + 
-                    chalk.yellow(`*${command.name}*`) + 
+                    chalk.magenta(`[NOT-FOUND] `) +
+                    chalk.white(`Command `) +
+                    chalk.yellow(`*${command.name}*`) +
                     chalk.white(` tidak terdaftar.`)
                 );
                 await sock.sendMessage(sender, { text: `❓ Command *${command.name}* tidak ditemukan.` });
