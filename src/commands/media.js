@@ -12,10 +12,11 @@
 
 'use strict';
 
-const fs   = require('fs');
+const fs = require('fs');
 const path = require('path');
-const os   = require('os');
-const { TextEncoder }                = require('util');
+const os = require('os');
+const config = require('../config');
+const { TextEncoder } = require('util');
 const { downloadContentFromMessage } = require('@whiskeysockets/baileys');
 
 // ─── Inject metadata ke WebP pakai node-webpmux (cara yang benar) ─────────────
@@ -26,10 +27,10 @@ async function injectStickerMetadata(webpBuffer, packName, authorName) {
         const { Image } = require('node-webpmux');
 
         const data = JSON.stringify({
-            'sticker-pack-id':        require('crypto').randomBytes(32).toString('hex'),
-            'sticker-pack-name':       packName,
-            'sticker-pack-publisher':  authorName,
-            'emojis':                  ['🤖'],
+            'sticker-pack-id': require('crypto').randomBytes(32).toString('hex'),
+            'sticker-pack-name': packName,
+            'sticker-pack-publisher': authorName,
+            'emojis': ['🤖'],
         });
 
         // Header byte ini HARUS persis — sama persis dengan wa-sticker-formatter
@@ -57,9 +58,9 @@ async function injectStickerMetadata(webpBuffer, packName, authorName) {
 // ─── Download media dari pesan Baileys ───────────────────────────────────────
 async function downloadMedia(message) {
     const typeMap = {
-        imageMessage:    'image',
-        videoMessage:    'video',
-        stickerMessage:  'sticker',
+        imageMessage: 'image',
+        videoMessage: 'video',
+        stickerMessage: 'sticker',
         documentMessage: 'document',
     };
     let msgContent = null, mediaType = null;
@@ -77,7 +78,7 @@ async function downloadMedia(message) {
 function runFFmpeg(inputPath, outputPath, optionsFn) {
     return new Promise((resolve, reject) => {
         let ffmpegPath;
-        try   { ffmpegPath = require('@ffmpeg-installer/ffmpeg').path; }
+        try { ffmpegPath = require('@ffmpeg-installer/ffmpeg').path; }
         catch { ffmpegPath = 'ffmpeg'; }
         const ffmpeg = require('fluent-ffmpeg');
         ffmpeg.setFfmpegPath(ffmpegPath);
@@ -94,19 +95,19 @@ function writeTmp(buffer, ext) {
 }
 
 function cleanTmp(...paths) {
-    for (const p of paths) { try { if (p) fs.unlinkSync(p); } catch {} }
+    for (const p of paths) { try { if (p) fs.unlinkSync(p); } catch { } }
 }
 
 // ─── Handler ──────────────────────────────────────────────────────────────────
 const handler = async (ctx) => {
     const { command, msg, sock, sender } = ctx;
-
+    const p = config.prefix;
     const quotedMsg = msg.message?.extendedTextMessage?.contextInfo?.quotedMessage
-                   || msg.message;
+        || msg.message;
 
     switch (command.name) {
-case 'downloadmenu':
-    let menu = `
+        case 'ffmpegmenu':
+            let menu = `
 ╭──❍『𝑫𝒐𝒘𝒏𝒍𝒐𝒂𝒅𝒆𝒓 𝑴𝒆𝒏𝒖』
 │
 │⭔ ${p}ytmp3 [url]
@@ -119,57 +120,61 @@ case 'downloadmenu':
 │
 ╰────❍
 `
-    await ctx.sendInteractive({
-    text: menu,
-    footer: config.botName,
-    quoted: ctx.fakeOrder,
-    contextInfo: {
-    mentionedJid: ["0@s.whatsapp.net"],
-    forwardingScore: 111,
-    isForwarded: true
-    },
-    buttons: [
-        { name: 'quick_reply', buttonParamsJson: JSON.stringify({ display_text: 'Kembali ke Menu', id: 'menu' }) },
-        { name: 'single_select',buttonParamsJson: JSON.stringify({ title: '『 Simpel Menu 』',
-            sections: [{
-            title: '『 Simpel Menu 』',
-            highlight_label: "",
-                rows: [{ title: "General Menu", description: "Select to display general menu", id: "generalmenu" }]
-                        }, {
-            highlight_label: "",
-                rows: [{ title: "Owner Menu", description: "Select to display owner menu", id: "ownermenu" }]
-                        }, {
-            highlight_label: "",
-                rows: [{ title: "Ffmpeg Menu", description: "Select to display ffmpeg menu", id: "ffmpeg" }]
-                        }, {
-            highlight_label: "",
-                rows: [{ title: "Downloader Menu", description: "Select to display downloader menu", id: "downloadmenu" }]
-                        }, {
-            highlight_label: "",
-                rows: [{ title: "Tools Menu", description: "Select to display tools menu", id: "toolsmenu" }]
-                        }, {
-            highlight_label: "Khusus Owner Utama",
-                rows: [{ title: "JadiBot Menu", description: "Select to display jadi bot menu", id: "jadibotmenu" }]
-                        }, {
-            highlight_label: "",
-                rows: [{ title: "Group Menu", description: "Select to display group menu ", id: "groupmenu" }]
-                },]
-            })
-        }]
-    });
-break;
+            await ctx.sendInteractive({
+                text: menu,
+                footer: config.botName,
+                quoted: ctx.fakeOrder,
+                contextInfo: {
+                    mentionedJid: ["0@s.whatsapp.net"],
+                    forwardingScore: 111,
+                    isForwarded: true
+                },
+                buttons: [
+                    { name: 'quick_reply', buttonParamsJson: JSON.stringify({ display_text: 'Kembali ke Menu', id: 'menu' }) },
+                    {
+                        name: 'single_select', buttonParamsJson: JSON.stringify({
+                            title: '『 Simpel Menu 』',
+                            sections: [{
+                                title: '『 Simpel Menu 』',
+                                highlight_label: "",
+                                rows: [{ title: "General Menu", description: "Select to display general menu", id: "generalmenu" }]
+                            }, {
+                                highlight_label: "",
+                                rows: [{ title: "Owner Menu", description: "Select to display owner menu", id: "ownermenu" }]
+                            }, {
+                                highlight_label: "",
+                                rows: [{ title: "Ffmpeg Menu", description: "Select to display ffmpeg menu", id: "ffmpeg" }]
+                            }, {
+                                highlight_label: "",
+                                rows: [{ title: "Downloader Menu", description: "Select to display downloader menu", id: "downloadmenu" }]
+                            }, {
+                                highlight_label: "",
+                                rows: [{ title: "Tools Menu", description: "Select to display tools menu", id: "toolsmenu" }]
+                            }, {
+                                highlight_label: "Khusus Owner Utama",
+                                rows: [{ title: "JadiBot Menu", description: "Select to display jadi bot menu", id: "jadibotmenu" }]
+                            }, {
+                                highlight_label: "",
+                                rows: [{ title: "Group Menu", description: "Select to display group menu ", id: "groupmenu" }]
+                            },]
+                        })
+                    }]
+            });
+            break;
         // ── !sticker / !s ─────────────────────────────────────────────────────
         case 'sticker':
         case 's': {
             const mediaResult = await downloadMedia(quotedMsg);
             if (!mediaResult) {
-                return ctx.reply({ text: [
-                    '❌ *Tidak ada media yang dideteksi!*', '',
-                    'Cara pakai:',
-                    '• Reply foto        → `!s`',
-                    '• Reply GIF/video   → `!s` (stiker animasi)',
-                    '• Custom nama       → `!s NamaPaket|Author`',
-                ].join('\n') });
+                return ctx.reply({
+                    text: [
+                        '❌ *Tidak ada media yang dideteksi!*', '',
+                        'Cara pakai:',
+                        '• Reply foto        → `!s`',
+                        '• Reply GIF/video   → `!s` (stiker animasi)',
+                        '• Custom nama       → `!s NamaPaket|Author`',
+                    ].join('\n')
+                });
             }
 
             await ctx.react('⏳');
@@ -180,7 +185,7 @@ break;
                 || (mediaType === 'sticker' && quotedMsg?.stickerMessage?.isAnimated);
 
             // Parse "NamaPaket|Author" dari args
-            const rawArgs    = (command.fullArgs || '').trim();
+            const rawArgs = (command.fullArgs || '').trim();
             const [packName, authorName] = rawArgs
                 ? rawArgs.split('|').map(s => s.trim())
                 : ['Bot', 'WaBot'];
@@ -190,7 +195,7 @@ break;
                 let stickerBuffer;
 
                 if (isAnimated) {
-                    inputPath  = writeTmp(buffer, mediaType === 'video' ? 'mp4' : 'webp');
+                    inputPath = writeTmp(buffer, mediaType === 'video' ? 'mp4' : 'webp');
                     outputPath = writeTmp(Buffer.alloc(0), 'webp');
                     await runFFmpeg(inputPath, outputPath, (cmd) => {
                         cmd
@@ -212,11 +217,11 @@ break;
                     try {
                         const sharp = require('sharp');
                         stickerBuffer = await sharp(buffer)
-                            .resize(512, 512, { fit: 'inside', background: { r:0, g:0, b:0, alpha:0 } })
+                            .resize(512, 512, { fit: 'inside', background: { r: 0, g: 0, b: 0, alpha: 0 } })
                             .webp({ quality: 80 })
                             .toBuffer();
                     } catch {
-                        inputPath  = writeTmp(buffer, 'jpg');
+                        inputPath = writeTmp(buffer, 'jpg');
                         outputPath = writeTmp(Buffer.alloc(0), 'webp');
                         await runFFmpeg(inputPath, outputPath, (cmd) => {
                             cmd.outputOptions([
@@ -266,7 +271,7 @@ break;
                         return;
                     } catch { /* fallback FFmpeg */ }
                 }
-                inputPath  = writeTmp(buffer, 'webp');
+                inputPath = writeTmp(buffer, 'webp');
                 outputPath = writeTmp(Buffer.alloc(0), 'png');
                 await runFFmpeg(inputPath, outputPath, (cmd) => {
                     cmd
@@ -308,7 +313,7 @@ break;
             let inputPath, outputPath;
 
             try {
-                inputPath  = writeTmp(buffer, isVideo ? 'mp4' : 'webp');
+                inputPath = writeTmp(buffer, isVideo ? 'mp4' : 'webp');
                 outputPath = writeTmp(Buffer.alloc(0), 'gif');
                 await runFFmpeg(inputPath, outputPath, (cmd) => {
                     cmd

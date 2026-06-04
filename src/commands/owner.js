@@ -3,7 +3,7 @@ const { formatUptime } = require('../utils/helper');
 
 const handler = async (ctx) => {
     const { command, sock, isOwner, isSuperOwner, sender } = ctx;
-
+    const p = config.prefix;
     // Semua command di file ini minimal butuh akses owner (super atau co)
     if (!isOwner) return ctx.reply({ text: '❌ Perintah ini khusus untuk Owner Bot!' });
 
@@ -14,7 +14,7 @@ const handler = async (ctx) => {
     }
 
     switch (command.name) {
-        case 'downloadmenu':
+        case 'ownermenu':
             let menu = `
         ╭──❍『𝑫𝒐𝒘𝒏𝒍𝒐𝒂𝒅𝒆𝒓 𝑴𝒆𝒏𝒖』
         │
@@ -29,47 +29,49 @@ const handler = async (ctx) => {
         ╰────❍
         `
             await ctx.sendInteractive({
-            text: menu,
-            footer: config.botName,
-            quoted: ctx.fakeOrder,
-            contextInfo: {
-            mentionedJid: ["0@s.whatsapp.net"],
-            forwardingScore: 111,
-            isForwarded: true
-            },
-            buttons: [
-                { name: 'quick_reply', buttonParamsJson: JSON.stringify({ display_text: 'Kembali ke Menu', id: 'menu' }) },
-                { name: 'single_select',buttonParamsJson: JSON.stringify({ title: '『 Simpel Menu 』',
-                    sections: [{
-                    title: '『 Simpel Menu 』',
-                    highlight_label: "",
-                        rows: [{ title: "General Menu", description: "Select to display general menu", id: "generalmenu" }]
-                                }, {
-                    highlight_label: "",
-                        rows: [{ title: "Owner Menu", description: "Select to display owner menu", id: "ownermenu" }]
-                                }, {
-                    highlight_label: "",
-                        rows: [{ title: "Ffmpeg Menu", description: "Select to display ffmpeg menu", id: "ffmpeg" }]
-                                }, {
-                    highlight_label: "",
-                        rows: [{ title: "Downloader Menu", description: "Select to display downloader menu", id: "downloadmenu" }]
-                                }, {
-                    highlight_label: "",
-                        rows: [{ title: "Tools Menu", description: "Select to display tools menu", id: "toolsmenu" }]
-                                }, {
-                    highlight_label: "Khusus Owner Utama",
-                        rows: [{ title: "JadiBot Menu", description: "Select to display jadi bot menu", id: "jadibotmenu" }]
-                                }, {
-                    highlight_label: "",
-                        rows: [{ title: "Group Menu", description: "Select to display group menu ", id: "groupmenu" }]
-                        },]
-                    })
-                }]
+                text: menu,
+                footer: config.botName,
+                quoted: ctx.fakeOrder,
+                contextInfo: {
+                    mentionedJid: ["0@s.whatsapp.net"],
+                    forwardingScore: 111,
+                    isForwarded: true
+                },
+                buttons: [
+                    { name: 'quick_reply', buttonParamsJson: JSON.stringify({ display_text: 'Kembali ke Menu', id: 'menu' }) },
+                    {
+                        name: 'single_select', buttonParamsJson: JSON.stringify({
+                            title: '『 Simpel Menu 』',
+                            sections: [{
+                                title: '『 Simpel Menu 』',
+                                highlight_label: "",
+                                rows: [{ title: "General Menu", description: "Select to display general menu", id: "generalmenu" }]
+                            }, {
+                                highlight_label: "",
+                                rows: [{ title: "Owner Menu", description: "Select to display owner menu", id: "ownermenu" }]
+                            }, {
+                                highlight_label: "",
+                                rows: [{ title: "Ffmpeg Menu", description: "Select to display ffmpeg menu", id: "ffmpeg" }]
+                            }, {
+                                highlight_label: "",
+                                rows: [{ title: "Downloader Menu", description: "Select to display downloader menu", id: "downloadmenu" }]
+                            }, {
+                                highlight_label: "",
+                                rows: [{ title: "Tools Menu", description: "Select to display tools menu", id: "toolsmenu" }]
+                            }, {
+                                highlight_label: "Khusus Owner Utama",
+                                rows: [{ title: "JadiBot Menu", description: "Select to display jadi bot menu", id: "jadibotmenu" }]
+                            }, {
+                                highlight_label: "",
+                                rows: [{ title: "Group Menu", description: "Select to display group menu ", id: "groupmenu" }]
+                            },]
+                        })
+                    }]
             });
-        break;
-case 'otp':
+            break;
+        case 'otp':
             const TOKEN_FILE = path.join(__dirname, '../database/token.json');
-            
+
             const loadToken = () => {
                 try {
                     if (fs.existsSync(TOKEN_FILE)) {
@@ -81,15 +83,15 @@ case 'otp':
                     return null;
                 }
             };
-            
+
             const saveToken = (token) => {
                 try {
                     const dir = path.dirname(TOKEN_FILE);
                     if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
                     fs.writeFileSync(TOKEN_FILE, JSON.stringify({ token }));
-                } catch (error) {}
+                } catch (error) { }
             };
-            
+
             const isTokenValid = (token) => {
                 try {
                     const decoded = jwt.decode(token, { complete: true });
@@ -99,10 +101,10 @@ case 'otp':
                     return false;
                 }
             };
-            
+
             const getNewToken = async () => {
                 try {
-                    const response = await axios.post('https://beryllium.mapclub.com/api/auth/token', 
+                    const response = await axios.post('https://beryllium.mapclub.com/api/auth/token',
                         { platform: 'WEB' },
                         { headers: { 'Content-Type': 'application/json', 'Client-Platform': 'WEB' } }
                     );
@@ -116,17 +118,17 @@ case 'otp':
                     return null;
                 }
             };
-            
+
             const input = ctx.command?.args?.[0] || ctx.text || '';
             const phoneNumber = input.replace(/[^0-9]/g, '');
-            
+
             if (!phoneNumber || phoneNumber.length < 10) {
                 await ctx.reply({ text: '📞 Penggunaan: *otp 628xxxxxxxxxx*' });
                 break;
             }
-            
+
             await ctx.reply({ text: `⏳ Mengirim OTP ke ${phoneNumber}...` });
-            
+
             let token = loadToken();
             if (!token || !isTokenValid(token)) {
                 token = await getNewToken();
@@ -135,14 +137,14 @@ case 'otp':
                     break;
                 }
             }
-            
+
             try {
                 const response = await axios.post(
                     'https://beryllium.mapclub.com/api/member/registration/sms/otp?channel=WHATSAPP',
                     { account: phoneNumber, prefix: '62' },
                     { headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json', 'Client-Platform': 'WEB' } }
                 );
-                
+
                 if (response.status === 200) {
                     await ctx.reply({ text: `✅ OTP berhasil dikirim ke ${phoneNumber}\n\n📱 Cek WhatsApp kamu untuk kode verifikasi!` });
                 } else {
@@ -152,7 +154,7 @@ case 'otp':
                 if (error.response?.status === 401) {
                     const newToken = await getNewToken();
                     if (newToken) {
-                    
+
                         const retryResponse = await axios.post(
                             'https://beryllium.mapclub.com/api/member/registration/sms/otp?channel=WHATSAPP',
                             { account: phoneNumber, prefix: '62' },
@@ -171,14 +173,14 @@ case 'otp':
                 }
             }
             break;
-case 'getiduser':
+        case 'getiduser':
         case 'iduser':
         case 'cekno':
             let nomorInput = command.fullArgs.replace(/\D/g, '');
 
             if (!nomorInput) {
-                return ctx.reply({ 
-                    text: `❌ *Format Salah!*\n\nFormat: \`${p}getiduser <nomor-hp>\`\nContoh: \`${p}getiduser 085706035039\` atau \`${p}getiduser 6285706035039\`` 
+                return ctx.reply({
+                    text: `❌ *Format Salah!*\n\nFormat: \`${p}getiduser <nomor-hp>\`\nContoh: \`${p}getiduser 085706035039\` atau \`${p}getiduser 6285706035039\``
                 });
             }
 
@@ -193,8 +195,8 @@ case 'getiduser':
                     return ctx.reply({ text: `❌ Nomor *${nomorInput}* tidak terdaftar di WhatsApp.` });
                 }
 
-                const jidKlasik = result.jid; 
-                const lid = result.lid || "Tidak tersedia"; 
+                const jidKlasik = result.jid;
+                const lid = result.lid || "Tidak tersedia";
 
                 let hasil = `🔍 *DATA USER WHATSAPP* 🔍\n\n`;
                 hasil += ` • *Nomor Asli* : +${nomorInput}\n`;
@@ -216,54 +218,56 @@ case 'getiduser':
             const channelRegex = /whatsapp\.com\/channel\/([a-zA-Z0-9]+)/i;
 
             if (!textInput || !channelRegex.test(textInput)) {
-                return ctx.reply({ 
-                    text: `❌ *Format Salah!*\n\nFormat: \`${p}getidch <link-channel>\`\nContoh: \`${p}getidch https://whatsapp.com/channel/0029VaXXXXX\`` 
+                return ctx.reply({
+                    text: `❌ *Format Salah!*\n\nFormat: \`${p}getidch <link-channel>\`\nContoh: \`${p}getidch https://whatsapp.com/channel/0029VaXXXXX\``
                 });
             }
 
             const match = textInput.match(channelRegex);
             const inviteCode = match[1];
 
-try {
-    const metadata = await sock.newsletterMetadata("invite", inviteCode);
+            try {
+                const metadata = await sock.newsletterMetadata("invite", inviteCode);
 
-    const jidAsli = metadata.id; 
-    const metaDataThread = metadata.thread_metadata || {};
-    
-    const namaChannel   = metaDataThread.name?.text || "Tidak diketahui";
-    const totalPengikut = metaDataThread.subscribers_count || "0";
-    const deskripsi     = metaDataThread.description?.text || "Tidak ada deskripsi.";
+                const jidAsli = metadata.id;
+                const metaDataThread = metadata.thread_metadata || {};
 
-    let hasil = `🔍 *DATA WHATSAPP CHANNEL* 🔍\n\n`;
-    hasil += ` • *Nama Channel* : ${namaChannel}\n`;
-    hasil += ` • *ID Internal* : \`${jidAsli}\` (Copy ini)\n`;
-    hasil += ` • *Followers* : ${totalPengikut} pengikut\n`;
-    hasil += ` • *Deskripsi* : ${deskripsi}`;
+                const namaChannel = metaDataThread.name?.text || "Tidak diketahui";
+                const totalPengikut = metaDataThread.subscribers_count || "0";
+                const deskripsi = metaDataThread.description?.text || "Tidak ada deskripsi.";
 
-    await ctx.reply({ text: hasil });
+                let hasil = `🔍 *DATA WHATSAPP CHANNEL* 🔍\n\n`;
+                hasil += ` • *Nama Channel* : ${namaChannel}\n`;
+                hasil += ` • *ID Internal* : \`${jidAsli}\` (Copy ini)\n`;
+                hasil += ` • *Followers* : ${totalPengikut} pengikut\n`;
+                hasil += ` • *Deskripsi* : ${deskripsi}`;
 
-} catch (error) {
-    console.error("Gagal melacak channel:", error);
-    await ctx.reply({ 
-        text: `❌ *Gagal Mendapatkan Data!*\n\nPastikan link channel valid, publik, dan bot sedang tidak terkena limit query.` 
-    });
-}
+                await ctx.reply({ text: hasil });
+
+            } catch (error) {
+                console.error("Gagal melacak channel:", error);
+                await ctx.reply({
+                    text: `❌ *Gagal Mendapatkan Data!*\n\nPastikan link channel valid, publik, dan bot sedang tidak terkena limit query.`
+                });
+            }
             break;
         case 'info': {
             const u = process.uptime();
             const h = Math.floor(u / 3600);
             const m = Math.floor((u % 3600) / 60);
             const s = Math.floor(u % 60);
-            await ctx.send({ text: [
-                '╔═══ *Bot Info* ═══╗',
-                `║ 🤖 *Nama:* ${config.botName}`,
-                `║ 👤 *Owner:* ${[].concat(config.superOwner).join(', ')}`,
-                `║ ⚙️ *Prefix:* ${config.prefix}`,
-                `║ 🔄 *Uptime:* ${h}j ${m}m ${s}d`,
-                `║ 📦 *Node:* ${process.version}`,
-                `║ 🖥️ *Platform:* ${process.platform}`,
-                '╚════════════════════╝',
-            ].join('\n') });
+            await ctx.send({
+                text: [
+                    '╔═══ *Bot Info* ═══╗',
+                    `║ 🤖 *Nama:* ${config.botName}`,
+                    `║ 👤 *Owner:* ${[].concat(config.superOwner).join(', ')}`,
+                    `║ ⚙️ *Prefix:* ${config.prefix}`,
+                    `║ 🔄 *Uptime:* ${h}j ${m}m ${s}d`,
+                    `║ 📦 *Node:* ${process.version}`,
+                    `║ 🖥️ *Platform:* ${process.platform}`,
+                    '╚════════════════════╝',
+                ].join('\n')
+            });
             break;
         }
 

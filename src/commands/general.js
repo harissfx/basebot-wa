@@ -1,4 +1,4 @@
-const fs   = require('fs');
+const fs = require('fs');
 const path = require('path');
 const config = require('../config');
 const { formatUptime } = require('../utils/helper');
@@ -9,8 +9,8 @@ const handler = async (ctx) => {
     let imgPath, imageSource, start, sent, u, h, m, s;
 
     switch (command.name) {
-case 'downloadmenu':
-    let menu = `
+        case 'generalmenu':
+            let menu = `
 ╭──❍『𝑫𝒐𝒘𝒏𝒍𝒐𝒂𝒅𝒆𝒓 𝑴𝒆𝒏𝒖』
 │
 │⭔ ${p}ytmp3 [url]
@@ -23,45 +23,47 @@ case 'downloadmenu':
 │
 ╰────❍
 `
-    await ctx.sendInteractive({
-    text: menu,
-    footer: config.botName,
-    quoted: ctx.fakeOrder,
-    contextInfo: {
-    mentionedJid: ["0@s.whatsapp.net"],
-    forwardingScore: 111,
-    isForwarded: true
-    },
-    buttons: [
-        { name: 'quick_reply', buttonParamsJson: JSON.stringify({ display_text: 'Kembali ke Menu', id: 'menu' }) },
-        { name: 'single_select',buttonParamsJson: JSON.stringify({ title: '『 Simpel Menu 』',
-            sections: [{
-            title: '『 Simpel Menu 』',
-            highlight_label: "",
-                rows: [{ title: "General Menu", description: "Select to display general menu", id: "generalmenu" }]
-                        }, {
-            highlight_label: "",
-                rows: [{ title: "Owner Menu", description: "Select to display owner menu", id: "ownermenu" }]
-                        }, {
-            highlight_label: "",
-                rows: [{ title: "Ffmpeg Menu", description: "Select to display ffmpeg menu", id: "ffmpeg" }]
-                        }, {
-            highlight_label: "",
-                rows: [{ title: "Downloader Menu", description: "Select to display downloader menu", id: "downloadmenu" }]
-                        }, {
-            highlight_label: "",
-                rows: [{ title: "Tools Menu", description: "Select to display tools menu", id: "toolsmenu" }]
-                        }, {
-            highlight_label: "Khusus Owner Utama",
-                rows: [{ title: "JadiBot Menu", description: "Select to display jadi bot menu", id: "jadibotmenu" }]
-                        }, {
-            highlight_label: "",
-                rows: [{ title: "Group Menu", description: "Select to display group menu ", id: "groupmenu" }]
-                },]
-            })
-        }]
-    });
-break;
+            await ctx.sendInteractive({
+                text: menu,
+                footer: config.botName,
+                quoted: ctx.fakeOrder,
+                contextInfo: {
+                    mentionedJid: ["0@s.whatsapp.net"],
+                    forwardingScore: 111,
+                    isForwarded: true
+                },
+                buttons: [
+                    { name: 'quick_reply', buttonParamsJson: JSON.stringify({ display_text: 'Kembali ke Menu', id: 'menu' }) },
+                    {
+                        name: 'single_select', buttonParamsJson: JSON.stringify({
+                            title: '『 Simpel Menu 』',
+                            sections: [{
+                                title: '『 Simpel Menu 』',
+                                highlight_label: "",
+                                rows: [{ title: "General Menu", description: "Select to display general menu", id: "generalmenu" }]
+                            }, {
+                                highlight_label: "",
+                                rows: [{ title: "Owner Menu", description: "Select to display owner menu", id: "ownermenu" }]
+                            }, {
+                                highlight_label: "",
+                                rows: [{ title: "Ffmpeg Menu", description: "Select to display ffmpeg menu", id: "ffmpeg" }]
+                            }, {
+                                highlight_label: "",
+                                rows: [{ title: "Downloader Menu", description: "Select to display downloader menu", id: "downloadmenu" }]
+                            }, {
+                                highlight_label: "",
+                                rows: [{ title: "Tools Menu", description: "Select to display tools menu", id: "toolsmenu" }]
+                            }, {
+                                highlight_label: "Khusus Owner Utama",
+                                rows: [{ title: "JadiBot Menu", description: "Select to display jadi bot menu", id: "jadibotmenu" }]
+                            }, {
+                                highlight_label: "",
+                                rows: [{ title: "Group Menu", description: "Select to display group menu ", id: "groupmenu" }]
+                            },]
+                        })
+                    }]
+            });
+            break;
         case 'menu':
             imgPath = path.join(__dirname, '../media/logo.png');
             if (!fs.existsSync(imgPath)) return ctx.reply({ text: '❌ File logo.png tidak ditemukan di folder media.' });
@@ -108,10 +110,10 @@ break;
                 },
                 buttons: [
                     { name: 'quick_reply', buttonParamsJson: JSON.stringify({ display_text: '📋 General', id: 'menu_general' }) },
-                    { name: 'cta_url',     buttonParamsJson: JSON.stringify({ display_text: '🌐 Buka GitHub', url: 'https://github.com/whiskeysockets/baileys' }) },
-                    { name: 'cta_copy',    buttonParamsJson: JSON.stringify({ display_text: '📋 Copy Kode', copy_code: 'KODE-PROMO-2025' }) },
+                    { name: 'cta_url', buttonParamsJson: JSON.stringify({ display_text: '🌐 Buka GitHub', url: 'https://github.com/whiskeysockets/baileys' }) },
+                    { name: 'cta_copy', buttonParamsJson: JSON.stringify({ display_text: '📋 Copy Kode', copy_code: 'KODE-PROMO-2025' }) },
                     { name: 'cta_call', buttonParamsJson: JSON.stringify({ display_text: '📱 Telepon Sekarang', phone_number: '+6281234567890' }) },
-                                        {
+                    {
                         name: 'single_select',
                         buttonParamsJson: JSON.stringify({
                             title: '📂 Buka Menu',
@@ -119,24 +121,24 @@ break;
                                 {
                                     title: '🍔 Makanan',
                                     rows: [
-                                        { id: 'food_1', title: 'Burger',    description: 'Burger daging sapi premium' },
-                                        { id: 'food_2', title: 'Pizza',     description: 'Pizza pepperoni large'      },
-                                        { id: 'food_3', title: 'Sushi',     description: 'Sushi salmon set'           },
+                                        { id: 'food_1', title: 'Burger', description: 'Burger daging sapi premium' },
+                                        { id: 'food_2', title: 'Pizza', description: 'Pizza pepperoni large' },
+                                        { id: 'food_3', title: 'Sushi', description: 'Sushi salmon set' },
                                     ]
                                 },
                                 {
                                     title: '🥤 Minuman',
                                     rows: [
                                         { id: 'drink_1', title: 'Kopi', description: 'Kopi arabica single origin' },
-                                        { id: 'drink_2', title: 'Teh',  description: 'Teh hijau organik'          },
-                                        { id: 'drink_3', title: 'Jus',  description: 'Jus jeruk segar'            },
+                                        { id: 'drink_2', title: 'Teh', description: 'Teh hijau organik' },
+                                        { id: 'drink_3', title: 'Jus', description: 'Jus jeruk segar' },
                                     ]
                                 },
                                 {
                                     title: '🍰 Dessert',
                                     rows: [
-                                        { id: 'dessert_1', title: 'Cheesecake', description: 'New York cheesecake'      },
-                                        { id: 'dessert_2', title: 'Brownies',   description: 'Chocolate fudge brownies' },
+                                        { id: 'dessert_1', title: 'Cheesecake', description: 'New York cheesecake' },
+                                        { id: 'dessert_2', title: 'Brownies', description: 'Chocolate fudge brownies' },
                                     ]
                                 },
                             ]
@@ -224,28 +226,28 @@ break;
 
         case 'ping':
             start = Date.now();
-            sent  = await ctx.reply({ text: '🏓 Pong!' });
+            sent = await ctx.reply({ text: '🏓 Pong!' });
             await sock.sendMessage(sender, {
                 text: `🏓 *Pong!*\n\n⏱️ Latency: *${Date.now() - start}ms*`,
                 edit: sent.key
             });
             break;
 
-       
-case 'owner': {
-    const superOwners = [].concat(config.superOwner);
-    if (!superOwners.length) return ctx.reply({ text: '❌ Nomor owner belum diatur.' });
-    const contacts = superOwners.map((num, i) => ({
-        vcard: `BEGIN:VCARD\nVERSION:3.0\nFN:Owner Bot${superOwners.length > 1 ? ' ' + (i + 1) : ''}\nTEL;type=CELL;type=VOICE;waid=${num}:+${num}\nEND:VCARD`
-    }));
-    await ctx.send({
-        contacts: {
-            displayName: 'Owner Bot',
-            contacts
+
+        case 'owner': {
+            const superOwners = [].concat(config.superOwner);
+            if (!superOwners.length) return ctx.reply({ text: '❌ Nomor owner belum diatur.' });
+            const contacts = superOwners.map((num, i) => ({
+                vcard: `BEGIN:VCARD\nVERSION:3.0\nFN:Owner Bot${superOwners.length > 1 ? ' ' + (i + 1) : ''}\nTEL;type=CELL;type=VOICE;waid=${num}:+${num}\nEND:VCARD`
+            }));
+            await ctx.send({
+                contacts: {
+                    displayName: 'Owner Bot',
+                    contacts
+                }
+            });
+            break;
         }
-    });
-    break;
-}
 
         case 'location':
             await ctx.reply({
@@ -275,7 +277,7 @@ case 'owner': {
                 poll: { name: 'Polling Favorit', values: ['Node.js', 'Python', 'Golang', 'Rust'], selectableCount: 1, toAnnouncementGroup: false }
             });
             break;
-        
+
 
     }
 };

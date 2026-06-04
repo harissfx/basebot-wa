@@ -4,10 +4,11 @@ const config = require('../config');
 const handler = async (ctx) => {
     const { command } = ctx;
     let kota, geo, loc, data, response, username, ip, text, from, to, query, pkg, result, url, sections;
-
+    const p = config.prefix;
     switch (command.name) {
-case 'downloadmenu':
-    let menu = `
+
+        case 'toolsmenu':
+            let menu = `
 ╭──❍『𝑫𝒐𝒘𝒏𝒍𝒐𝒂𝒅𝒆𝒓 𝑴𝒆𝒏𝒖』
 │
 │⭔ ${p}ytmp3 [url]
@@ -20,45 +21,47 @@ case 'downloadmenu':
 │
 ╰────❍
 `
-    await ctx.sendInteractive({
-    text: menu,
-    footer: config.botName,
-    quoted: ctx.fakeOrder,
-    contextInfo: {
-    mentionedJid: ["0@s.whatsapp.net"],
-    forwardingScore: 111,
-    isForwarded: true
-    },
-    buttons: [
-        { name: 'quick_reply', buttonParamsJson: JSON.stringify({ display_text: 'Kembali ke Menu', id: 'menu' }) },
-        { name: 'single_select',buttonParamsJson: JSON.stringify({ title: '『 Simpel Menu 』',
-            sections: [{
-            title: '『 Simpel Menu 』',
-            highlight_label: "",
-                rows: [{ title: "General Menu", description: "Select to display general menu", id: "generalmenu" }]
-                        }, {
-            highlight_label: "",
-                rows: [{ title: "Owner Menu", description: "Select to display owner menu", id: "ownermenu" }]
-                        }, {
-            highlight_label: "",
-                rows: [{ title: "Ffmpeg Menu", description: "Select to display ffmpeg menu", id: "ffmpeg" }]
-                        }, {
-            highlight_label: "",
-                rows: [{ title: "Downloader Menu", description: "Select to display downloader menu", id: "downloadmenu" }]
-                        }, {
-            highlight_label: "",
-                rows: [{ title: "Tools Menu", description: "Select to display tools menu", id: "toolsmenu" }]
-                        }, {
-            highlight_label: "Khusus Owner Utama",
-                rows: [{ title: "JadiBot Menu", description: "Select to display jadi bot menu", id: "jadibotmenu" }]
-                        }, {
-            highlight_label: "",
-                rows: [{ title: "Group Menu", description: "Select to display group menu ", id: "groupmenu" }]
-                },]
-            })
-        }]
-    });
-break;
+            await ctx.sendInteractive({
+                text: menu,
+                footer: config.botName,
+                quoted: ctx.fakeOrder,
+                contextInfo: {
+                    mentionedJid: ["0@s.whatsapp.net"],
+                    forwardingScore: 111,
+                    isForwarded: true
+                },
+                buttons: [
+                    { name: 'quick_reply', buttonParamsJson: JSON.stringify({ display_text: 'Kembali ke Menu', id: 'menu' }) },
+                    {
+                        name: 'single_select', buttonParamsJson: JSON.stringify({
+                            title: '『 Simpel Menu 』',
+                            sections: [{
+                                title: '『 Simpel Menu 』',
+                                highlight_label: "",
+                                rows: [{ title: "General Menu", description: "Select to display general menu", id: "generalmenu" }]
+                            }, {
+                                highlight_label: "",
+                                rows: [{ title: "Owner Menu", description: "Select to display owner menu", id: "ownermenu" }]
+                            }, {
+                                highlight_label: "",
+                                rows: [{ title: "Ffmpeg Menu", description: "Select to display ffmpeg menu", id: "ffmpeg" }]
+                            }, {
+                                highlight_label: "",
+                                rows: [{ title: "Downloader Menu", description: "Select to display downloader menu", id: "downloadmenu" }]
+                            }, {
+                                highlight_label: "",
+                                rows: [{ title: "Tools Menu", description: "Select to display tools menu", id: "toolsmenu" }]
+                            }, {
+                                highlight_label: "Khusus Owner Utama",
+                                rows: [{ title: "JadiBot Menu", description: "Select to display jadi bot menu", id: "jadibotmenu" }]
+                            }, {
+                                highlight_label: "",
+                                rows: [{ title: "Group Menu", description: "Select to display group menu ", id: "groupmenu" }]
+                            },]
+                        })
+                    }]
+            });
+            break;
         case 'cuaca':
             kota = command.fullArgs || 'Jakarta';
             try {
@@ -71,14 +74,16 @@ break;
                 );
                 data = response.data.current_weather;
 
-                await ctx.reply({ text: [
-                    `🌤️ *Cuaca ${loc.name}* (${loc.country || ''})`,
-                    '',
-                    `🌡️ Suhu: *${data.temperature}°C*`,
-                    `💨 Angin: *${data.windspeed} km/j*`,
-                    `🧭 Arah: *${data.winddirection}°*`,
-                    `🕐 Waktu lokal: *${data.time}*`,
-                ].join('\n') });
+                await ctx.reply({
+                    text: [
+                        `🌤️ *Cuaca ${loc.name}* (${loc.country || ''})`,
+                        '',
+                        `🌡️ Suhu: *${data.temperature}°C*`,
+                        `💨 Angin: *${data.windspeed} km/j*`,
+                        `🧭 Arah: *${data.winddirection}°*`,
+                        `🕐 Waktu lokal: *${data.time}*`,
+                    ].join('\n')
+                });
             } catch {
                 await ctx.reply({ text: '❌ Gagal mengambil data cuaca.' });
             }
@@ -89,13 +94,15 @@ break;
                 response = await axios.get('https://zenquotes.io/api/random');
                 data = response.data?.[0];
                 if (!data) return ctx.reply({ text: '❌ Gagal mengambil quote.' });
-                await ctx.reply({ text: [
-                    `📜 *Quote of the Day*`,
-                    '',
-                    `"${data.q}"`,
-                    '',
-                    `— *${data.a}*`
-                ].join('\n') });
+                await ctx.reply({
+                    text: [
+                        `📜 *Quote of the Day*`,
+                        '',
+                        `"${data.q}"`,
+                        '',
+                        `— *${data.a}*`
+                    ].join('\n')
+                });
             } catch {
                 await ctx.reply({ text: '❌ Gagal mengambil quote.' });
             }
@@ -105,20 +112,22 @@ break;
             try {
                 response = await axios.get('https://api.exchangerate-api.com/v4/latest/USD');
                 data = response.data.rates;
-                await ctx.reply({ text: [
-                    `💱 *Kurs Mata Uang* (Base: USD)`,
-                    '',
-                    `🇮🇩 IDR: ${new Intl.NumberFormat('id-ID').format(data.IDR)}`,
-                    `🇪🇺 EUR: ${data.EUR}`,
-                    `🇯🇵 JPY: ${new Intl.NumberFormat('id-ID').format(data.JPY)}`,
-                    `🇬🇧 GBP: ${data.GBP}`,
-                    `🇸🇬 SGD: ${data.SGD}`,
-                    `🇲🇾 MYR: ${data.MYR}`,
-                    `🇰🇷 KRW: ${new Intl.NumberFormat('id-ID').format(data.KRW)}`,
-                    `🇨🇳 CNY: ${data.CNY}`,
-                    '',
-                    `🕐 Update: ${response.data.date}`
-                ].join('\n') });
+                await ctx.reply({
+                    text: [
+                        `💱 *Kurs Mata Uang* (Base: USD)`,
+                        '',
+                        `🇮🇩 IDR: ${new Intl.NumberFormat('id-ID').format(data.IDR)}`,
+                        `🇪🇺 EUR: ${data.EUR}`,
+                        `🇯🇵 JPY: ${new Intl.NumberFormat('id-ID').format(data.JPY)}`,
+                        `🇬🇧 GBP: ${data.GBP}`,
+                        `🇸🇬 SGD: ${data.SGD}`,
+                        `🇲🇾 MYR: ${data.MYR}`,
+                        `🇰🇷 KRW: ${new Intl.NumberFormat('id-ID').format(data.KRW)}`,
+                        `🇨🇳 CNY: ${data.CNY}`,
+                        '',
+                        `🕐 Update: ${response.data.date}`
+                    ].join('\n')
+                });
             } catch {
                 await ctx.reply({ text: '❌ Gagal mengambil data kurs.' });
             }
@@ -130,19 +139,21 @@ break;
             try {
                 response = await axios.get(`https://api.github.com/users/${encodeURIComponent(username)}`);
                 data = response.data;
-                await ctx.reply({ text: [
-                    `🐙 *GitHub Profile*`,
-                    '',
-                    `👤 *Nama:* ${data.name || data.login}`,
-                    `🔗 *User:* @${data.login}`,
-                    `📝 *Bio:* ${data.bio || '-'}`,
-                    `📍 *Lokasi:* ${data.location || '-'}`,
-                    `🏢 *Company:* ${data.company || '-'}`,
-                    `👥 *Followers:* ${data.followers} | *Following:* ${data.following}`,
-                    `📦 *Public Repos:* ${data.public_repos}`,
-                    `⭐ *Gists:* ${data.public_gists}`,
-                    `🌐 ${data.html_url}`
-                ].join('\n') });
+                await ctx.reply({
+                    text: [
+                        `🐙 *GitHub Profile*`,
+                        '',
+                        `👤 *Nama:* ${data.name || data.login}`,
+                        `🔗 *User:* @${data.login}`,
+                        `📝 *Bio:* ${data.bio || '-'}`,
+                        `📍 *Lokasi:* ${data.location || '-'}`,
+                        `🏢 *Company:* ${data.company || '-'}`,
+                        `👥 *Followers:* ${data.followers} | *Following:* ${data.following}`,
+                        `📦 *Public Repos:* ${data.public_repos}`,
+                        `⭐ *Gists:* ${data.public_gists}`,
+                        `🌐 ${data.html_url}`
+                    ].join('\n')
+                });
             } catch {
                 await ctx.reply({ text: `❌ User *${username}* tidak ditemukan.` });
             }
@@ -155,19 +166,21 @@ break;
                 response = await axios.get(url);
                 data = response.data;
                 if (data.error) return ctx.reply({ text: `❌ ${data.reason || 'Gagal cek IP'}` });
-                await ctx.reply({ text: [
-                    `🌐 *IP Information*`,
-                    '',
-                    `📍 IP: *${data.ip}*`,
-                    `🏳️ Negara: ${data.country_name} (${data.country})`,
-                    `🏠 Region: ${data.region}`,
-                    `🏙️ Kota: ${data.city}`,
-                    `📮 Kode Pos: ${data.postal || '-'}`,
-                    `🌍 Koordinat: ${data.latitude}, ${data.longitude}`,
-                    `🏢 ISP: ${data.org || '-'}`,
-                    `⏰ Zona Waktu: ${data.timezone || '-'}`,
-                    `💱 Mata Uang: ${data.currency || '-'}`
-                ].join('\n') });
+                await ctx.reply({
+                    text: [
+                        `🌐 *IP Information*`,
+                        '',
+                        `📍 IP: *${data.ip}*`,
+                        `🏳️ Negara: ${data.country_name} (${data.country})`,
+                        `🏠 Region: ${data.region}`,
+                        `🏙️ Kota: ${data.city}`,
+                        `📮 Kode Pos: ${data.postal || '-'}`,
+                        `🌍 Koordinat: ${data.latitude}, ${data.longitude}`,
+                        `🏢 ISP: ${data.org || '-'}`,
+                        `⏰ Zona Waktu: ${data.timezone || '-'}`,
+                        `💱 Mata Uang: ${data.currency || '-'}`
+                    ].join('\n')
+                });
             } catch {
                 await ctx.reply({ text: '❌ Gagal mengecek IP.' });
             }
@@ -183,27 +196,29 @@ break;
         case 'translate':
 
             const isLangCode = (str) => /^[a-zA-Z]{2}(\|[a-zA-Z]{2})?$/.test(str);
-            
+
             if (!command.args.length) {
-                return ctx.reply({ text: [
-                    '❌ *Cara pakai:*',
-                    '',
-                    '`!translate <teks>`',
-                    '  → Auto-translate ke *Bahasa Indonesia*',
-                    '  Contoh: `!translate Hello world`',
-                    '',
-                    '`!translate <ke> <teks>`',
-                    '  → Translate ke bahasa tujuan (auto-deteksi sumber)',
-                    '  Contoh: `!translate en Halo dunia`',
-                    '',
-                    '`!translate <dari>|<ke> <teks>`',
-                    '  → Translate custom',
-                    '  Contoh: `!translate ja|en こんにちは`',
-                    '',
-                    'Kode umum: `id`, `en`, `ja`, `ko`, `ar`, `es`, `fr`, `de`, `ru`, `zh`, `pt`, `th`, `vi`, `ms`'
-                ].join('\n') });
+                return ctx.reply({
+                    text: [
+                        '❌ *Cara pakai:*',
+                        '',
+                        '`!translate <teks>`',
+                        '  → Auto-translate ke *Bahasa Indonesia*',
+                        '  Contoh: `!translate Hello world`',
+                        '',
+                        '`!translate <ke> <teks>`',
+                        '  → Translate ke bahasa tujuan (auto-deteksi sumber)',
+                        '  Contoh: `!translate en Halo dunia`',
+                        '',
+                        '`!translate <dari>|<ke> <teks>`',
+                        '  → Translate custom',
+                        '  Contoh: `!translate ja|en こんにちは`',
+                        '',
+                        'Kode umum: `id`, `en`, `ja`, `ko`, `ar`, `es`, `fr`, `de`, `ru`, `zh`, `pt`, `th`, `vi`, `ms`'
+                    ].join('\n')
+                });
             }
-            
+
             if (command.args[0].includes('|')) {
 
                 [from, to] = command.args[0].split('|');
@@ -217,14 +232,14 @@ break;
                 from = 'Autodetect';
                 text = command.fullArgs;
             }
-            
+
             if (!text) return ctx.reply({ text: '❌ Masukkan teks yang mau diterjemahkan.' });
-            
+
             try {
                 let res = await axios.get(
                     `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${from}|${to}`
                 );
-                
+
                 if ((!res.data?.responseData?.translatedText) || res.data.responseStatus !== 200) {
                     const fallbacks = ['id', 'en'];
                     for (const fb of fallbacks) {
@@ -238,19 +253,21 @@ break;
                         }
                     }
                 }
-                
+
                 result = res.data.responseData;
                 if (!result?.translatedText || res.data.responseStatus !== 200) {
                     return ctx.reply({ text: '❌ Gagal menerjemahkan. Cek kode bahasa (contoh: id, en, ja, ko, ar).' });
                 }
-                
-                await ctx.reply({ text: [
-                    `🌐 *Translate* (${from} → ${to})`,
-                    '',
-                    `📝 *Asli:*\n${text}`,
-                    '',
-                    `✅ *Hasil:*\n${result.translatedText}`
-                ].join('\n') });
+
+                await ctx.reply({
+                    text: [
+                        `🌐 *Translate* (${from} → ${to})`,
+                        '',
+                        `📝 *Asli:*\n${text}`,
+                        '',
+                        `✅ *Hasil:*\n${result.translatedText}`
+                    ].join('\n')
+                });
             } catch (err) {
                 console.error('Translate error:', err.message);
                 await ctx.reply({ text: '❌ Gagal menerjemahkan.' });
@@ -262,7 +279,7 @@ break;
             if (!query) return ctx.reply({ text: '❌ Contoh: !wiki Node.js' });
             try {
                 const headers = { 'User-Agent': 'Mozilla/5.0 (compatible; WhatsAppBot/1.0; +https://github.com)' };
-                
+
                 const searchRes = await axios.get(
                     `https://id.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(query)}&srlimit=1&format=json&origin=*`,
                     { headers }
@@ -284,15 +301,17 @@ break;
                     break;
                 }
 
-                await ctx.reply({ text: [
-                    `📖 *Wikipedia*`,
-                    '',
-                    `*${data.title}*`,
-                    '',
-                    data.extract || 'Tidak ada deskripsi.',
-                    '',
-                    `🔗 ${data.content_urls?.desktop?.page || `https://id.wikipedia.org/wiki/${encodeURIComponent(exactTitle)}`}`
-                ].join('\n') });
+                await ctx.reply({
+                    text: [
+                        `📖 *Wikipedia*`,
+                        '',
+                        `*${data.title}*`,
+                        '',
+                        data.extract || 'Tidak ada deskripsi.',
+                        '',
+                        `🔗 ${data.content_urls?.desktop?.page || `https://id.wikipedia.org/wiki/${encodeURIComponent(exactTitle)}`}`
+                    ].join('\n')
+                });
             } catch (err) {
                 console.error('Wiki error:', err.message);
                 await ctx.reply({ text: `❌ Gagal mengambil artikel *${query}*.` });
@@ -310,17 +329,19 @@ break;
                 const author = data.author?.name || data.author || '-';
                 const license = data.license || '-';
                 const homepage = data.homepage || `https://npmjs.com/package/${pkg}`;
-                await ctx.reply({ text: [
-                    `📦 *NPM Package*`,
-                    '',
-                    `*${data.name}* @ ${latest}`,
-                    `📝 ${desc}`,
-                    '',
-                    `👤 Author: ${author}`,
-                    `📜 License: ${license}`,
-                    `⬇️ Downloads: cek di npmjs.com`,
-                    `🌐 ${homepage}`
-                ].join('\n') });
+                await ctx.reply({
+                    text: [
+                        `📦 *NPM Package*`,
+                        '',
+                        `*${data.name}* @ ${latest}`,
+                        `📝 ${desc}`,
+                        '',
+                        `👤 Author: ${author}`,
+                        `📜 License: ${license}`,
+                        `⬇️ Downloads: cek di npmjs.com`,
+                        `🌐 ${homepage}`
+                    ].join('\n')
+                });
             } catch {
                 await ctx.reply({ text: `❌ Package *${pkg}* tidak ditemukan.` });
             }
