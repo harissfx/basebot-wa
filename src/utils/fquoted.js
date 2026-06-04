@@ -1,6 +1,5 @@
 const config = require('../config');
- imgPath = path.join(__dirname, '../media/logo.png');
-           
+const dummyThumbnail = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==";
             imageSource = fs.readFileSync(imgPath);
 const fakeOrder = {
 key: {
@@ -12,7 +11,7 @@ participant: '0@s.whatsapp.net',
 						"header": {
 						
 							"hasMediaAttachment": [],
-							"jpegThumbnail": imageSource,
+							"jpegThumbnail": Buffer.from(dummyThumbnail, 'base64'),
 													},
 						"nativeFlowMessage": {
 							"buttons": [
