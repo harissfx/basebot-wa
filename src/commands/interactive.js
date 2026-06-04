@@ -95,18 +95,22 @@ hanzt = `┌━━━━━━━━━━━━━━┈ ❋ཻུ۪۪⸙
 │✑ 𝖢𝗈𝗉𝗒𝗋𝗂𝗀𝗁𝗍 𝖧𝖺𝗇𝗓 𝖮𝖿𝖼
 └━━━━━━━━━━━━━━━┈ ❋ཻུ۪۪⸙`
 await sock.sendMessage(sender, {
-text: hanzt,
-contextInfo:{
-mentionedJid:[senderJid],
-forwardingScore: 111,
-isForwarded: true,
-"renderLargerThumbnail": true,
-"title": `Hay Kak ${pushname} 👋 Selamat ${salam}`,
-"mediaType": 1, 
-"thumbnail": imageSource,
-"mediaUrl": `https://whatsapp.com/channel/0029Va9311BFy72KkrEY5v3K`,
-"sourceUrl": `https://whatsapp.com/channel/0029Va9311BFy72KkrEY5v3K`
-}
+    text: hanzt,
+    contextInfo: {
+        mentionedJid: [senderJid],
+        forwardingScore: 111,
+        isForwarded: true,
+        externalAdReply: {          // ← ini yang kurang, harus dibungkus
+            showAdAttribution: true,
+            renderLargerThumbnail: true,
+            title: `Hay Kak ${pushname} 👋 Selamat ${salam}`,
+            containsAutoReply: true,
+            mediaType: 1,
+            thumbnail: imageSource,
+            mediaUrl: `https://whatsapp.com/channel/0029Va9311BFy72KkrEY5v3K`,
+            sourceUrl: `https://whatsapp.com/channel/0029Va9311BFy72KkrEY5v3K`
+        }
+    }
 }, { quoted: ctx.msg })
 break
         case 'button':
