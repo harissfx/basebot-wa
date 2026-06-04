@@ -108,7 +108,7 @@ isForwarded: true,
 "mediaUrl": `https://whatsapp.com/channel/0029Va9311BFy72KkrEY5v3K`,
 "sourceUrl": `https://whatsapp.com/channel/0029Va9311BFy72KkrEY5v3K`
 }
-}, { quoted: msg })
+}, { quoted: ctx.msg })
 break
         case 'button':
             await ctx.sendButtons({
