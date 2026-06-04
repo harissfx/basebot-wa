@@ -1,10 +1,9 @@
 const fs   = require('fs');
 const path = require('path');
-const axios = require('axios');
-const jwt = require('jsonwebtoken');
+const config = require('../config');
 
 const handler = async (ctx) => {
-    const { command } = ctx;
+    const { command, sock, sender, from, senderJid, pushname, salam, isOwner } = ctx
 
     switch (command.name) {
 case 'downloadmenu':
@@ -60,6 +59,56 @@ case 'downloadmenu':
         }]
     });
 break;
+case 'test':
+ imgPath = path.join(__dirname, '../media/logo.png');
+            if (!fs.existsSync(imgPath)) return ctx.reply({ text: '❌ File logo.png tidak ditemukan di folder media.' });
+            imageSource = fs.readFileSync(imgPath);
+hanzt = `┌━━━━━━━━━━━━━━┈ ❋ཻུ۪۪⸙
+│    「 𝙄𝙉𝙁𝙊 𝘽𝙊𝙏 」
+│● 𝘖𝘸𝘯𝘦𝘳: ẉHanzOfc.to
+│● 𝘕𝘰𝘮𝘰𝘳: ${config.superOwner}
+│● 𝘙𝘶𝘯𝘵𝘪𝘮𝘦: ${formatUptime(process.uptime())}
+│● 𝘕𝘢𝘮𝘢 𝘠𝘵: 𝖧𝖺𝗇𝗓 𝖮𝖿𝖼
+│● 𝘕𝘢𝘮𝘢 𝘉𝘰𝘵: ${config.botName}
+└┬━━━━━━━━━━━━━━┈ ⳹
+┌┤  「 𝙈𝙀𝙉𝙐 𝘽𝙊𝙏 」
+││
+││⪩ 𝗍𝗈𝗆𝖾𝗇𝗎
+││⪩ 𝖼𝗎𝖼𝗂𝗆𝖺𝗍𝖺
+││⪩ 𝗅𝗂𝗌𝗍𝗆𝗎𝗌𝗂𝗄
+││⪩ 𝗍𝖾𝗑𝗍𝗆𝖺𝗄𝖾𝗋
+││⪩ 𝖿𝗎𝗇𝗆𝖾𝗇𝗎
+││⪩ 𝖺𝖽𝖽𝗆𝖾𝗇𝗎
+││⪩ 𝗀𝖺𝗌𝗆𝖾𝗇𝗎
+││⪩ 𝖻𝗎𝗀𝗆𝖾𝗇𝗎
+││⪩ 𝗂𝗌𝗅𝖺𝗆𝗆𝖾𝗇𝗎
+││⪩ 𝖻𝖾𝗋𝗂𝗍𝖺𝗆𝖾𝗇𝗎
+││⪩ 𝗀𝖺𝗆𝖾𝗆𝖾𝗇𝗎
+││⪩ 𝗀𝗋𝗈𝗎𝗉𝗆𝖾𝗇𝗎
+││⪩ 𝗋𝖺𝗇𝖽𝗈𝗆𝗆𝖾𝗇𝗎
+││⪩ 𝖽𝗈𝗐𝗇𝗅𝗈𝖺𝖽𝗆𝖾𝗇𝗎
+││
+│└────────────┈ ⳹
+│›⟩ ∘ 𝘓𝘢𝘯𝘨𝘶𝘢𝘨𝘦: 𝘑𝘢𝘷𝘢𝘚𝘤𝘳𝘪𝘱𝘵
+│›⟩ ∘ 𝘚𝘤𝘳𝘪𝘱𝘵?: 𝘎𝘬 𝘥𝘪 𝘫𝘶𝘢𝘭 ( ͡° ͜ʖ ͡°)
+├───────────────
+│✑ 𝖢𝗈𝗉𝗒𝗋𝗂𝗀𝗁𝗍 𝖧𝖺𝗇𝗓 𝖮𝖿𝖼
+└━━━━━━━━━━━━━━━┈ ❋ཻུ۪۪⸙`
+await sock.sendMessage(sender, {
+text: hanzt,
+contextInfo:{
+mentionedJid:[senderJid],
+forwardingScore: 111,
+isForwarded: true,
+"renderLargerThumbnail": true,
+"title": `Hay Kak ${pushname} 👋 Selamat ${salam}`,
+"mediaType": 1, 
+"thumbnail": imageSource,
+"mediaUrl": `https://whatsapp.com/channel/0029Va9311BFy72KkrEY5v3K`,
+"sourceUrl": `https://whatsapp.com/channel/0029Va9311BFy72KkrEY5v3K`
+}
+}, { quoted: ctx.msg })
+break
         case 'button':
             await ctx.sendButtons({
                 text: '🎛️ Silakan pilih salah satu:',
