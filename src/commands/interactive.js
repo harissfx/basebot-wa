@@ -127,17 +127,15 @@ const handler = async (ctx) => {
                 ]
             });
             break;
-
-        // ─── PAYMENT BUTTON ─────────────────────────────────────────────────────
-        case 'pay': {
-            const imagePath = path.join(__dirname, '../media/logo.png');
+    case 'pay': 
+            const imagePathh = path.join(__dirname, '../media/logo.png');
             await ctx.sendInteractive({
     'message': {
 	"interactiveMessage": {
 						"header": {
 						
 							"hasMediaAttachment": [],
-							"jpegThumbnail": fs.readFileSync(imagePath),
+							"jpegThumbnail": fs.readFileSync(imagePathh),
 													},
 						"nativeFlowMessage": {
 							"buttons": [
@@ -147,10 +145,13 @@ const handler = async (ctx) => {
 								}
 							]
 			}
+            
 }}
 });
             break;
-        }
-
+        
     }
 };
+
+
+module.exports = handler;
