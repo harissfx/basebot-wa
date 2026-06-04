@@ -92,14 +92,14 @@ case 'menudownloader':
     menu = `
 ╭──❍『𝑫𝒐𝒘𝒏𝒍𝒐𝒂𝒅𝒆𝒓 𝑴𝒆𝒏𝒖』
 │
-│⭔ ${prefix}ytmp3 [url]
-│⭔ ${prefix}ytmp4 [url]
-│⭔ ${prefix}twiter [url]
-│⭔ ${prefix}umma [url]
-│⭔ ${prefix}mediafire [url]
-│⭔ ${prefix}gitclone [url]
-│⭔ ${prefix}facebook [url]
-│⭔ ${prefix}tiktok [url]
+│⭔ ${p}ytmp3 [url]
+│⭔ ${p}ytmp4 [url]
+│⭔ ${p}twiter [url]
+│⭔ ${p}umma [url]
+│⭔ ${p}mediafire [url]
+│⭔ ${p}gitclone [url]
+│⭔ ${p}facebook [url]
+│⭔ ${p}tiktok [url]
 │
 ╰────❍
 `
