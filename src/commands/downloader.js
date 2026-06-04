@@ -18,6 +18,7 @@ const fs           = require('fs');
 const path         = require('path');
 const os           = require('os');
 const { execFile } = require('child_process');
+const config = require('../config');
 
 const YTDLP_PATH  = '/usr/local/bin/yt-dlp';
 const MAX_SIZE_MB = 90; // batas ukuran file sebelum ditolak
