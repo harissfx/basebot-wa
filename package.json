@@ -4,7 +4,7 @@
   "description": "Base bot WhatsApp dengan Node.js & Baileys - Support Button, List, Media, Poll",
   "main": "index.js",
   "scripts": {
-    "start": "npm install --omit=dev && node index.js",
+    "start": "node index.js",
     "dev": "node index.js",
     "postinstall": "sed -i '/console.info.*Closing session/d' node_modules/libsignal/src/session_record.js"
   },
