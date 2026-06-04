@@ -5,14 +5,14 @@ const { formatUptime } = require('../utils/helper');
 const { getDevice } = require('@whiskeysockets/baileys');
 
 const handler = async (ctx) => {
-    const { command, sock, sender, msg, pushname, isOwner, isGroup } = ctx;
+    const { command, isSuperOwner, sock, sender, msg, pushname, isOwner, isGroup } = ctx;
     const p = config.prefix;
     let imgPath, imageSource, start, sent, u, h, m, s;
 
     switch (command.name) {
         case 'generalmenu':
             const device = getDevice(msg.key.id);
-            const role = isOwner ? 'Owner 👑' : 'User 👤';
+            const role = isSuperOwner ? 'Super Owner 👑' : (isOwner ? 'Co-Owner 👥' : 'User 👤');
             const chatType = isGroup ? 'Grup 👥' : 'Pribadi 💬';
             const time = new Date().toLocaleTimeString('id-ID', { timeZone: 'Asia/Jakarta', hour: '2-digit', minute: '2-digit' }) + ' WIB';
             let menu = `┌─❖「 𝗜𝗡𝗙𝗢 𝗨𝗦𝗘𝗥 」
