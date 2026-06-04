@@ -105,44 +105,30 @@ case 'menudownloader':
 │
 ╰────❍
 `
-            await ctx.sendInteractive({
-                
-                text: menu,
-                footer: config.botName,
-                quoted: ctx.msg,
-                buttons: [
-                    { name: 'quick_reply', buttonParamsJson: JSON.stringify({ display_text: 'Kembali ke Menu', id: 'menu' }) },
-                    { name: 'single_select',buttonParamsJson: JSON.stringify({ title: '📂 Buka Menu',
-                        sections: [{
-                            title: '🍔 Makanan',
-                            highlight_label: "label test",
-                                    rows: [
-                                        { id: 'food_1', title: 'Burger',    description: 'Burger daging sapi premium' },
-                                        { id: 'food_2', title: 'Pizza',     description: 'Pizza pepperoni large'      },
-                                        { id: 'food_3', title: 'Sushi',     description: 'Sushi salmon set'           },
-                                    ]
-                                },
-                                {
-                                    title: '🥤 Minuman',
-                                    rows: [
-                                        { id: 'drink_1', title: 'Kopi', description: 'Kopi arabica single origin' },
-                                        { id: 'drink_2', title: 'Teh',  description: 'Teh hijau organik'          },
-                                        { id: 'drink_3', title: 'Jus',  description: 'Jus jeruk segar'            },
-                                    ]
-                                },
-                                {
-                                    title: '🍰 Dessert',
-                                    rows: [
-                                        { id: 'dessert_1', title: 'Cheesecake', description: 'New York cheesecake'      },
-                                        { id: 'dessert_2', title: 'Brownies',   description: 'Chocolate fudge brownies' },
-                                    ]
-                                },
-                            ]
-                        })
-                    }
-                ]
-            });
-            break;
+    await ctx.sendInteractive({
+    text: menu,
+    footer: config.botName,
+    quoted: ctx.msg,
+    buttons: [
+        { name: 'quick_reply', buttonParamsJson: JSON.stringify({ display_text: 'Kembali ke Menu', id: 'menu' }) },
+        { name: 'single_select',buttonParamsJson: JSON.stringify({ title: 'Simpel Menu',
+            sections: [{
+            title: '🍔 Makanan',
+            highlight_label: "label test",
+            rows: [
+                { id: 'generalmenu', title: 'General',    description: 'Burger daging sapi premium' },
+                { id: 'ffmpegmenu', title: 'Ffmpag',     description: 'Pizza pepperoni large'      },
+                { id: 'jadibotmenu', title: 'Jadibot',     description: 'Pizza pepperoni large'      },
+                { id: 'ownermenu', title: 'Owner',     description: 'Pizza pepperoni large'      },
+                { id: 'toolsmenu', title: 'Tools',     description: 'Sushi salmon set'           },
+                { id: 'groupmenu', title: 'Group',    description: 'Burger daging sapi premium' },                 
+                { id: 'funmenu', title: 'Fun',     description: 'Sushi salmon set'           },
+                    ]
+                },]
+            })
+        }]
+    });
+break;
         // ── !ytmp3 ── YouTube → Audio MP3 ─────────────────────────────────────
         case 'ytmp3': {
             if (!url) return ctx.reply({ text: '❌ Contoh: `!ytmp3 https://youtu.be/xxx`' });
