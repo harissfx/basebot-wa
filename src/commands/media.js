@@ -8,10 +8,6 @@
  *
  * Cara install dependency:
  *   npm install fluent-ffmpeg @ffmpeg-installer/ffmpeg sharp
- *
- * Pastikan juga ffmpeg tersedia di sistem:
- *   Ubuntu/Debian : sudo apt install ffmpeg
- *   Atau pakai @ffmpeg-installer/ffmpeg (auto-download, tidak perlu apt)
  */
 
 const fs   = require('fs');
@@ -19,19 +15,59 @@ const path = require('path');
 const os   = require('os');
 const { downloadContentFromMessage } = require('@whiskeysockets/baileys');
 
+// ─── Inject metadata nama paket & author ke WebP (EXIF trick) ────────────────
+// WhatsApp baca nama stiker dari chunk "EXIF" di dalam file WebP.
+// Format: pakai JSON di dalam chunk custom "EXIF" yang WhatsApp kenali.
+function injectStickerMetadata(webpBuffer, packName, authorName) {
+    try {
+        // Metadata JSON yang dibaca WhatsApp
+        const metaJson = JSON.stringify({
+            'sticker-pack-id':        `com.bot.sticker.${Date.now()}`,
+            'sticker-pack-name':       packName,
+            'sticker-pack-publisher':  authorName,
+            'emojis':                  ['🤖'],
+        });
+
+        const metaBuf    = Buffer.from(metaJson, 'utf-8');
+        // Chunk ID "EXIF" = 4 bytes, size = 4 bytes (little-endian)
+        const chunkId    = Buffer.from('EXIF');
+        const chunkSize  = Buffer.alloc(4);
+        chunkSize.writeUInt32LE(metaBuf.length, 0);
+        const exifChunk  = Buffer.concat([chunkId, chunkSize, metaBuf]);
+
+        // WebP header: "RIFF" (4) + fileSize (4) + "WEBP" (4) = 12 bytes
+        // Sisipkan chunk EXIF tepat setelah header RIFF+WEBP
+        const riffHeader = webpBuffer.slice(0, 12);
+        const rest       = webpBuffer.slice(12);
+
+        // Update ukuran file di RIFF header
+        const newTotalSize = 4 + exifChunk.length + rest.length; // 4 = "WEBP"
+        const newRiff = Buffer.concat([
+            Buffer.from('RIFF'),
+            (() => { const b = Buffer.alloc(4); b.writeUInt32LE(newTotalSize, 0); return b; })(),
+            Buffer.from('WEBP'),
+        ]);
+
+        return Buffer.concat([newRiff, exifChunk, rest]);
+    } catch (e) {
+        // Kalau inject gagal, kembalikan buffer asli tanpa crash
+        console.warn('[STICKER META] Gagal inject metadata:', e.message);
+        return webpBuffer;
+    }
+}
+
 // ─── Helper: download media dari pesan Baileys ke Buffer ──────────────────────
 async function downloadMedia(message) {
     const typeMap = {
-        imageMessage:   'image',
-        videoMessage:   'video',
-        stickerMessage: 'sticker',
-        documentMessage:'document',
+        imageMessage:    'image',
+        videoMessage:    'video',
+        stickerMessage:  'sticker',
+        documentMessage: 'document',
     };
 
     let msgContent = null;
     let mediaType  = null;
 
-    // Cek pesan langsung
     for (const [key, type] of Object.entries(typeMap)) {
         if (message?.[key]) {
             msgContent = message[key];
@@ -48,14 +84,14 @@ async function downloadMedia(message) {
     return { buffer: Buffer.concat(chunks), mediaType };
 }
 
-// ─── Helper: jalankan FFmpeg via fluent-ffmpeg ────────────────────────────────
+// ─── Helper: jalankan FFmpeg ──────────────────────────────────────────────────
 function runFFmpeg(inputPath, outputPath, optionsFn) {
     return new Promise((resolve, reject) => {
         let ffmpegPath;
         try {
             ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
         } catch {
-            ffmpegPath = 'ffmpeg'; // fallback ke ffmpeg sistem
+            ffmpegPath = 'ffmpeg';
         }
 
         const ffmpeg = require('fluent-ffmpeg');
@@ -71,9 +107,9 @@ function runFFmpeg(inputPath, outputPath, optionsFn) {
     });
 }
 
-// ─── Helper: tulis buffer ke file temp, kembalikan pathnya ───────────────────
+// ─── Helper: tulis buffer ke file temp ───────────────────────────────────────
 function writeTmp(buffer, ext) {
-    const tmpPath = path.join(os.tmpdir(), `wbot_${Date.now()}.${ext}`);
+    const tmpPath = path.join(os.tmpdir(), `wbot_${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`);
     fs.writeFileSync(tmpPath, buffer);
     return tmpPath;
 }
@@ -81,7 +117,7 @@ function writeTmp(buffer, ext) {
 // ─── Helper: hapus file temp ─────────────────────────────────────────────────
 function cleanTmp(...paths) {
     for (const p of paths) {
-        try { fs.unlinkSync(p); } catch {}
+        try { if (p) fs.unlinkSync(p); } catch {}
     }
 }
 
@@ -89,7 +125,6 @@ function cleanTmp(...paths) {
 const handler = async (ctx) => {
     const { command, msg, sock, sender } = ctx;
 
-    // Ambil pesan yang di-reply (quoted), atau pesan itu sendiri jika ada media
     const quotedMsg = msg.message?.extendedTextMessage?.contextInfo?.quotedMessage
                    || msg.message;
 
@@ -106,9 +141,9 @@ const handler = async (ctx) => {
                         '❌ *Tidak ada media yang dideteksi!*',
                         '',
                         'Cara pakai:',
-                        '• Reply foto → `!sticker`',
+                        '• Reply foto  → `!sticker`',
                         '• Reply GIF/video → `!sticker` (jadi stiker animasi)',
-                        '• Reply stiker → auto-convert ke format WebP',
+                        '• Nama paket : `!sticker NamaPaket|Author`',
                     ].join('\n'),
                 });
             }
@@ -120,19 +155,23 @@ const handler = async (ctx) => {
                 || (mediaType === 'image' && quotedMsg?.imageMessage?.mimetype === 'image/gif')
                 || (mediaType === 'sticker' && quotedMsg?.stickerMessage?.isAnimated);
 
-            // Parse nama paket & author dari args: !sticker NamaPaket|Author
-            const [packName = 'Bot', authorName = 'WaBot'] = (command.fullArgs || '').split('|').map(s => s.trim());
+            // Parse packName & authorName dari args: !sticker NamaPaket|Author
+            const rawArgs   = (command.fullArgs || '').trim();
+            const [packName = 'Bot', authorName = 'WaBot'] = rawArgs
+                ? rawArgs.split('|').map(s => s.trim())
+                : ['Bot', 'WaBot'];
 
             let inputPath, outputPath;
             try {
+                let stickerBuffer;
+
                 if (isAnimated) {
-                    // Video/GIF → WebP animasi
-                    inputPath  = writeTmp(buffer, mediaType === 'video' ? 'mp4' : 'gif');
+                    inputPath  = writeTmp(buffer, mediaType === 'video' ? 'mp4' : 'webp');
                     outputPath = writeTmp(Buffer.alloc(0), 'webp');
 
                     await runFFmpeg(inputPath, outputPath, (cmd) => {
                         cmd
-                            .inputOptions(['-t 8'])          // maks 8 detik
+                            .inputOptions(['-t 8'])
                             .outputOptions([
                                 '-vf', 'scale=512:512:force_original_aspect_ratio=decrease,fps=15,pad=512:512:(ow-iw)/2:(oh-ih)/2:color=0x00000000',
                                 '-vcodec', 'libwebp',
@@ -145,18 +184,19 @@ const handler = async (ctx) => {
                                 '-vsync', '0',
                             ]);
                     });
+
+                    stickerBuffer = fs.readFileSync(outputPath);
+
                 } else {
                     // Foto → WebP statis
-                    // Coba pakai sharp dulu (lebih cepat), fallback ke FFmpeg
-                    let webpBuffer;
                     try {
                         const sharp = require('sharp');
-                        webpBuffer = await sharp(buffer)
-                            .resize(512, 512, { fit: 'inside', background: { r:0, g:0, b:0, alpha:0 } })
+                        stickerBuffer = await sharp(buffer)
+                            .resize(512, 512, { fit: 'inside', background: { r: 0, g: 0, b: 0, alpha: 0 } })
                             .webp({ quality: 80 })
                             .toBuffer();
                     } catch {
-                        // Fallback ke FFmpeg
+                        // Fallback FFmpeg
                         inputPath  = writeTmp(buffer, 'jpg');
                         outputPath = writeTmp(Buffer.alloc(0), 'webp');
                         await runFFmpeg(inputPath, outputPath, (cmd) => {
@@ -165,22 +205,13 @@ const handler = async (ctx) => {
                                 '-quality', '80',
                             ]);
                         });
-                        webpBuffer = fs.readFileSync(outputPath);
-                    }
-                    if (webpBuffer) {
-                        await sock.sendMessage(sender, {
-                            sticker: webpBuffer,
-                            isAnimated: false,
-                        }, { quoted: msg });
-                        cleanTmp(inputPath, outputPath);
-                        await ctx.react('✅');
-                        return;
+                        stickerBuffer = fs.readFileSync(outputPath);
                     }
                 }
 
-                const stickerBuffer = fs.readFileSync(outputPath);
+                // ✅ Inject metadata nama paket & author ke WebP
+                stickerBuffer = injectStickerMetadata(stickerBuffer, packName, authorName);
 
-                // Kirim stiker
                 await sock.sendMessage(sender, {
                     sticker: stickerBuffer,
                     isAnimated,
@@ -193,7 +224,7 @@ const handler = async (ctx) => {
                 cleanTmp(inputPath, outputPath);
                 console.error('[STICKER ERROR]', err.message);
                 await ctx.react('❌');
-                await ctx.reply({ text: `❌ Gagal membuat stiker.\nError: ${err.message}\n\nPastikan FFmpeg sudah terinstall dan dependency lengkap.` });
+                await ctx.reply({ text: `❌ Gagal membuat stiker.\nError: ${err.message}` });
             }
             break;
         }
@@ -209,7 +240,6 @@ const handler = async (ctx) => {
                         '',
                         'Cara pakai:',
                         '• Reply stiker → `!toimg`',
-                        '• Hasilnya akan dikirim sebagai foto PNG',
                     ].join('\n'),
                 });
             }
@@ -221,40 +251,34 @@ const handler = async (ctx) => {
 
             let inputPath, outputPath;
             try {
-                inputPath  = writeTmp(buffer, 'webp');
-                outputPath = writeTmp(Buffer.alloc(0), 'png');
-
-                if (isAnimated) {
-                    // Ambil frame pertama dari WebP animasi
-                    await runFFmpeg(inputPath, outputPath, (cmd) => {
-                        cmd
-                            .inputOptions(['-vframes 1'])
-                            .outputOptions(['-vf', 'scale=512:512:force_original_aspect_ratio=decrease']);
-                    });
-                } else {
+                if (!isAnimated) {
+                    // Stiker statis → PNG via sharp
                     try {
-                        // Coba sharp dulu
                         const sharp = require('sharp');
                         const pngBuffer = await sharp(buffer).png().toBuffer();
                         await sock.sendMessage(sender, {
                             image: pngBuffer,
                             caption: '🖼️ Stiker dikonversi ke foto!',
                         }, { quoted: msg });
-                        cleanTmp(inputPath, outputPath);
                         await ctx.react('✅');
                         return;
-                    } catch {
-                        // Fallback FFmpeg
-                        await runFFmpeg(inputPath, outputPath, (cmd) => {
-                            cmd.outputOptions(['-vf', 'scale=512:512:force_original_aspect_ratio=decrease']);
-                        });
-                    }
+                    } catch { /* fallback FFmpeg */ }
                 }
+
+                // Animasi atau fallback: ambil frame pertama via FFmpeg
+                inputPath  = writeTmp(buffer, 'webp');
+                outputPath = writeTmp(Buffer.alloc(0), 'png');
+
+                await runFFmpeg(inputPath, outputPath, (cmd) => {
+                    cmd
+                        .inputOptions(['-vframes 1'])
+                        .outputOptions(['-vf', 'scale=512:512:force_original_aspect_ratio=decrease']);
+                });
 
                 const imgBuffer = fs.readFileSync(outputPath);
                 await sock.sendMessage(sender, {
                     image: imgBuffer,
-                    caption: `🖼️ Stiker dikonversi ke foto!${isAnimated ? '\n_(Diambil frame pertama dari stiker animasi)_' : ''}`,
+                    caption: `🖼️ Stiker dikonversi ke foto!${isAnimated ? '\n_(frame pertama dari stiker animasi)_' : ''}`,
                 }, { quoted: msg });
 
                 cleanTmp(inputPath, outputPath);
@@ -281,7 +305,6 @@ const handler = async (ctx) => {
                         'Cara pakai:',
                         '• Reply stiker animasi → `!togif`',
                         '• Reply video → `!togif`',
-                        '• Hasilnya akan dikirim sebagai GIF',
                     ].join('\n'),
                 });
             }
@@ -298,13 +321,12 @@ const handler = async (ctx) => {
 
             let inputPath, outputPath;
             try {
-                const inputExt = isVideo ? 'mp4' : 'webp';
-                inputPath  = writeTmp(buffer, inputExt);
+                inputPath  = writeTmp(buffer, isVideo ? 'mp4' : 'webp');
                 outputPath = writeTmp(Buffer.alloc(0), 'gif');
 
                 await runFFmpeg(inputPath, outputPath, (cmd) => {
                     cmd
-                        .inputOptions(isVideo ? ['-t 8'] : [])  // maks 8 detik untuk video
+                        .inputOptions(isVideo ? ['-t 8'] : [])
                         .outputOptions([
                             '-vf', 'scale=320:-1:flags=lanczos,fps=12,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse',
                             '-loop', '0',
@@ -317,7 +339,7 @@ const handler = async (ctx) => {
                 if (gifBuffer.length > 10 * 1024 * 1024) {
                     cleanTmp(inputPath, outputPath);
                     await ctx.react('❌');
-                    return ctx.reply({ text: `❌ GIF terlalu besar (${gifSizeMB} MB). Coba pakai video yang lebih pendek.` });
+                    return ctx.reply({ text: `❌ GIF terlalu besar (${gifSizeMB} MB). Coba video lebih pendek.` });
                 }
 
                 await sock.sendMessage(sender, {
