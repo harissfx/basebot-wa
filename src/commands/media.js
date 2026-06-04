@@ -5,78 +5,34 @@
  *   !sticker / !s  → foto/gif/video (reply) jadi stiker
  *   !toimg         → stiker (reply) jadi foto
  *   !togif         → stiker/video (reply) jadi GIF
- *   !tourl         → upload foto/video/file ke URL publik
  *
  * Install dependency:
- *   npm install fluent-ffmpeg @ffmpeg-installer/ffmpeg sharp node-webpmux form-data cheerio
+ *   npm install fluent-ffmpeg @ffmpeg-installer/ffmpeg sharp node-webpmux
  */
 
 'use strict';
 
-const fs        = require('fs');
-const path      = require('path');
-const os        = require('os');
-const axios     = require('axios');
-const BodyForm  = require('form-data');
-const cheerio   = require('cheerio');
+const fs   = require('fs');
+const path = require('path');
+const os   = require('os');
 const { TextEncoder }                = require('util');
 const { downloadContentFromMessage } = require('@whiskeysockets/baileys');
 
-// ─── Upload helpers ───────────────────────────────────────────────────────────
-
-// Upload gambar ke telegra.ph → URL publik
-function uploadTelegraPh(filePath) {
-    return new Promise(async (resolve, reject) => {
-        if (!fs.existsSync(filePath)) return reject(new Error('File not found'));
-        try {
-            const form = new BodyForm();
-            form.append('file', fs.createReadStream(filePath));
-            const res = await axios({
-                url: 'https://telegra.ph/upload',
-                method: 'POST',
-                headers: { ...form.getHeaders() },
-                data: form,
-            });
-            resolve('https://telegra.ph' + res.data[0].src);
-        } catch (err) {
-            reject(new Error(String(err)));
-        }
-    });
-}
-
-
-// Upload file (video/dokumen/dll) ke uguu.se → URL publik
-function uploadUguu(filePath) {
-    return new Promise(async (resolve, reject) => {
-        try {
-            const form = new BodyForm();
-            form.append('files[]', fs.createReadStream(filePath));
-            const res = await axios({
-                url: 'https://uguu.se/upload.php',
-                method: 'POST',
-                headers: {
-                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
-                    ...form.getHeaders(),
-                },
-                data: form,
-            });
-            resolve(res.data.files[0]);
-        } catch (err) {
-            reject(err);
-        }
-    });
-}
-
-// ─── Inject metadata ke WebP pakai node-webpmux ───────────────────────────────
+// ─── Inject metadata ke WebP pakai node-webpmux (cara yang benar) ─────────────
+// Format byte EXIF ini IDENTIK dengan yang dipakai wa-sticker-formatter.
+// WhatsApp hanya baca metadata kalau byte header-nya benar.
 async function injectStickerMetadata(webpBuffer, packName, authorName) {
     try {
         const { Image } = require('node-webpmux');
+
         const data = JSON.stringify({
             'sticker-pack-id':        require('crypto').randomBytes(32).toString('hex'),
             'sticker-pack-name':       packName,
             'sticker-pack-publisher':  authorName,
             'emojis':                  ['🤖'],
         });
+
+        // Header byte ini HARUS persis — sama persis dengan wa-sticker-formatter
         const exif = Buffer.concat([
             Buffer.from([
                 0x49, 0x49, 0x2a, 0x00, 0x08, 0x00, 0x00, 0x00,
@@ -85,14 +41,16 @@ async function injectStickerMetadata(webpBuffer, packName, authorName) {
             ]),
             Buffer.from(data, 'utf-8'),
         ]);
+        // Tulis panjang JSON ke offset 14 (4 byte LE)
         exif.writeUIntLE(new TextEncoder().encode(data).length, 14, 4);
+
         const img = new Image();
         await img.load(webpBuffer);
         img.exif = exif;
-        return await img.save(null);
+        return await img.save(null); // null = kembalikan sebagai Buffer
     } catch (e) {
         console.warn('[STICKER META] Gagal inject metadata:', e.message);
-        return webpBuffer;
+        return webpBuffer; // fallback, stiker tetap terkirim tanpa metadata
     }
 }
 
@@ -169,6 +127,7 @@ const handler = async (ctx) => {
                 || (mediaType === 'image' && quotedMsg?.imageMessage?.mimetype === 'image/gif')
                 || (mediaType === 'sticker' && quotedMsg?.stickerMessage?.isAnimated);
 
+            // Parse "NamaPaket|Author" dari args
             const rawArgs    = (command.fullArgs || '').trim();
             const [packName, authorName] = rawArgs
                 ? rawArgs.split('|').map(s => s.trim())
@@ -197,6 +156,7 @@ const handler = async (ctx) => {
                     });
                     stickerBuffer = fs.readFileSync(outputPath);
                 } else {
+                    // Foto → WebP statis
                     try {
                         const sharp = require('sharp');
                         stickerBuffer = await sharp(buffer)
@@ -216,7 +176,9 @@ const handler = async (ctx) => {
                     }
                 }
 
+                // ✅ Inject metadata nama & author yang benar
                 stickerBuffer = await injectStickerMetadata(stickerBuffer, packName, authorName);
+
                 await sock.sendMessage(sender, { sticker: stickerBuffer, isAnimated }, { quoted: msg });
                 cleanTmp(inputPath, outputPath);
                 await ctx.react('✅');
@@ -322,68 +284,6 @@ const handler = async (ctx) => {
                 console.error('[TOGIF ERROR]', err.message);
                 await ctx.react('❌');
                 await ctx.reply({ text: `❌ Gagal konversi ke GIF.\nError: ${err.message}` });
-            }
-            break;
-        }
-
-        // ── !tourl ────────────────────────────────────────────────────────────
-        case 'tourl': {
-            const mediaResult = await downloadMedia(quotedMsg);
-            if (!mediaResult) {
-                return ctx.reply({ text: [
-                    '❌ *Tidak ada media yang dideteksi!*', '',
-                    'Cara pakai:',
-                    '• Reply foto  → `!tourl` (upload ke telegra.ph)',
-                    '• Reply video/file → `!tourl` (upload ke uguu.se)',
-                ].join('\n') });
-            }
-
-            await ctx.react('⏳');
-
-            const { buffer, mediaType } = mediaResult;
-            const isImage = mediaType === 'image';
-
-            // Tentukan ekstensi file
-            const extMap = { image: 'jpg', video: 'mp4', sticker: 'webp', document: 'bin' };
-            const ext    = extMap[mediaType] || 'bin';
-            const tmpFile = writeTmp(buffer, ext);
-
-            try {
-                let resultUrl;
-
-                if (isImage) {
-                    // Foto → telegra.ph (support image langsung)
-                    resultUrl = await uploadTelegraPh(tmpFile);
-                    await ctx.reply({ text: [
-                        '🖼️ *Upload Berhasil!*',
-                        '',
-                        `🔗 URL: ${resultUrl}`,
-                        '',
-                        '_Host: Telegra.ph_',
-                    ].join('\n') });
-                } else {
-                    // Video/stiker/file → uguu.se
-                    const result = await uploadUguu(tmpFile);
-                    resultUrl = result.url || result;
-                    await ctx.reply({ text: [
-                        '📁 *Upload Berhasil!*',
-                        '',
-                        `🔗 URL: ${resultUrl}`,
-                        `📝 Nama: ${result.name || path.basename(tmpFile)}`,
-                        `📦 Size: ${result.size ? (result.size / 1024).toFixed(1) + ' KB' : '-'}`,
-                        '',
-                        '_Host: Uguu.se (file tersedia 48 jam)_',
-                    ].join('\n') });
-                }
-
-                cleanTmp(tmpFile);
-                await ctx.react('✅');
-
-            } catch (err) {
-                cleanTmp(tmpFile);
-                console.error('[TOURL ERROR]', err.message);
-                await ctx.react('❌');
-                await ctx.reply({ text: `❌ Gagal upload media.\nError: ${err.message}` });
             }
             break;
         }
