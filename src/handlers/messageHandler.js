@@ -41,6 +41,18 @@ function extractMessageText(message) {
         case 'buttonsResponseMessage': return message.buttonsResponseMessage?.selectedButtonId;
         case 'listResponseMessage': return message.listResponseMessage?.singleSelectReply?.selectedRowId;
         case 'templateButtonReplyMessage': return message.templateButtonReplyMessage?.selectedId;
+        case 'interactiveResponseMessage': {
+            const paramsJson = message.interactiveResponseMessage?.nativeFlowResponseMessage?.paramsJson;
+            if (paramsJson) {
+                try {
+                    const parsed = JSON.parse(paramsJson);
+                    return parsed.id;
+                } catch {
+                    return null;
+                }
+            }
+            return null;
+        }
         default: return null;
     }
 }
