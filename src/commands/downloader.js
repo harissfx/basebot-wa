@@ -91,7 +91,7 @@ const handler = async (ctx) => {
     switch (command.name) {
 
 case 'menudownloader':
-    menu = `
+    let menu = `
 ╭──❍『𝑫𝒐𝒘𝒏𝒍𝒐𝒂𝒅𝒆𝒓 𝑴𝒆𝒏𝒖』
 │
 │⭔ ${p}ytmp3 [url]
