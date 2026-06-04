@@ -117,6 +117,43 @@ const handler = async (ctx) => {
         case 'like': await ctx.react('❤️'); break;
         case 'share': await ctx.reply({ text: '📤 Makasih udah mau share!' }); break;
 
+        case 'fakeorder':
+        case 'orderdummy':
+        case 'taeek': {
+            const { sendFakeOrder } = require('../utils/interactiveHelper');
+            const adjectives = ['Premium', 'Exclusive', 'Limited', 'Special', 'VIP', 'Ultimate'];
+            const nouns      = ['Package', 'Bundle', 'Deal', 'Order', 'Box', 'Collection'];
+            const rand       = (arr) => arr[Math.floor(Math.random() * arr.length)];
+            const randRef    = () => {
+                const c = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+                let r = '';
+                for (let i = 0; i < 8; i++) r += c[Math.floor(Math.random() * c.length)];
+                return `ORD-${r}-${Date.now().toString(36).toUpperCase()}`;
+            };
+
+            const itemName = ctx.command.fullArgs?.trim() || `${rand(adjectives)} ${rand(nouns)}`;
+            const ref      = randRef();
+
+            let thumbnail = null;
+            const thumbPath = require('path').join(__dirname, '../media/logo.png');
+            if (require('fs').existsSync(thumbPath)) thumbnail = require('fs').readFileSync(thumbPath);
+
+            await sendFakeOrder(ctx.sock, ctx.sender, {
+                quoted:      ctx.msg,
+                thumbnail,
+                currency:    'USD',
+                totalAmount: 100_000_000,
+                offset:      2,
+                referenceId: ref,
+                description: itemName,
+                itemName:    `${itemName} - ${ref}`,
+                quantity:    '999',
+                paymentNote: `Pembayaran untuk ${itemName}`,
+                paymentUrl:  'https://example.com/pay',
+            });
+            break;
+        }
+
         case 'buttoncall':
             await ctx.sendInteractive({
                 text: '📞 Hubungi kami:',
