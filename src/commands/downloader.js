@@ -109,10 +109,14 @@ case 'downloadmenu':
     text: menu,
     footer: config.botName,
     quoted: ctx.msg,
-    contextInfo: {
+contextInfo: {
     externalAdReply: {
-    showAdAttribution: true,
-    }},
+        showAdAttribution: true
+    },
+    mentionedJid: ["0@s.whatsapp.net"],
+    forwardingScore: 111,
+    isForwarded: true
+},
     buttons: [
         { name: 'quick_reply', buttonParamsJson: JSON.stringify({ display_text: 'Kembali ke Menu', id: 'menu' }) },
         { name: 'single_select',buttonParamsJson: JSON.stringify({ title: '『 Simpel Menu 』',
