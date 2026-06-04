@@ -167,7 +167,7 @@ case 'menudownloader':
                             imgPath = path.join(__dirname, '../media/logo.png');
                             if (!fs.existsSync(imgPath)) return ctx.reply({ text: '❌ File logo.png tidak ditemukan di folder media.' });
                             imageSource = fs.readFileSync(imgPath);
-            await sock.sendMessage(from, {
+            await ctx.sendInteractive(from, {
                interactiveMessage: {
                   title: `test isi`,
                   footer: `© since 20#9 ݁₊.ᐟ`,
