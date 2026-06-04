@@ -91,7 +91,6 @@ const handler = async (ctx) => {
     switch (command.name) {
 
         case 'downloadmenu':
-            fs.writeFileSync(path.join(__dirname, '../../msg_debug.json'), JSON.stringify(msg, null, 2));
             let menu = `┌─❖「 𝗜𝗡𝗙𝗢 𝗨𝗦𝗘𝗥 」
 │● 𝘕𝘢𝘮𝘢: ${pushname}
 │● 𝘕𝘰𝘮𝘰𝘳: ${senderNumber}

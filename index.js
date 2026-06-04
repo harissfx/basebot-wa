@@ -15,12 +15,12 @@ const chalk = require('chalk');
 const figlet = require('figlet');
 const Spinnies = require('spinnies');
 
-const config  = require('./src/config.js');
+const config = require('./src/config.js');
 const plugins = require('./src/utils/PluginLoader');
-const logger  = P({ level: 'silent' });
+const logger = P({ level: 'silent' });
 
 const _origConsoleLog = console.log;
-console.log = function(...args) {
+console.log = function (...args) {
     const str = args[0];
     if (str && typeof str === 'string' && str.startsWith('Closing session')) return;
     if (str && typeof str === 'object' && str?._chains !== undefined) return;
@@ -70,7 +70,7 @@ function printBanner() {
 
 plugins.init();
 
-let phoneNumber    = null;
+let phoneNumber = null;
 let isFirstConnect = true;
 
 global.conns = global.conns || {};
@@ -97,7 +97,7 @@ async function startBot(authFolder = config.authFolder, isMain = true, customPho
         logger,
         printQRInTerminal: false,
         auth: state,
-        browser: ['Ubuntu', 'Chrome', '20.0.04'], 
+        browser: ['Ubuntu', 'Chrome', '20.0.04'],
         generateHighQualityLinkPreview: true,
         syncFullHistory: false,
         markOnlineOnConnect: true,
@@ -115,14 +115,14 @@ async function startBot(authFolder = config.authFolder, isMain = true, customPho
 
     const messageHandler = require('./src/handlers/messageHandler');
     sock.ev.on('messages.upsert', (m) => {
-        messageHandler(sock, m, isMain); 
+        messageHandler(sock, m, isMain);
     });
     sock.ev.on('connection.update', async (update) => {
         const { connection, lastDisconnect } = update;
 
         if (connection === 'close') {
             if (isMain) {
-                try { spinnies.remove("waiting"); } catch (e) {}
+                try { spinnies.remove("waiting"); } catch (e) { }
             }
 
             const statusCode = (lastDisconnect?.error instanceof Boom)
@@ -133,8 +133,8 @@ async function startBot(authFolder = config.authFolder, isMain = true, customPho
                 console.log(chalk.red(`\n[!] Sesi ${instanceKey} keluar/logged out.`));
                 if (isMain) process.exit(0);
                 delete global.conns[instanceKey];
-                
-                try { fs.rmSync(authFolder, { recursive: true, force: true }); } catch (e) {}
+
+                try { fs.rmSync(authFolder, { recursive: true, force: true }); } catch (e) { }
                 return;
             }
 
@@ -148,20 +148,20 @@ async function startBot(authFolder = config.authFolder, isMain = true, customPho
 
         } else if (connection === 'open') {
             const name = sock.user?.name || sock.user?.id?.split(':')[0] || 'Unknown';
-            
+
             if (isMain) {
                 console.log(chalk.green(`\nSTATUS: Bot Utama Berhasil Terhubung!`));
                 console.log(chalk.white(` • ID/No   : ${name}`));
                 console.log(chalk.white(` • Prefix  : ${config.prefix}`));
                 console.log(chalk.white(` • Commands: ${plugins.commandList().length} fitur aktif`));
                 console.log(chalk.blue(`\n💡 Edit file di src/commands/ untuk auto-reload tanpa restart.\n`));
-                
-                try { spinnies.remove("waiting"); } catch (e) {}
+
+                try { spinnies.remove("waiting"); } catch (e) { }
                 spinnies.add("waiting", { text: "Menunggu Pesan..." });
 
                 autoLoadJadibot();
 
-                messageHandler.resolveOwnerLids(sock).catch(() => {});
+                messageHandler.resolveOwnerLids(sock).catch(() => { });
             } else {
                 console.log(chalk.green(`\n[JADIBOT] Clone Bot +${instanceKey} Berhasil Terhubung!`));
             }
@@ -224,7 +224,7 @@ async function startBot(authFolder = config.authFolder, isMain = true, customPho
 
 global.createNewBotInstance = async (targetPhone) => {
     const sessionPath = path.join(__dirname, 'src', 'database', 'jadibot', targetPhone);
-    
+
     if (fs.existsSync(path.join(sessionPath, 'creds.json'))) {
         const creds = JSON.parse(fs.readFileSync(path.join(sessionPath, 'creds.json'), 'utf-8'));
         if (creds.registered) {
@@ -250,7 +250,7 @@ global.createNewBotInstance = async (targetPhone) => {
 
 function autoLoadJadibot() {
     const sessionsDir = path.join(__dirname, 'src', 'database', 'jadibot');
-    
+
     if (!fs.existsSync(sessionsDir)) {
         fs.mkdirSync(sessionsDir, { recursive: true });
     }
@@ -262,13 +262,13 @@ function autoLoadJadibot() {
 
             if (fs.existsSync(path.join(fullPath, 'creds.json'))) {
                 console.log(chalk.blue(`[AUTOLOAD] Menghidupkan kembali clone bot: +${folder}`));
-                startBot(fullPath, false, folder).catch(() => {});
+                startBot(fullPath, false, folder).catch(() => { });
             }
         }
     });
 }
 
-process.on('uncaughtException',  (err)    => console.error(chalk.red('[Error Uncaught]:'), err.message));
+process.on('uncaughtException', (err) => console.error(chalk.red('[Error Uncaught]:'), err.message));
 process.on('unhandledRejection', (reason) => console.error(chalk.red('[Error Rejection]:'), reason));
 
 startBot().catch((err) => {
