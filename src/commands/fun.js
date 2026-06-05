@@ -4,7 +4,7 @@ const { getDevice } = require('@whiskeysockets/baileys');
 const { pick } = require('../../lib/random');
 
 const handler = async (m) => {
-    const { command, isSuperOwner, Hanz, sender, msg, senderNumber, pushname, isOwner, isGroup } = m;
+    const { command, isSuperOwner, Hanz, sender, msg, senderNumber, pushname, isOwner } = m;
     const p = config.prefix;
     let max, answers, jokes, fortunes;
 

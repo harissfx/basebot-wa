@@ -1,7 +1,6 @@
 const fs = require('fs');
 const config = require('../config');
 
-// Mode bot disimpan di global supaya bisa diubah dari command tanpa restart
 if (global.botMode === undefined) global.botMode = config.botMode;
 const plugins = require('../utils/PluginLoader');
 const chalk = require('chalk');
@@ -66,7 +65,7 @@ function isFromMe(msg) { return msg.key.fromMe; }
 
 function getSenderNumber(sender, msg) {
     const candidates = [
-        msg?.key?.senderPn,         // nomor asli (Baileys terbaru)
+        msg?.key?.senderPn,
         msg?.key?.participantAlt,
         msg?.key?.remoteJidAlt,
         msg?.key?.participant,

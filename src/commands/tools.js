@@ -4,7 +4,7 @@ const { getDevice } = require('@whiskeysockets/baileys');
 
 const handler = async (m) => {
     const { command, isSuperOwner, msg, senderNumber, pushname, isOwner } = m;
-    let kota, geo, loc, data, response, username, ip, text, from, to, query, pkg, result, url, sections;
+    let kota, geo, loc, data, response, username, ip, text, from, to, query, pkg, result, url;
     const p = config.prefix;
     switch (command.name) {
 
