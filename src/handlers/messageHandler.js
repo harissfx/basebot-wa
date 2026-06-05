@@ -150,6 +150,7 @@ async function handleMessages(sock, m, isMain = true) {
                 try {
                     await handler({
                         sock, msg, sender,
+                        senderNumber: getSenderNumber(sender, msg),
                         pushname: msg.pushName || 'Kak',
                         isGroup: isGroup(sender),
                         isOwner: checkOwner,
