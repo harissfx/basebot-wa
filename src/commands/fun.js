@@ -193,7 +193,7 @@ const handler = async (m) => {
 │└────────────┈ ⳹
 │「 𝗙𝗨𝗡 𝗠𝗘𝗡𝗨 」
 │
-│${funCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
+${funCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
 │
 └────────────┈ ⳹`;
             await m.sendInteractive({
@@ -207,8 +207,7 @@ const handler = async (m) => {
                 },
                 buttons: [
                     { name: 'quick_reply', buttonParamsJson: JSON.stringify({ display_text: 'Kembali ke Menu', id: 'menu' }) },
-                    {
-                        name: 'single_select', buttonParamsJson: JSON.stringify({
+                    { name: 'single_select', buttonParamsJson: JSON.stringify({
                             title: '『 Simpel Menu 』',
                             sections: [{
                                 title: '『 Simpel Menu 』',
@@ -229,6 +228,9 @@ const handler = async (m) => {
                             }, {
                                 highlight_label: "Khusus Owner Utama",
                                 rows: [{ title: "JadiBot Menu", description: "Select to display jadi bot menu", id: "jadibotmenu" }]
+                            }, {
+                                highlight_label: "",
+                                rows: [{ title: "Game Menu", description: "Select to display jadi bot menu", id: "funmenu" }]
                             }, {
                                 highlight_label: "",
                                 rows: [{ title: "Group Menu", description: "Select to display group menu ", id: "groupmenu" }]

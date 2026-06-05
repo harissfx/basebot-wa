@@ -63,8 +63,11 @@ ${generalCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
                                 rows: [{ title: "JadiBot Menu", description: "Select to display jadi bot menu", id: "jadibotmenu" }]
                             }, {
                                 highlight_label: "",
+                                rows: [{ title: "Game Menu", description: "Select to display jadi bot menu", id: "funmenu" }]
+                            }, {
+                                highlight_label: "",
                                 rows: [{ title: "Group Menu", description: "Select to display group menu ", id: "groupmenu" }]
-                            },]
+                            }]
                         })
                     }]
             });
