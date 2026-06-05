@@ -162,8 +162,8 @@ const handler = async (ctx) => {
                     footer: config.footerTxt,
                     quoted: ctx.msg,
                     buttons: [
-                        { name: 'cta_copy', buttonParamsJson: JSON.stringify({ display_text: 'Copy JID Klasik', copy_code: jidKlasik }) },
-                        { name: 'cta_copy', buttonParamsJson: JSON.stringify({ display_text: 'Copy LID', copy_code: lid }) },
+                        { name: 'cta_copy', buttonParamsJson: JSON.stringify({ display_text: '📋 Copy JID Klasik', copy_code: jidKlasik }) },
+                        { name: 'cta_copy', buttonParamsJson: JSON.stringify({ display_text: '📋 Copy LID', copy_code: lid }) },
                     ]
                 });
             } catch (error) {
@@ -207,7 +207,7 @@ const handler = async (ctx) => {
                     footer: config.footerTxt,
                     quoted: ctx.msg,
                     buttons: [
-                        { name: 'cta_copy', buttonParamsJson: JSON.stringify({ display_text: 'Copy ID Channel', copy_code: jidAsli }) },
+                        { name: 'cta_copy', buttonParamsJson: JSON.stringify({ display_text: '📋 Copy ID Channel', copy_code: jidAsli }) },
                     ]
                 });
             } catch (error) {
@@ -227,7 +227,7 @@ const handler = async (ctx) => {
 
             if (!['public', 'self'].includes(modeInput)) {
                 return ctx.sendInteractive({
-                    text: `⚙️ *MODE BOT SAAT INI:* ${config.botMode.toUpperCase()}
+                    text: `⚙️ *MODE BOT SAAT INI:* ${(global.botMode || config.botMode).toUpperCase()}
 
 ` +
                         `• *public* → semua orang bisa pakai bot
@@ -236,13 +236,13 @@ const handler = async (ctx) => {
                     footer: config.footerTxt,
                     quoted: ctx.msg,
                     buttons: [
-                        { name: 'quick_reply', buttonParamsJson: JSON.stringify({ display_text: 'Set Public', id: 'setmode public' }) },
-                        { name: 'quick_reply', buttonParamsJson: JSON.stringify({ display_text: 'Set Self', id: 'setmode self' }) },
+                        { name: 'quick_reply', buttonParamsJson: JSON.stringify({ display_text: '🌐 Set Public', id: 'setmode public' }) },
+                        { name: 'quick_reply', buttonParamsJson: JSON.stringify({ display_text: '🔒 Set Self', id: 'setmode self' }) },
                     ]
                 });
             }
 
-            if (modeInput === config.botMode) {
+            if (modeInput === (global.botMode || config.botMode)) {
                 return ctx.reply({ text: `ℹ️ Mode bot sudah dalam mode *${modeInput.toUpperCase()}*.` });
             }
 

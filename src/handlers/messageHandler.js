@@ -1,5 +1,8 @@
 const fs = require('fs');
 const config = require('../config');
+
+// Mode bot disimpan di global supaya bisa diubah dari command tanpa restart
+if (global.botMode === undefined) global.botMode = config.botMode;
 const plugins = require('../utils/PluginLoader');
 const chalk = require('chalk');
 const readline = require('readline');
@@ -121,10 +124,7 @@ async function handleMessages(sock, m, isMain = true) {
         const checkSuperOwner = isSuperOwner(sender, msg);
         const checkCoOwner = isCoOwner(sender, msg);
 
-        const configFile = fs.readFileSync(require.resolve('../config'), 'utf8');
-        const modeMatch = configFile.match(/botMode:\s*'(public|self)'/);
-        const currentMode = modeMatch ? modeMatch[1] : 'public';
-        if (!fromMe && currentMode === 'self' && !checkOwner) continue;
+        if (!fromMe && global.botMode === 'self' && !checkOwner) continue;
 
         const text = extractMessageText(msg.message);
         if (!text) continue;
