@@ -27,8 +27,8 @@ const {
 } = require('../../lib/ytdlp');
 
 // ─── Handler ──────────────────────────────────────────────────────────────────
-const handler = async (ctx) => {
-    const { command, isSuperOwner, sock, sender, msg, senderNumber, pushname, isOwner, isGroup } = ctx;
+const handler = async (m) => {
+    const { command, isSuperOwner, Hanz, sender, msg, senderNumber, pushname, isOwner, isGroup } = m;
     const url = command.fullArgs?.trim();
     const p = config.prefix;
 
@@ -58,10 +58,10 @@ const handler = async (ctx) => {
 │⪩ \`${p}𝗉𝗂𝗇𝗍𝖾𝗋𝖾𝗌𝗍 (𝗅𝗂𝗇𝗄)\`
 │
 └────────────┈ ⳹`
-            await ctx.sendInteractive({
+            await m.sendInteractive({
                 text: menu,
                 footer: config.footerTxt,
-                quoted: ctx.fakeOrder,
+                quoted: m.fakeOrder,
                 contextInfo: {
                     mentionedJid: ["0@s.whatsapp.net"],
                     forwardingScore: 111,
@@ -102,21 +102,21 @@ const handler = async (ctx) => {
 
         // ── !ytmp3 ── YouTube → Audio MP3 ─────────────────────────────────────
         case 'ytmp3': {
-            if (!url) return ctx.reply({ text: '❌ Contoh: `!ytmp3 https://youtu.be/xxx`' });
+            if (!url) return m.reply({ text: '❌ Contoh: `!ytmp3 https://youtu.be/xxx`' });
 
-            await ctx.react('⏳');
+            await m.react('⏳');
             let filePath;
             try {
-                await ctx.reply({ text: '🔍 Mengambil info lagu...' });
+                await m.reply({ text: '🔍 Mengambil info lagu...' });
                 const info = await getInfo(url);
 
                 const durSec = info.duration || 0;
                 if (durSec > 15 * 60) {
-                    await ctx.react('❌');
-                    return ctx.reply({ text: `❌ Durasi terlalu panjang (${formatDuration(durSec)}). Maksimal 15 menit.` });
+                    await m.react('❌');
+                    return m.reply({ text: `❌ Durasi terlalu panjang (${formatDuration(durSec)}). Maksimal 15 menit.` });
                 }
 
-                await ctx.reply({
+                await m.reply({
                     text: [
                         `🎵 *${info.title}*`,
                         `⏱️ Durasi: ${formatDuration(durSec)}`,
@@ -133,11 +133,11 @@ const handler = async (ctx) => {
                 const sizeMB = fileSizeMB(filePath);
                 if (sizeMB > MAX_SIZE_MB) {
                     cleanTmp(filePath);
-                    await ctx.react('❌');
-                    return ctx.reply({ text: `❌ File terlalu besar (${sizeMB.toFixed(1)} MB). Coba lagu yang lebih pendek.` });
+                    await m.react('❌');
+                    return m.reply({ text: `❌ File terlalu besar (${sizeMB.toFixed(1)} MB). Coba lagu yang lebih pendek.` });
                 }
 
-                await sock.sendMessage(sender, {
+                await Hanz.sendMessage(sender, {
                     audio: fs.readFileSync(filePath),
                     mimetype: 'audio/mpeg',
                     fileName: `${info.title}.mp3`,
@@ -145,34 +145,34 @@ const handler = async (ctx) => {
                 }, { quoted: msg });
 
                 cleanTmp(filePath);
-                await ctx.react('✅');
+                await m.react('✅');
 
             } catch (err) {
                 cleanTmp(filePath);
                 console.error('[YTMP3 ERROR]', err.message);
-                await ctx.react('❌');
-                await ctx.reply({ text: `❌ Gagal download audio.\nError: ${err.message.slice(0, 200)}` });
+                await m.react('❌');
+                await m.reply({ text: `❌ Gagal download audio.\nError: ${err.message.slice(0, 200)}` });
             }
             break;
         }
 
         // ── !ytmp4 ── YouTube → Video MP4 ─────────────────────────────────────
         case 'ytmp4': {
-            if (!url) return ctx.reply({ text: '❌ Contoh: `!ytmp4 https://youtu.be/xxx`' });
+            if (!url) return m.reply({ text: '❌ Contoh: `!ytmp4 https://youtu.be/xxx`' });
 
-            await ctx.react('⏳');
+            await m.react('⏳');
             let filePath;
             try {
-                await ctx.reply({ text: '🔍 Mengambil info video...' });
+                await m.reply({ text: '🔍 Mengambil info video...' });
                 const info = await getInfo(url);
 
                 const durSec = info.duration || 0;
                 if (durSec > 5 * 60) {
-                    await ctx.react('❌');
-                    return ctx.reply({ text: `❌ Durasi terlalu panjang (${formatDuration(durSec)}). Maksimal 5 menit untuk video.` });
+                    await m.react('❌');
+                    return m.reply({ text: `❌ Durasi terlalu panjang (${formatDuration(durSec)}). Maksimal 5 menit untuk video.` });
                 }
 
-                await ctx.reply({
+                await m.reply({
                     text: [
                         `🎬 *${info.title}*`,
                         `⏱️ Durasi: ${formatDuration(durSec)}`,
@@ -188,11 +188,11 @@ const handler = async (ctx) => {
                 const sizeMB = fileSizeMB(filePath);
                 if (sizeMB > MAX_SIZE_MB) {
                     cleanTmp(filePath);
-                    await ctx.react('❌');
-                    return ctx.reply({ text: `❌ File terlalu besar (${sizeMB.toFixed(1)} MB). Coba video lebih pendek.` });
+                    await m.react('❌');
+                    return m.reply({ text: `❌ File terlalu besar (${sizeMB.toFixed(1)} MB). Coba video lebih pendek.` });
                 }
 
-                await sock.sendMessage(sender, {
+                await Hanz.sendMessage(sender, {
                     video: fs.readFileSync(filePath),
                     mimetype: 'video/mp4',
                     fileName: `${info.title}.mp4`,
@@ -200,13 +200,13 @@ const handler = async (ctx) => {
                 }, { quoted: msg });
 
                 cleanTmp(filePath);
-                await ctx.react('✅');
+                await m.react('✅');
 
             } catch (err) {
                 cleanTmp(filePath);
                 console.error('[YTMP4 ERROR]', err.message);
-                await ctx.react('❌');
-                await ctx.reply({ text: `❌ Gagal download video.\nError: ${err.message.slice(0, 200)}` });
+                await m.react('❌');
+                await m.reply({ text: `❌ Gagal download video.\nError: ${err.message.slice(0, 200)}` });
             }
             break;
         }
@@ -214,12 +214,12 @@ const handler = async (ctx) => {
         // ── !tiktok ── TikTok video tanpa watermark ────────────────────────────
         case 'tiktok':
         case 'tt': {
-            if (!url) return ctx.reply({ text: '❌ Contoh: `!tiktok https://vt.tiktok.com/xxx`' });
+            if (!url) return m.reply({ text: '❌ Contoh: `!tiktok https://vt.tiktok.com/xxx`' });
 
-            await ctx.react('⏳');
+            await m.react('⏳');
             let filePath;
             try {
-                await ctx.reply({ text: '⬇️ Mendownload video TikTok...' });
+                await m.reply({ text: '⬇️ Mendownload video TikTok...' });
 
                 filePath = await download(url, [
                     '-f', 'download_addr-0/bestvideo+bestaudio/best',
@@ -229,27 +229,27 @@ const handler = async (ctx) => {
                 const sizeMB = fileSizeMB(filePath);
                 if (sizeMB > MAX_SIZE_MB) {
                     cleanTmp(filePath);
-                    await ctx.react('❌');
-                    return ctx.reply({ text: `❌ File terlalu besar (${sizeMB.toFixed(1)} MB).` });
+                    await m.react('❌');
+                    return m.reply({ text: `❌ File terlalu besar (${sizeMB.toFixed(1)} MB).` });
                 }
 
                 let info;
                 try { info = await getInfo(url); } catch { }
 
-                await sock.sendMessage(sender, {
+                await Hanz.sendMessage(sender, {
                     video: fs.readFileSync(filePath),
                     mimetype: 'video/mp4',
                     caption: info?.title ? `🎵 ${info.title}` : '✅ TikTok downloaded!',
                 }, { quoted: msg });
 
                 cleanTmp(filePath);
-                await ctx.react('✅');
+                await m.react('✅');
 
             } catch (err) {
                 cleanTmp(filePath);
                 console.error('[TIKTOK ERROR]', err.message);
-                await ctx.react('❌');
-                await ctx.reply({ text: `❌ Gagal download TikTok.\nError: ${err.message.slice(0, 200)}` });
+                await m.react('❌');
+                await m.reply({ text: `❌ Gagal download TikTok.\nError: ${err.message.slice(0, 200)}` });
             }
             break;
         }
@@ -259,12 +259,12 @@ const handler = async (ctx) => {
         case 'twdl':
         case 'twiter':
             {
-                if (!url) return ctx.reply({ text: '❌ Contoh: `!xdl https://x.com/xxx/status/xxx`' });
+                if (!url) return m.reply({ text: '❌ Contoh: `!xdl https://x.com/xxx/status/xxx`' });
 
-                await ctx.react('⏳');
+                await m.react('⏳');
                 let filePath;
                 try {
-                    await ctx.reply({ text: '⬇️ Mendownload video dari X/Twitter...' });
+                    await m.reply({ text: '⬇️ Mendownload video dari X/Twitter...' });
 
                     filePath = await download(url, [
                         '-f', 'best[ext=mp4]/best',
@@ -274,24 +274,24 @@ const handler = async (ctx) => {
                     const sizeMB = fileSizeMB(filePath);
                     if (sizeMB > MAX_SIZE_MB) {
                         cleanTmp(filePath);
-                        await ctx.react('❌');
-                        return ctx.reply({ text: `❌ File terlalu besar (${sizeMB.toFixed(1)} MB).` });
+                        await m.react('❌');
+                        return m.reply({ text: `❌ File terlalu besar (${sizeMB.toFixed(1)} MB).` });
                     }
 
-                    await sock.sendMessage(sender, {
+                    await Hanz.sendMessage(sender, {
                         video: fs.readFileSync(filePath),
                         mimetype: 'video/mp4',
                         caption: '✅ Downloaded dari X/Twitter!',
                     }, { quoted: msg });
 
                     cleanTmp(filePath);
-                    await ctx.react('✅');
+                    await m.react('✅');
 
                 } catch (err) {
                     cleanTmp(filePath);
                     console.error('[XDL ERROR]', err.message);
-                    await ctx.react('❌');
-                    await ctx.reply({ text: `❌ Gagal download dari X/Twitter.\nError: ${err.message.slice(0, 200)}` });
+                    await m.react('❌');
+                    await m.reply({ text: `❌ Gagal download dari X/Twitter.\nError: ${err.message.slice(0, 200)}` });
                 }
                 break;
             }
@@ -300,13 +300,13 @@ const handler = async (ctx) => {
         case 'instagram':
         case 'igdl':
             {
-                if (!url) return ctx.reply({ text: '❌ Contoh: `!igdl https://www.instagram.com/reel/...`' });
+                if (!url) return m.reply({ text: '❌ Contoh: `!igdl https://www.instagram.com/reel/...`' });
 
-                await ctx.react('⏳');
+                await m.react('⏳');
                 let filePath;
 
                 try {
-                    await ctx.reply({ text: '⬇️ Mendownload Instagram...' });
+                    await m.reply({ text: '⬇️ Mendownload Instagram...' });
 
                     filePath = await download(url, [
                         '-f', 'best',
@@ -317,8 +317,8 @@ const handler = async (ctx) => {
 
                     if (sizeMB > MAX_SIZE_MB) {
                         cleanTmp(filePath);
-                        await ctx.react('❌');
-                        return ctx.reply({
+                        await m.react('❌');
+                        return m.reply({
                             text: `❌ File terlalu besar (${sizeMB.toFixed(1)} MB).`
                         });
                     }
@@ -326,21 +326,21 @@ const handler = async (ctx) => {
                     let info;
                     try { info = await getInfo(url); } catch { }
 
-                    await sock.sendMessage(sender, {
+                    await Hanz.sendMessage(sender, {
                         video: fs.readFileSync(filePath),
                         mimetype: 'video/mp4',
                         caption: info?.title || '✅ Instagram Downloaded!'
                     }, { quoted: msg });
 
                     cleanTmp(filePath);
-                    await ctx.react('✅');
+                    await m.react('✅');
 
                 } catch (err) {
                     cleanTmp(filePath);
                     console.error('[IGDL ERROR]', err.message);
 
-                    await ctx.react('❌');
-                    await ctx.reply({
+                    await m.react('❌');
+                    await m.reply({
                         text: `❌ Gagal download Instagram.\nError: ${err.message.slice(0, 200)}`
                     });
                 }
@@ -352,13 +352,13 @@ const handler = async (ctx) => {
         case 'fbdl':
         case 'facebook':
             {
-                if (!url) return ctx.reply({ text: '❌ Contoh: `!fbdl https://facebook.com/...`' });
+                if (!url) return m.reply({ text: '❌ Contoh: `!fbdl https://facebook.com/...`' });
 
-                await ctx.react('⏳');
+                await m.react('⏳');
                 let filePath;
 
                 try {
-                    await ctx.reply({ text: '⬇️ Mendownload Facebook...' });
+                    await m.reply({ text: '⬇️ Mendownload Facebook...' });
 
                     filePath = await download(url, [
                         '-f', 'best',
@@ -369,8 +369,8 @@ const handler = async (ctx) => {
 
                     if (sizeMB > MAX_SIZE_MB) {
                         cleanTmp(filePath);
-                        await ctx.react('❌');
-                        return ctx.reply({
+                        await m.react('❌');
+                        return m.reply({
                             text: `❌ File terlalu besar (${sizeMB.toFixed(1)} MB).`
                         });
                     }
@@ -378,21 +378,21 @@ const handler = async (ctx) => {
                     let info;
                     try { info = await getInfo(url); } catch { }
 
-                    await sock.sendMessage(sender, {
+                    await Hanz.sendMessage(sender, {
                         video: fs.readFileSync(filePath),
                         mimetype: 'video/mp4',
                         caption: info?.title || '✅ Facebook Downloaded!'
                     }, { quoted: msg });
 
                     cleanTmp(filePath);
-                    await ctx.react('✅');
+                    await m.react('✅');
 
                 } catch (err) {
                     cleanTmp(filePath);
                     console.error('[FBDL ERROR]', err.message);
 
-                    await ctx.react('❌');
-                    await ctx.reply({
+                    await m.react('❌');
+                    await m.reply({
                         text: `❌ Gagal download Facebook.\nError: ${err.message.slice(0, 200)}`
                     });
                 }
@@ -403,13 +403,13 @@ const handler = async (ctx) => {
         case 'pinterest':
         case 'pindl':
         case 'pin': {
-            if (!url) return ctx.reply({ text: '❌ Contoh: `!pindl https://pin.it/...`' });
+            if (!url) return m.reply({ text: '❌ Contoh: `!pindl https://pin.it/...`' });
 
-            await ctx.react('⏳');
+            await m.react('⏳');
             let filePath;
 
             try {
-                await ctx.reply({ text: '⬇️ Mendownload Pinterest...' });
+                await m.reply({ text: '⬇️ Mendownload Pinterest...' });
 
                 filePath = await download(url, [
                     '-f', 'best',
@@ -420,8 +420,8 @@ const handler = async (ctx) => {
 
                 if (sizeMB > MAX_SIZE_MB) {
                     cleanTmp(filePath);
-                    await ctx.react('❌');
-                    return ctx.reply({
+                    await m.react('❌');
+                    return m.reply({
                         text: `❌ File terlalu besar (${sizeMB.toFixed(1)} MB).`
                     });
                 }
@@ -429,21 +429,21 @@ const handler = async (ctx) => {
                 let info;
                 try { info = await getInfo(url); } catch { }
 
-                await sock.sendMessage(sender, {
+                await Hanz.sendMessage(sender, {
                     video: fs.readFileSync(filePath),
                     mimetype: 'video/mp4',
                     caption: info?.title || '✅ Pinterest Downloaded!'
                 }, { quoted: msg });
 
                 cleanTmp(filePath);
-                await ctx.react('✅');
+                await m.react('✅');
 
             } catch (err) {
                 cleanTmp(filePath);
                 console.error('[PINDL ERROR]', err.message);
 
-                await ctx.react('❌');
-                await ctx.reply({
+                await m.react('❌');
+                await m.reply({
                     text: `❌ Gagal download Pinterest.\nError: ${err.message.slice(0, 200)}`
                 });
             }

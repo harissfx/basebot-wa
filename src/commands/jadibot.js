@@ -2,14 +2,14 @@ const config = require('../config');
 const { sendInteractiveMessage } = require('../utils/interactiveHelper');
 const { getDevice } = require('@whiskeysockets/baileys');
 
-const handler = async (ctx) => {
+const handler = async (m) => {
 
-    const { command, isSuperOwner, isMain, sock, sender, msg, senderNumber, pushname, isOwner } = ctx;
+    const { command, isSuperOwner, isMain, Hanz, sender, msg, senderNumber, pushname, isOwner } = m;
     const p = config.prefix;
-    if (!isOwner) return ctx.reply({ text: '❌ Perintah ini khusus untuk Owner Bot!' });
+    if (!isOwner) return m.reply({ text: '❌ Perintah ini khusus untuk Owner Bot!' });
 
     if (!isMain) {
-        return ctx.reply({ text: '❌ Fitur ini hanya bisa digunakan melalui *Bot Utama*, bukan dari clone bot!' });
+        return m.reply({ text: '❌ Fitur ini hanya bisa digunakan melalui *Bot Utama*, bukan dari clone bot!' });
     }
 
     switch (command.name) {
@@ -33,10 +33,10 @@ const handler = async (ctx) => {
 │⪩ \`${p}𝗌𝗍𝗈𝗉𝖻𝗈𝗍 (𝗇𝗈𝗆𝗈𝗋)\`
 │
 └────────────┈ ⳹`
-            await ctx.sendInteractive({
+            await m.sendInteractive({
                 text: menu,
                 footer: config.footerTxt,
-                quoted: ctx.fakeOrder,
+                quoted: m.fakeOrder,
                 contextInfo: {
                     mentionedJid: ["0@s.whatsapp.net"],
                     forwardingScore: 111,
@@ -76,29 +76,29 @@ const handler = async (ctx) => {
             break;
         case 'addbot':
         case 'jadibot': {
-            if (!isSuperOwner) return ctx.reply({ text: '❌ Perintah ini hanya untuk Super Owner!' });
+            if (!isSuperOwner) return m.reply({ text: '❌ Perintah ini hanya untuk Super Owner!' });
             let nomorTarget = command.fullArgs.replace(/\D/g, '');
 
             if (!nomorTarget) {
-                return ctx.reply({ text: `⚠️ *Format Salah!*\n\nFormat: \`${config.prefix}jadibot <nomor-hp>\`\nContoh: \`${config.prefix}jadibot 62857xxxx\`` });
+                return m.reply({ text: `⚠️ *Format Salah!*\n\nFormat: \`${config.prefix}jadibot <nomor-hp>\`\nContoh: \`${config.prefix}jadibot 62857xxxx\`` });
             }
 
             if (nomorTarget.startsWith('0')) {
                 nomorTarget = '62' + nomorTarget.slice(1);
             }
 
-            await ctx.reply({ text: `🔍 Memeriksa nomor +${nomorTarget} di WhatsApp...` });
+            await m.reply({ text: `🔍 Memeriksa nomor +${nomorTarget} di WhatsApp...` });
 
             try {
-                const [checkResult] = await sock.onWhatsApp(`${nomorTarget}@s.whatsapp.net`);
+                const [checkResult] = await Hanz.onWhatsApp(`${nomorTarget}@s.whatsapp.net`);
                 if (!checkResult?.exists) {
-                    return ctx.reply({ text: `❌ *Nomor +${nomorTarget} tidak terdaftar di WhatsApp!*\n\nPastikan nomor sudah benar dan aktif di WhatsApp.` });
+                    return m.reply({ text: `❌ *Nomor +${nomorTarget} tidak terdaftar di WhatsApp!*\n\nPastikan nomor sudah benar dan aktif di WhatsApp.` });
                 }
             } catch (err) {
-                return ctx.reply({ text: `❌ Gagal memeriksa nomor: ${err.message}` });
+                return m.reply({ text: `❌ Gagal memeriksa nomor: ${err.message}` });
             }
 
-            await ctx.reply({ text: `⏳ Sedang menginisialisasi sesi baru dan meminta Pairing Code untuk +${nomorTarget}...` });
+            await m.reply({ text: `⏳ Sedang menginisialisasi sesi baru dan meminta Pairing Code untuk +${nomorTarget}...` });
 
             try {
                 const pairingCode = await global.createNewBotInstance(nomorTarget);
@@ -107,7 +107,7 @@ const handler = async (ctx) => {
                 const targetJid = `${nomorTarget}@s.whatsapp.net`;
 
                 try {
-                    await sendInteractiveMessage(sock, targetJid, {
+                    await sendInteractiveMessage(Hanz, targetJid, {
                         text:
                             `🤖 *Halo! Kamu sedang didaftarkan sebagai Clone Bot.*\n\n` +
                             `• *Pairing Code* : *${pairingCode}*\n\n` +
@@ -129,7 +129,7 @@ const handler = async (ctx) => {
                     console.error('[JADIBOT] Gagal kirim pesan ke nomor target:', sendErr.message);
                 }
 
-                await ctx.sendInteractive({
+                await m.sendInteractive({
                     text:
                         `✅ *BERHASIL GENERATE CLONE BOT*\n\n` +
                         `• *Nomor Bot* : +${nomorTarget}\n` +
@@ -137,7 +137,7 @@ const handler = async (ctx) => {
                         `📨 Pairing code sudah dikirim langsung ke nomor *+${nomorTarget}*.\n\n` +
                         `👉 Atau klik tombol di bawah untuk menyalin kode, lalu masukkan pada menu *Linked Devices → Link with phone number*.`,
                     footer: config.footerTxt,
-                    quoted: ctx.msg,
+                    quoted: m.msg,
                     buttons: [
                         {
                             name: 'cta_copy',
@@ -151,17 +151,17 @@ const handler = async (ctx) => {
 
             } catch (error) {
                 console.error('Gagal kloning bot:', error);
-                await ctx.reply({ text: `❌ Gagal membuat clone bot: ${error.message}` });
+                await m.reply({ text: `❌ Gagal membuat clone bot: ${error.message}` });
             }
             break;
         }
 
         case 'listbot': {
-            if (!isSuperOwner) return ctx.reply({ text: '❌ Perintah ini hanya untuk Super Owner!' });
+            if (!isSuperOwner) return m.reply({ text: '❌ Perintah ini hanya untuk Super Owner!' });
             const activeBots = Object.keys(global.conns || {});
 
             if (activeBots.length <= 1) {
-                return ctx.reply({ text: `ℹ️ Belum ada clone bot (*jadibot*) yang aktif saat ini.` });
+                return m.reply({ text: `ℹ️ Belum ada clone bot (*jadibot*) yang aktif saat ini.` });
             }
 
             let teksList = `🤖 *DAFTAR CLONE BOT AKTIF* 🤖\n\n`;
@@ -173,26 +173,26 @@ const handler = async (ctx) => {
                 }
             });
 
-            await ctx.reply({ text: teksList });
+            await m.reply({ text: teksList });
             break;
         }
 
         case 'stopbot': {
-            if (!isSuperOwner) return ctx.reply({ text: '❌ Perintah ini hanya untuk Super Owner!' });
+            if (!isSuperOwner) return m.reply({ text: '❌ Perintah ini hanya untuk Super Owner!' });
             let targetStop = command.fullArgs.replace(/\D/g, '');
-            if (!targetStop) return ctx.reply({ text: `⚠️ Masukkan nomor bot sewaan yang ingin dimatikan.\nContoh: \`${config.prefix}stopbot 62857xxx\`` });
+            if (!targetStop) return m.reply({ text: `⚠️ Masukkan nomor bot sewaan yang ingin dimatikan.\nContoh: \`${config.prefix}stopbot 62857xxx\`` });
 
             if (global.conns[targetStop]) {
                 try {
                     global.conns[targetStop].logout();
                     delete global.conns[targetStop];
 
-                    await ctx.reply({ text: `✅ Sesi Clone Bot *+${targetStop}* berhasil dimatikan.` });
+                    await m.reply({ text: `✅ Sesi Clone Bot *+${targetStop}* berhasil dimatikan.` });
                 } catch (e) {
-                    await ctx.reply({ text: `❌ Terjadi kesalahan saat mematikan bot: ${e.message}` });
+                    await m.reply({ text: `❌ Terjadi kesalahan saat mematikan bot: ${e.message}` });
                 }
             } else {
-                await ctx.reply({ text: `❌ Nomor *+${targetStop}* tidak ditemukan di dalam daftar bot aktif.` });
+                await m.reply({ text: `❌ Nomor *+${targetStop}* tidak ditemukan di dalam daftar bot aktif.` });
             }
             break;
         }

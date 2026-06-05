@@ -3,8 +3,8 @@ const config = require('../config');
 const { getDevice } = require('@whiskeysockets/baileys');
 const { pick } = require('../../lib/random');
 
-const handler = async (ctx) => {
-    const { command, isSuperOwner, sock, sender, msg, senderNumber, pushname, isOwner, isGroup } = ctx;
+const handler = async (m) => {
+    const { command, isSuperOwner, Hanz, sender, msg, senderNumber, pushname, isOwner, isGroup } = m;
     const p = config.prefix;
     let max, answers, jokes, fortunes;
 
@@ -33,10 +33,10 @@ const handler = async (ctx) => {
 │⪩ \`${p}𝗍𝗒𝗉𝗂𝗇𝗀\`
 │
 └────────────┈ ⳹`
-            await ctx.sendInteractive({
+            await m.sendInteractive({
                 text: menu,
                 footer: config.footerTxt,
-                quoted: ctx.fakeOrder,
+                quoted: m.fakeOrder,
                 contextInfo: {
                     mentionedJid: ["0@s.whatsapp.net"],
                     forwardingScore: 111,
@@ -76,16 +76,16 @@ const handler = async (ctx) => {
             break;
 
         case 'dice':
-            await ctx.reply({ text: `🎲 Dadu: *${Math.floor(Math.random() * 6) + 1}*` });
+            await m.reply({ text: `🎲 Dadu: *${Math.floor(Math.random() * 6) + 1}*` });
             break;
 
         case 'coin':
-            await ctx.reply({ text: `🪙 Hasil: *${Math.random() < 0.5 ? 'Kepala' : 'Ekor'}*` });
+            await m.reply({ text: `🪙 Hasil: *${Math.random() < 0.5 ? 'Kepala' : 'Ekor'}*` });
             break;
 
         case 'random':
             max = parseInt(command.args[0]) || 100;
-            await ctx.reply({ text: `🔢 Random (1-${max}): *${Math.floor(Math.random() * max) + 1}*` });
+            await m.reply({ text: `🔢 Random (1-${max}): *${Math.floor(Math.random() * max) + 1}*` });
             break;
 
         case '8ball':
@@ -94,7 +94,7 @@ const handler = async (ctx) => {
                 'Coba lagi nanti ⏳', 'Saya ragu-ragu 🤷', 'Sudah pasti! 💯',
                 'Tanda-tanda menunjukkan ya 👍', 'Tidak mungkin 🚫',
             ];
-            await ctx.reply({ text: `🎱 *8-Ball:*\n\n${pick(answers)}` });
+            await m.reply({ text: `🎱 *8-Ball:*\n\n${pick(answers)}` });
             break;
 
         case 'joke':
@@ -104,7 +104,7 @@ const handler = async (ctx) => {
                 'Kenapa JavaScript developer tidak bisa tidur?\nKarena mereka selalu *await* sesuatu! 😴',
                 'Apa yang dikatakan server ke client?\n"404: Joke not found" 🔍',
             ];
-            await ctx.reply({ text: `😂 *Joke:*\n\n${pick(jokes)}` });
+            await m.reply({ text: `😂 *Joke:*\n\n${pick(jokes)}` });
             break;
 
         case 'fortune':
@@ -115,14 +115,14 @@ const handler = async (ctx) => {
                 'Jangan takut mengambil risiko hari ini. 🚀',
                 'Kreativitasmu akan membawa hasil besar. 🎨',
             ];
-            await ctx.reply({ text: `🥠 *Fortune Cookie:*\n\n${pick(fortunes)}` });
+            await m.reply({ text: `🥠 *Fortune Cookie:*\n\n${pick(fortunes)}` });
             break;
 
         case 'typing':
-            await sock.sendPresenceUpdate('composing', sender);
+            await Hanz.sendPresenceUpdate('composing', sender);
             await delay(2000);
-            await sock.sendPresenceUpdate('paused', sender);
-            await ctx.reply({ text: '⌨️ Ini contoh typing indicator!' });
+            await Hanz.sendPresenceUpdate('paused', sender);
+            await m.reply({ text: '⌨️ Ini contoh typing indicator!' });
             break;
 
     }

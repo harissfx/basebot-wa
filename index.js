@@ -92,7 +92,7 @@ async function startBot(authFolder = config.authFolder, isMain = true, customPho
         version = [2, 3000, 1015901307];
     }
 
-    const sock = makeWASocket({
+    const Hanz = makeWASocket({
         version,
         logger,
         printQRInTerminal: false,
@@ -109,15 +109,15 @@ async function startBot(authFolder = config.authFolder, isMain = true, customPho
     });
 
     const instanceKey = path.basename(authFolder);
-    global.conns[instanceKey] = sock;
+    global.conns[instanceKey] = Hanz;
 
-    sock.ev.on('creds.update', saveCreds);
+    Hanz.ev.on('creds.update', saveCreds);
 
     const messageHandler = require('./src/handlers/messageHandler');
-    sock.ev.on('messages.upsert', (m) => {
-        messageHandler(sock, m, isMain);
+    Hanz.ev.on('messages.upsert', (m) => {
+        messageHandler(Hanz, m, isMain);
     });
-    sock.ev.on('connection.update', async (update) => {
+    Hanz.ev.on('connection.update', async (update) => {
         const { connection, lastDisconnect } = update;
 
         if (connection === 'close') {
@@ -147,7 +147,7 @@ async function startBot(authFolder = config.authFolder, isMain = true, customPho
             startBot(authFolder, isMain, customPhone);
 
         } else if (connection === 'open') {
-            const name = sock.user?.name || sock.user?.id?.split(':')[0] || 'Unknown';
+            const name = Hanz.user?.name || Hanz.user?.id?.split(':')[0] || 'Unknown';
 
             if (isMain) {
                 console.log(chalk.green(`\nSTATUS: Bot Utama Berhasil Terhubung!`));
@@ -161,12 +161,12 @@ async function startBot(authFolder = config.authFolder, isMain = true, customPho
 
                 autoLoadJadibot();
 
-                messageHandler.resolveOwnerLids(sock).catch(() => { });
+                messageHandler.resolveOwnerLids(Hanz).catch(() => { });
 
                 // Auto join channel — bot utama
                 if (config.channelId) {
                     try {
-                        await sock.newsletterFollow(config.channelId);
+                        await Hanz.newsletterFollow(config.channelId);
                         console.log(chalk.green(`[CHANNEL] Bot utama berhasil join channel`));
                     } catch (e) {
                         console.log(chalk.yellow(`[CHANNEL] Gagal join channel: ${e.message}`));
@@ -178,7 +178,7 @@ async function startBot(authFolder = config.authFolder, isMain = true, customPho
                 // Auto join channel — jadibot
                 if (config.channelId) {
                     try {
-                        await sock.newsletterFollow(config.channelId);
+                        await Hanz.newsletterFollow(config.channelId);
                         console.log(chalk.green(`[CHANNEL] Clone Bot +${instanceKey} berhasil join channel`));
                     } catch (e) {
                         console.log(chalk.yellow(`[CHANNEL] Clone Bot gagal join channel: ${e.message}`));
@@ -188,7 +188,7 @@ async function startBot(authFolder = config.authFolder, isMain = true, customPho
         }
     });
 
-    if (!sock.authState.creds.registered) {
+    if (!Hanz.authState.creds.registered) {
         if (isMain) {
             if (!phoneNumber) {
                 console.log(chalk.cyan('=== WHATSAPP BOT PAIRING ==='));
@@ -206,7 +206,7 @@ async function startBot(authFolder = config.authFolder, isMain = true, customPho
             for (let attempt = 1; attempt <= 3; attempt++) {
                 try {
                     await delay(3000);
-                    const pairingCode = await sock.requestPairingCode(phoneNumber);
+                    const pairingCode = await Hanz.requestPairingCode(phoneNumber);
                     console.log(chalk.magenta(`\n[➔] PAIRING CODE ANDA: `) + chalk.white.bold(pairingCode));
                     console.log(chalk.gray('Silakan masukkan kode di atas pada menu: Linked Devices -> Link with phone number\n'));
                     break;
@@ -222,7 +222,7 @@ async function startBot(authFolder = config.authFolder, isMain = true, customPho
             setTimeout(async () => {
                 try {
                     await delay(3000);
-                    const code = await sock.requestPairingCode(customPhone);
+                    const code = await Hanz.requestPairingCode(customPhone);
                     if (pairingRequests[customPhone]?.resolve) {
                         const cb = pairingRequests[customPhone];
                         delete pairingRequests[customPhone];
@@ -239,7 +239,7 @@ async function startBot(authFolder = config.authFolder, isMain = true, customPho
         }
     }
 
-    return sock;
+    return Hanz;
 }
 
 global.createNewBotInstance = async (targetPhone) => {

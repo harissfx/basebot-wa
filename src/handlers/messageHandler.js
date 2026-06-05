@@ -13,7 +13,7 @@ const { fakeOrder } = require('../utils/fquoted');
 const superOwnerLidCache = new Set();
 const coOwnerLidCache = new Set();
 
-async function resolveOwnerLids(sock) {
+async function resolveOwnerLids(Hanz) {
     const resolveList = [
         { numbers: [].concat(config.superOwner), cache: superOwnerLidCache, label: 'SUPER' },
         { numbers: [].concat(config.coOwner || []), cache: coOwnerLidCache, label: 'CO' },
@@ -21,7 +21,7 @@ async function resolveOwnerLids(sock) {
     for (const { numbers, cache, label } of resolveList) {
         for (const nomor of numbers.map(n => n.replace(/\D/g, ''))) {
             try {
-                const [result] = await sock.onWhatsApp(nomor);
+                const [result] = await Hanz.onWhatsApp(nomor);
                 if (result?.exists && result?.lid) {
                     const lidNum = result.lid.replace(/\D/g, '').replace(/@.+$/, '').split(':')[0];
                     cache.add(lidNum);
@@ -113,7 +113,7 @@ function parseCommand(text) {
     return null;
 }
 
-async function handleMessages(sock, m, isMain = true) {
+async function handleMessages(Hanz, m, isMain = true) {
     for (const msg of m.messages) {
         if (!msg.message) continue;
 
@@ -140,8 +140,8 @@ async function handleMessages(sock, m, isMain = true) {
             );
         }
 
-        if (config.autoRead) await sock.readMessages([msg.key]);
-        if (config.autoTyping && !isGroup(sender)) await sock.sendPresenceUpdate('composing', sender);
+        if (config.autoRead) await Hanz.readMessages([msg.key]);
+        if (config.autoTyping && !isGroup(sender)) await Hanz.sendPresenceUpdate('composing', sender);
 
         const command = parseCommand(text);
 
@@ -161,7 +161,7 @@ async function handleMessages(sock, m, isMain = true) {
 
                 try {
                     await handler({
-                        sock, msg, sender,
+                        Hanz, msg, sender,
                         senderNumber: getSenderNumber(sender, msg),
                         pushname: msg.pushName || 'Kak',
                         isGroup: isGroup(sender),
@@ -171,15 +171,15 @@ async function handleMessages(sock, m, isMain = true) {
                         command, text,
                         fakeOrder,
                         isMain,
-                        reply: (content) => sock.sendMessage(sender, content, { quoted: msg }),
-                        replyFake: (content) => sock.sendMessage(sender, content, { quoted: fakeOrder }),
-                        send: (content) => sock.sendMessage(sender, content),
-                        sendButtons: (content) => sendButtons(sock, sender, content),
-                        sendList: (content) => sendListMessage(sock, sender, content),
-                        sendInteractive: (content) => sendInteractiveMessage(sock, sender, content),
-                        sendButtonWithImage: (content) => sendButtonWithImage(sock, sender, content),
-                        sendInteractiveWithImage: (content) => sendInteractiveWithImage(sock, sender, content),
-                        react: (emoji) => sock.sendMessage(sender, { react: { text: emoji, key: msg.key } }),
+                        reply: (content) => Hanz.sendMessage(sender, content, { quoted: msg }),
+                        replyFake: (content) => Hanz.sendMessage(sender, content, { quoted: fakeOrder }),
+                        send: (content) => Hanz.sendMessage(sender, content),
+                        sendButtons: (content) => sendButtons(Hanz, sender, content),
+                        sendList: (content) => sendListMessage(Hanz, sender, content),
+                        sendInteractive: (content) => sendInteractiveMessage(Hanz, sender, content),
+                        sendButtonWithImage: (content) => sendButtonWithImage(Hanz, sender, content),
+                        sendInteractiveWithImage: (content) => sendInteractiveWithImage(Hanz, sender, content),
+                        react: (emoji) => Hanz.sendMessage(sender, { react: { text: emoji, key: msg.key } }),
                     });
                 } catch (err) {
                     readline.clearLine(process.stdout, 0);
@@ -190,7 +190,7 @@ async function handleMessages(sock, m, isMain = true) {
                         chalk.yellow(`[${command.name}]: `) +
                         chalk.red(err.message)
                     );
-                    await sock.sendMessage(sender, { text: '❌ Terjadi kesalahan saat menjalankan perintah.' });
+                    await Hanz.sendMessage(sender, { text: '❌ Terjadi kesalahan saat menjalankan perintah.' });
                 }
             } else {
                 readline.clearLine(process.stdout, 0);
@@ -202,11 +202,11 @@ async function handleMessages(sock, m, isMain = true) {
                     chalk.yellow(`*${command.name}*`) +
                     chalk.white(` tidak terdaftar.`)
                 );
-                await sock.sendMessage(sender, { text: `❓ Command *${command.name}* tidak ditemukan.` });
+                await Hanz.sendMessage(sender, { text: `❓ Command *${command.name}* tidak ditemukan.` });
             }
         }
 
-        if (config.autoTyping && !isGroup(sender)) await sock.sendPresenceUpdate('paused', sender);
+        if (config.autoTyping && !isGroup(sender)) await Hanz.sendPresenceUpdate('paused', sender);
     }
 }
 

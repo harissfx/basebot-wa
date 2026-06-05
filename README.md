@@ -148,8 +148,8 @@ Buat fungsi baru di salah satu file di `src/commands/`, atau buat file baru:
 ```js
 // src/commands/custom.js
 const customCommands = {
-    halo: async (ctx) => {
-        await ctx.reply({ text: '👋 Halo juga!' });
+    halo: async (m) => {
+        await m.reply({ text: '👋 Halo juga!' });
     },
 };
 

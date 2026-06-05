@@ -1,16 +1,14 @@
-const fs = require('fs');
-const path = require('path');
 const config = require('../config');
 const { formatUptime } = require('../utils/helper');
 const plugins = require('../utils/PluginLoader');
 const { getImage } = require('../utils/helper');
 const { getDevice } = require('@whiskeysockets/baileys');
 
-const handler = async (ctx) => {
-    const { command, isSuperOwner, sock, sender, msg, senderNumber, pushname, isOwner } = ctx;
+const handler = async (m) => {
+    const { command, isSuperOwner, Hanz, sender, msg, senderNumber, pushname, isOwner } = m;
     const p = config.prefix;
     const nomorUser = senderNumber;
-    let imgPath, imageSource, start, sent, u, h, m, s;
+    let start, sent;
 
     switch (command.name) {
         case 'generalmenu':
@@ -32,10 +30,10 @@ const handler = async (ctx) => {
 │⪩ \`${p}𝗈𝗐𝗇𝖾𝗋\`
 │
 └────────────┈ ⳹`
-            await ctx.sendInteractive({
+            await m.sendInteractive({
                 text: menu,
                 footer: config.footerTxt,
-                quoted: ctx.fakeOrder,
+                quoted: m.fakeOrder,
                 contextInfo: {
                     mentionedJid: ["0@s.whatsapp.net"],
                     forwardingScore: 111,
@@ -91,11 +89,11 @@ ${Object.entries(plugins.commandsByFile()).map(([file, cmds]) => `││\n││
 ├───────────────
 │✑ 𝖢𝗈𝗉𝗒𝗋𝗂𝗀𝗁𝗍 Haris Syc
 └━━━━━━━━━━━━━━━┈ ❋ཻུ۪۪⸙`
-            await ctx.sendInteractiveWithImage({
+            await m.sendInteractiveWithImage({
                 imageSource: getImage(),
                 text: menutxt,
                 footer: config.footerTxt,
-                quoted: ctx.fakeOrder,
+                quoted: m.fakeOrder,
                 contextInfo: {
                     mentionedJid: ['0@s.whatsapp.net'],
                     forwardingScore: 999,
@@ -152,10 +150,10 @@ case 'sc':
  │✑  𝐹𝑟𝑒𝑒 𝑁𝑜 𝐸𝑛𝑐
  │✑  𝑁𝑜 𝑅𝑒𝑛𝑎𝑚𝑒 𝑘𝑖𝑑𝑠
  └─────────────┈ ⳹`
-    await ctx.sendInteractive({
+    await m.sendInteractive({
                 text: tete,
                 footer: config.footerTxt,
-                quoted: ctx.msg,
+                quoted: m.msg,
                 contextInfo: {
                     mentionedJid: ['0@s.whatsapp.net'],
                     forwardingScore: 999,
@@ -169,19 +167,19 @@ case 'sc':
 break;
         case 'ping':
             start = Date.now();
-            sent = await ctx.reply({ text: '🏓 Pong!' });
-            await sock.sendMessage(sender, {
+            sent = await m.reply({ text: '🏓 Pong!' });
+            await Hanz.sendMessage(sender, {
                 text: `🏓 *Pong!*\n\nSpeed: *${Date.now() - start}ms*\nUptime: \`${formatUptime(process.uptime())}\``,
                 edit: sent.key
             });
             break;
         case 'owner': {
             const superOwners = [].concat(config.superOwner);
-            if (!superOwners.length) return ctx.reply({ text: '❌ Nomor owner belum diatur.' });
+            if (!superOwners.length) return m.reply({ text: '❌ Nomor owner belum diatur.' });
             const contacts = superOwners.map((num, i) => ({
                 vcard: `BEGIN:VCARD\nVERSION:3.0\nFN:Owner Bot${superOwners.length > 1 ? ' ' + (i + 1) : ''}\nTEL;type=CELL;type=VOICE;waid=${num}:+${num}\nEND:VCARD`
             }));
-            await ctx.send({
+            await m.send({
                 contacts: {
                     displayName: 'Owner Bot',
                     contacts

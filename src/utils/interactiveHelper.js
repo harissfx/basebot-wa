@@ -39,13 +39,13 @@ function buildMessage(jid, interactiveMsg) {
     }), { userJid: jid });
 }
 
-async function relayInteractive(sock, jid, message, buttonType) {
+async function relayInteractive(Hanz, jid, message, buttonType) {
     const additionalNodes = buildInteractiveNodes(buttonType);
     if (!isJidGroup(jid)) additionalNodes.push({ tag: 'bot', attrs: { biz_bot: '1' } });
-    return sock.relayMessage(jid, message.message, { messageId: message.key.id, additionalNodes });
+    return Hanz.relayMessage(jid, message.message, { messageId: message.key.id, additionalNodes });
 }
 
-async function sendButtons(sock, jid, content) {
+async function sendButtons(Hanz, jid, content) {
     const { text, footer = '', buttons = [], quoted, contextInfo: extra = {} } = content;
     const contextInfo = buildContextInfo(quoted, extra);
 
@@ -63,10 +63,10 @@ async function sendButtons(sock, jid, content) {
         ...(contextInfo ? { contextInfo } : {})
     });
 
-    return relayInteractive(sock, jid, buildMessage(jid, interactiveMsg), 'quick_reply');
+    return relayInteractive(Hanz, jid, buildMessage(jid, interactiveMsg), 'quick_reply');
 }
 
-async function sendListMessage(sock, jid, content) {
+async function sendListMessage(Hanz, jid, content) {
     const { text, footer = '', buttonTitle = '📂 Pilih', sections = [], quoted, contextInfo: extra = {} } = content;
     const contextInfo = buildContextInfo(quoted, extra);
 
@@ -95,10 +95,10 @@ async function sendListMessage(sock, jid, content) {
         ...(contextInfo ? { contextInfo } : {})
     });
 
-    return relayInteractive(sock, jid, buildMessage(jid, interactiveMsg), 'single_select');
+    return relayInteractive(Hanz, jid, buildMessage(jid, interactiveMsg), 'single_select');
 }
 
-async function sendInteractiveMessage(sock, jid, content) {
+async function sendInteractiveMessage(Hanz, jid, content) {
     const { text, footer = '', buttons = [], quoted, contextInfo: extra = {} } = content;
     const contextInfo = buildContextInfo(quoted, extra);
 
@@ -110,10 +110,10 @@ async function sendInteractiveMessage(sock, jid, content) {
         ...(contextInfo ? { contextInfo } : {})
     });
 
-    return relayInteractive(sock, jid, buildMessage(jid, interactiveMsg), 'mixed');
+    return relayInteractive(Hanz, jid, buildMessage(jid, interactiveMsg), 'mixed');
 }
 
-async function sendButtonWithImage(sock, jid, content) {
+async function sendButtonWithImage(Hanz, jid, content) {
     const { text, footer = '', buttons = [], imageUrl, quoted, contextInfo: extra = {} } = content;
     const contextInfo = buildContextInfo(quoted, extra);
 
@@ -122,7 +122,7 @@ async function sendButtonWithImage(sock, jid, content) {
         const { prepareWAMessageMedia } = require('@whiskeysockets/baileys');
 
         const { data } = await axios.get(imageUrl, { responseType: 'arraybuffer' });
-        const media = await prepareWAMessageMedia({ image: Buffer.from(data) }, { upload: sock.waUploadToServer });
+        const media = await prepareWAMessageMedia({ image: Buffer.from(data) }, { upload: Hanz.waUploadToServer });
 
         const interactiveMsg = proto.Message.InteractiveMessage.fromObject({
             body: { text },
@@ -138,14 +138,14 @@ async function sendButtonWithImage(sock, jid, content) {
             ...(contextInfo ? { contextInfo } : {})
         });
 
-        return relayInteractive(sock, jid, buildMessage(jid, interactiveMsg), 'quick_reply');
+        return relayInteractive(Hanz, jid, buildMessage(jid, interactiveMsg), 'quick_reply');
     } catch (err) {
         console.error('Error button with image, fallback ke sendButtons:', err.message);
-        return sendButtons(sock, jid, { text, footer, buttons, quoted });
+        return sendButtons(Hanz, jid, { text, footer, buttons, quoted });
     }
 }
 
-async function sendInteractiveWithImage(sock, jid, content) {
+async function sendInteractiveWithImage(Hanz, jid, content) {
     const { text, footer = '', buttons = [], imageSource, quoted, contextInfo: extra = {} } = content;
     const contextInfo = buildContextInfo(quoted, extra);
 
@@ -163,7 +163,7 @@ async function sendInteractiveWithImage(sock, jid, content) {
             throw new Error('imageSource harus Buffer atau { url: "..." }');
         }
 
-        const media = await prepareWAMessageMedia(mediaInput, { upload: sock.waUploadToServer });
+        const media = await prepareWAMessageMedia(mediaInput, { upload: Hanz.waUploadToServer });
 
         const interactiveMsg = proto.Message.InteractiveMessage.fromObject({
             body: { text },
@@ -173,10 +173,10 @@ async function sendInteractiveWithImage(sock, jid, content) {
             ...(contextInfo ? { contextInfo } : {})
         });
 
-        return relayInteractive(sock, jid, buildMessage(jid, interactiveMsg), 'mixed');
+        return relayInteractive(Hanz, jid, buildMessage(jid, interactiveMsg), 'mixed');
     } catch (err) {
         console.error('Error sendInteractiveWithImage, fallback ke sendInteractive:', err.message);
-        return sendInteractiveMessage(sock, jid, { text, footer, buttons, quoted });
+        return sendInteractiveMessage(Hanz, jid, { text, footer, buttons, quoted });
     }
 }
 

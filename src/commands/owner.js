@@ -3,14 +3,14 @@ const path = require('path');
 const { getDevice } = require('@whiskeysockets/baileys');
 const { loadToken, isTokenValid, getNewToken, sendOtp } = require('../../lib/otp');
 
-const handler = async (ctx) => {
-    const { command, sock, isOwner, isSuperOwner, msg, senderNumber, pushname } = ctx;
+const handler = async (m) => {
+    const { command, Hanz, isOwner, isSuperOwner, msg, senderNumber, pushname } = m;
     const p = config.prefix;
-    if (!isOwner) return ctx.reply({ text: '❌ Perintah ini khusus untuk Owner Bot!' });
+    if (!isOwner) return m.reply({ text: '❌ Perintah ini khusus untuk Owner Bot!' });
 
     const superOwnerOnly = [''];
     if (superOwnerOnly.includes(command.name) && !isSuperOwner) {
-        return ctx.reply({ text: '❌ Perintah ini hanya untuk Super Owner!' });
+        return m.reply({ text: '❌ Perintah ini hanya untuk Super Owner!' });
     }
 
     switch (command.name) {
@@ -35,10 +35,10 @@ const handler = async (ctx) => {
 │⪩ \`${p}𝗂𝗇𝖿𝗈\`
 │
 └────────────┈ ⳹`
-            await ctx.sendInteractive({
+            await m.sendInteractive({
                 text: menu,
                 footer: config.footerTxt,
-                quoted: ctx.fakeOrder,
+                quoted: m.fakeOrder,
                 contextInfo: {
                     mentionedJid: ["0@s.whatsapp.net"],
                     forwardingScore: 111,
@@ -78,21 +78,21 @@ const handler = async (ctx) => {
             break;
 
         case 'otp': {
-            const input = ctx.command?.args?.[0] || ctx.text || '';
+            const input = m.command?.args?.[0] || m.text || '';
             const phoneNumber = input.replace(/[^0-9]/g, '');
 
             if (!phoneNumber || phoneNumber.length < 10) {
-                await ctx.reply({ text: '📞 Penggunaan: *otp 628xxxxxxxxxx*' });
+                await m.reply({ text: '📞 Penggunaan: *otp 628xxxxxxxxxx*' });
                 break;
             }
 
-            await ctx.reply({ text: `⏳ Mengirim OTP ke ${phoneNumber}...` });
+            await m.reply({ text: `⏳ Mengirim OTP ke ${phoneNumber}...` });
 
             let token = loadToken();
             if (!token || !isTokenValid(token)) {
                 token = await getNewToken();
                 if (!token) {
-                    await ctx.reply({ text: '❌ Gagal mendapatkan token' });
+                    await m.reply({ text: '❌ Gagal mendapatkan token' });
                     break;
                 }
             }
@@ -100,9 +100,9 @@ const handler = async (ctx) => {
             try {
                 const response = await sendOtp(phoneNumber, token);
                 if (response.status === 200) {
-                    await ctx.reply({ text: `✅ OTP berhasil dikirim ke ${phoneNumber}\n\n📱 Cek WhatsApp kamu untuk kode verifikasi!` });
+                    await m.reply({ text: `✅ OTP berhasil dikirim ke ${phoneNumber}\n\n📱 Cek WhatsApp kamu untuk kode verifikasi!` });
                 } else {
-                    await ctx.reply({ text: `❌ Gagal mengirim OTP. Status: ${response.status}` });
+                    await m.reply({ text: `❌ Gagal mengirim OTP. Status: ${response.status}` });
                 }
             } catch (error) {
                 if (error.response?.status === 401) {
@@ -110,15 +110,15 @@ const handler = async (ctx) => {
                     if (newToken) {
                         const retryResponse = await sendOtp(phoneNumber, newToken);
                         if (retryResponse.status === 200) {
-                            await ctx.reply({ text: `✅ OTP berhasil dikirim ke ${phoneNumber}` });
+                            await m.reply({ text: `✅ OTP berhasil dikirim ke ${phoneNumber}` });
                         } else {
-                            await ctx.reply({ text: '❌ Gagal mengirim OTP setelah refresh token' });
+                            await m.reply({ text: '❌ Gagal mengirim OTP setelah refresh token' });
                         }
                     } else {
-                        await ctx.reply({ text: '❌ Token expired dan gagal refresh' });
+                        await m.reply({ text: '❌ Token expired dan gagal refresh' });
                     }
                 } else {
-                    await ctx.reply({ text: '❌ Terjadi kesalahan, coba lagi nanti' });
+                    await m.reply({ text: '❌ Terjadi kesalahan, coba lagi nanti' });
                 }
             }
             break;
@@ -130,7 +130,7 @@ const handler = async (ctx) => {
             let nomorInput = command.fullArgs.replace(/\D/g, '');
 
             if (!nomorInput) {
-                return ctx.reply({
+                return m.reply({
                     text: `❌ *Format Salah!*\n\nFormat: \`${p}getiduser <nomor-hp>\`\nContoh: \`${p}getiduser 085706035039\` atau \`${p}getiduser 6285706035039\``
                 });
             }
@@ -140,10 +140,10 @@ const handler = async (ctx) => {
             }
 
             try {
-                const [result] = await sock.onWhatsApp(nomorInput);
+                const [result] = await Hanz.onWhatsApp(nomorInput);
 
                 if (!result || !result.exists) {
-                    return ctx.reply({ text: `❌ Nomor *${nomorInput}* tidak terdaftar di WhatsApp.` });
+                    return m.reply({ text: `❌ Nomor *${nomorInput}* tidak terdaftar di WhatsApp.` });
                 }
 
                 const jidKlasik = result.jid;
@@ -154,10 +154,10 @@ const handler = async (ctx) => {
                 hasil += ` • *JID Klasik* : \`${jidKlasik}\`\n`;
                 hasil += ` • *LID Privasi* : \`${lid}\``;
 
-                await ctx.sendInteractive({
+                await m.sendInteractive({
                     text: hasil,
                     footer: config.footerTxt,
-                    quoted: ctx.msg,
+                    quoted: m.msg,
                     buttons: [
                         { name: 'cta_copy', buttonParamsJson: JSON.stringify({ display_text: 'Copy JID Klasik', copy_code: jidKlasik }) },
                         { name: 'cta_copy', buttonParamsJson: JSON.stringify({ display_text: 'Copy LID', copy_code: lid }) },
@@ -165,7 +165,7 @@ const handler = async (ctx) => {
                 });
             } catch (error) {
                 console.error("Gagal melacak nomor:", error);
-                await ctx.reply({ text: `❌ Terjadi kesalahan saat memeriksa nomor tersebut.` });
+                await m.reply({ text: `❌ Terjadi kesalahan saat memeriksa nomor tersebut.` });
             }
             break;
         }
@@ -177,7 +177,7 @@ const handler = async (ctx) => {
             const channelRegex = /whatsapp\.com\/channel\/([a-zA-Z0-9]+)/i;
 
             if (!textInput || !channelRegex.test(textInput)) {
-                return ctx.reply({
+                return m.reply({
                     text: `❌ *Format Salah!*\n\nFormat: \`${p}getidch <link-channel>\`\nContoh: \`${p}getidch https://whatsapp.com/channel/0029VaXXXXX\``
                 });
             }
@@ -186,7 +186,7 @@ const handler = async (ctx) => {
             const inviteCode = match[1];
 
             try {
-                const metadata = await sock.newsletterMetadata("invite", inviteCode);
+                const metadata = await Hanz.newsletterMetadata("invite", inviteCode);
                 const jidAsli = metadata.id;
                 const metaDataThread = metadata.thread_metadata || {};
                 const namaChannel = metaDataThread.name?.text || "Tidak diketahui";
@@ -199,17 +199,17 @@ const handler = async (ctx) => {
                 hasil += ` • *Followers* : ${totalPengikut} pengikut\n`;
                 hasil += ` • *Deskripsi* : ${deskripsi}`;
 
-                await ctx.sendInteractive({
+                await m.sendInteractive({
                     text: hasil,
                     footer: config.footerTxt,
-                    quoted: ctx.msg,
+                    quoted: m.msg,
                     buttons: [
                         { name: 'cta_copy', buttonParamsJson: JSON.stringify({ display_text: 'Copy ID Channel', copy_code: jidAsli }) },
                     ]
                 });
             } catch (error) {
                 console.error("Gagal melacak channel:", error);
-                await ctx.reply({
+                await m.reply({
                     text: `❌ *Gagal Mendapatkan Data!*\n\nPastikan link channel valid, publik, dan bot sedang tidak terkena limit query.`
                 });
             }
@@ -218,12 +218,12 @@ const handler = async (ctx) => {
 
         case 'setmode':
         case 'mode': {
-            if (!isSuperOwner) return ctx.reply({ text: '❌ Perintah ini hanya untuk Super Owner!' });
+            if (!isSuperOwner) return m.reply({ text: '❌ Perintah ini hanya untuk Super Owner!' });
 
             const modeInput = command.fullArgs.trim().toLowerCase();
 
             if (!['public', 'self'].includes(modeInput)) {
-                return ctx.sendInteractive({
+                return m.sendInteractive({
                     text: `⚙️ *MODE BOT SAAT INI:* ${(global.botMode || config.botMode).toUpperCase()}
 
 ` +
@@ -231,7 +231,7 @@ const handler = async (ctx) => {
 ` +
                         `• *self* → hanya owner yang bisa pakai bot`,
                     footer: config.footerTxt,
-                    quoted: ctx.msg,
+                    quoted: m.msg,
                     buttons: [
                         { name: 'quick_reply', buttonParamsJson: JSON.stringify({ display_text: 'Set Public', id: 'setmode public' }) },
                         { name: 'quick_reply', buttonParamsJson: JSON.stringify({ display_text: 'Set Self', id: 'setmode self' }) },
@@ -240,7 +240,7 @@ const handler = async (ctx) => {
             }
 
             if (modeInput === (global.botMode || config.botMode)) {
-                return ctx.reply({ text: `ℹ️ Mode bot sudah dalam mode *${modeInput.toUpperCase()}*.` });
+                return m.reply({ text: `ℹ️ Mode bot sudah dalam mode *${modeInput.toUpperCase()}*.` });
             }
             global.botMode = modeInput;
             try {
@@ -250,7 +250,7 @@ const handler = async (ctx) => {
                 require('fs').writeFileSync(configPath, configFile, 'utf8');
             } catch (e) { }
 
-            await ctx.reply({
+            await m.reply({
                 text: `✅ Mode bot berhasil diubah ke *${modeInput.toUpperCase()}*!\n\n` +
                     `${modeInput === 'self' ? '🔒 Sekarang hanya owner yang bisa pakai bot.' : '🌐 Sekarang semua orang bisa pakai bot.'}`
             });
@@ -262,7 +262,7 @@ const handler = async (ctx) => {
             const h = Math.floor(u / 3600);
             const m = Math.floor((u % 3600) / 60);
             const s = Math.floor(u % 60);
-            await ctx.send({
+            await m.send({
                 text: [
                     '╔═══ *Bot Info* ═══╗',
                     `║ 🤖 *Nama:* ${config.botName}`,

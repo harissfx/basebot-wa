@@ -24,8 +24,8 @@ const {
 } = require('../../lib/ffmpeg');
 
 // ─── Handler ──────────────────────────────────────────────────────────────────
-const handler = async (ctx) => {
-    const { command, isSuperOwner, msg, sock, sender, senderNumber, pushname, isOwner } = ctx;
+const handler = async (m) => {
+    const { command, isSuperOwner, msg, Hanz, sender, senderNumber, pushname, isOwner } = m;
     const p = config.prefix;
     const quotedMsg = msg.message?.extendedTextMessage?.contextInfo?.quotedMessage
         || msg.message;
@@ -51,10 +51,10 @@ const handler = async (ctx) => {
 │⪩ \`${p}𝗍𝗈𝗀𝗂𝖿 (𝗋𝖾𝗉𝗅𝗒 𝗌𝗍𝗂𝗄𝖾𝗋)\`
 │
 └────────────┈ ⳹`
-            await ctx.sendInteractive({
+            await m.sendInteractive({
                 text: menu,
                 footer: config.footerTxt,
-                quoted: ctx.fakeOrder,
+                quoted: m.fakeOrder,
                 contextInfo: {
                     mentionedJid: ["0@s.whatsapp.net"],
                     forwardingScore: 111,
@@ -98,7 +98,7 @@ const handler = async (ctx) => {
         case 's': {
             const mediaResult = await downloadMedia(quotedMsg);
             if (!mediaResult) {
-                return ctx.reply({
+                return m.reply({
                     text: [
                         '❌ *Tidak ada media yang dideteksi!*', '',
                         'Cara pakai:',
@@ -109,7 +109,7 @@ const handler = async (ctx) => {
                 });
             }
 
-            await ctx.react('⏳');
+            await m.react('⏳');
 
             const { buffer, mediaType } = mediaResult;
             const isAnimated = mediaType === 'video'
@@ -165,15 +165,15 @@ const handler = async (ctx) => {
 
                 stickerBuffer = await injectStickerMetadata(stickerBuffer, packName, authorName);
 
-                await sock.sendMessage(sender, { sticker: stickerBuffer, isAnimated }, { quoted: msg });
+                await Hanz.sendMessage(sender, { sticker: stickerBuffer, isAnimated }, { quoted: msg });
                 cleanTmp(inputPath, outputPath);
-                await ctx.react('✅');
+                await m.react('✅');
 
             } catch (err) {
                 cleanTmp(inputPath, outputPath);
                 console.error('[STICKER ERROR]', err.message);
-                await ctx.react('❌');
-                await ctx.reply({ text: `❌ Gagal membuat stiker.\nError: ${err.message}` });
+                await m.react('❌');
+                await m.reply({ text: `❌ Gagal membuat stiker.\nError: ${err.message}` });
             }
             break;
         }
@@ -182,10 +182,10 @@ const handler = async (ctx) => {
         case 'toimg': {
             const mediaResult = await downloadMedia(quotedMsg);
             if (!mediaResult || mediaResult.mediaType !== 'sticker') {
-                return ctx.reply({ text: '❌ Reply sebuah stiker!\n\nCara pakai: reply stiker → `!toimg`' });
+                return m.reply({ text: '❌ Reply sebuah stiker!\n\nCara pakai: reply stiker → `!toimg`' });
             }
 
-            await ctx.react('⏳');
+            await m.react('⏳');
             const { buffer } = mediaResult;
             const isAnimated = quotedMsg?.stickerMessage?.isAnimated;
             let inputPath, outputPath;
@@ -195,8 +195,8 @@ const handler = async (ctx) => {
                     try {
                         const sharp = require('sharp');
                         const pngBuffer = await sharp(buffer).png().toBuffer();
-                        await sock.sendMessage(sender, { image: pngBuffer, caption: '🖼️ Stiker → Foto!' }, { quoted: msg });
-                        await ctx.react('✅');
+                        await Hanz.sendMessage(sender, { image: pngBuffer, caption: '🖼️ Stiker → Foto!' }, { quoted: msg });
+                        await m.react('✅');
                         return;
                     } catch { /* fallback FFmpeg */ }
                 }
@@ -208,17 +208,17 @@ const handler = async (ctx) => {
                         .outputOptions(['-vf', 'scale=512:512:force_original_aspect_ratio=decrease']);
                 });
                 const imgBuffer = fs.readFileSync(outputPath);
-                await sock.sendMessage(sender, {
+                await Hanz.sendMessage(sender, {
                     image: imgBuffer,
                     caption: `🖼️ Stiker → Foto!${isAnimated ? '\n_(frame pertama dari stiker animasi)_' : ''}`,
                 }, { quoted: msg });
                 cleanTmp(inputPath, outputPath);
-                await ctx.react('✅');
+                await m.react('✅');
             } catch (err) {
                 cleanTmp(inputPath, outputPath);
                 console.error('[TOIMG ERROR]', err.message);
-                await ctx.react('❌');
-                await ctx.reply({ text: `❌ Gagal konversi stiker ke foto.\nError: ${err.message}` });
+                await m.react('❌');
+                await m.reply({ text: `❌ Gagal konversi stiker ke foto.\nError: ${err.message}` });
             }
             break;
         }
@@ -227,7 +227,7 @@ const handler = async (ctx) => {
         case 'togif': {
             const mediaResult = await downloadMedia(quotedMsg);
             if (!mediaResult) {
-                return ctx.reply({ text: '❌ Reply stiker animasi atau video!\n\nCara pakai: reply stiker/video → `!togif`' });
+                return m.reply({ text: '❌ Reply stiker animasi atau video!\n\nCara pakai: reply stiker/video → `!togif`' });
             }
 
             const { buffer, mediaType } = mediaResult;
@@ -235,10 +235,10 @@ const handler = async (ctx) => {
             const isVideo = mediaType === 'video';
 
             if (!isAnimatedSticker && !isVideo) {
-                return ctx.reply({ text: '❌ Hanya stiker animasi atau video yang bisa dikonversi ke GIF!' });
+                return m.reply({ text: '❌ Hanya stiker animasi atau video yang bisa dikonversi ke GIF!' });
             }
 
-            await ctx.react('⏳');
+            await m.react('⏳');
             let inputPath, outputPath;
 
             try {
@@ -256,20 +256,20 @@ const handler = async (ctx) => {
                 const gifSizeMB = (gifBuffer.length / 1024 / 1024).toFixed(2);
                 if (gifBuffer.length > 10 * 1024 * 1024) {
                     cleanTmp(inputPath, outputPath);
-                    await ctx.react('❌');
-                    return ctx.reply({ text: `❌ GIF terlalu besar (${gifSizeMB} MB). Coba video lebih pendek.` });
+                    await m.react('❌');
+                    return m.reply({ text: `❌ GIF terlalu besar (${gifSizeMB} MB). Coba video lebih pendek.` });
                 }
-                await sock.sendMessage(sender, {
+                await Hanz.sendMessage(sender, {
                     video: gifBuffer, gifPlayback: true,
                     caption: `🎞️ GIF berhasil! (${gifSizeMB} MB)`,
                 }, { quoted: msg });
                 cleanTmp(inputPath, outputPath);
-                await ctx.react('✅');
+                await m.react('✅');
             } catch (err) {
                 cleanTmp(inputPath, outputPath);
                 console.error('[TOGIF ERROR]', err.message);
-                await ctx.react('❌');
-                await ctx.reply({ text: `❌ Gagal konversi ke GIF.\nError: ${err.message}` });
+                await m.react('❌');
+                await m.reply({ text: `❌ Gagal konversi ke GIF.\nError: ${err.message}` });
             }
             break;
         }

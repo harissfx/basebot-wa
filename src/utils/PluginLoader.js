@@ -8,11 +8,11 @@ const readline = require('readline');
  * PluginLoader — support DUA format export:
  *
  * Format LAMA (object of functions):
- * module.exports = { ping: async (ctx) => {...}, menu: async (ctx) => {...} }
+ * module.exports = { ping: async (m) => {...}, menu: async (m) => {...} }
  *
  * Format BARU (switch case):
- * module.exports = async (ctx) => {
- *   switch (ctx.command.name) {
+ * module.exports = async (m) => {
+ *   switch (m.command.name) {
  *     case 'ping': ...; break;
  *     case 'menu': ...; break;
  *   }
@@ -78,7 +78,7 @@ class PluginLoader {
 
             if (typeof mod === 'function') {
                 for (const name of cmds) {
-                    this.plugins[name] = (ctx) => mod(ctx);
+                    this.plugins[name] = (m) => mod(m);
                     loaded.push(name);
                 }
             } else if (typeof mod === 'object') {

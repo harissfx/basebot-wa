@@ -2,8 +2,8 @@ const axios = require('axios');
 const config = require('../config');
 const { getDevice } = require('@whiskeysockets/baileys');
 
-const handler = async (ctx) => {
-    const { command, isSuperOwner, msg, senderNumber, pushname, isOwner } = ctx;
+const handler = async (m) => {
+    const { command, isSuperOwner, msg, senderNumber, pushname, isOwner } = m;
     let kota, geo, loc, data, response, username, ip, text, from, to, query, pkg, result, url, sections;
     const p = config.prefix;
     switch (command.name) {
@@ -34,10 +34,10 @@ const handler = async (ctx) => {
 │⪩ \`${p}𝗇𝗉𝗆 (𝗉𝖺𝖼𝗄𝖺𝗀𝖾)\`
 │
 └────────────┈ ⳹`
-            await ctx.sendInteractive({
+            await m.sendInteractive({
                 text: menu,
                 footer: config.footerTxt,
-                quoted: ctx.fakeOrder,
+                quoted: m.fakeOrder,
                 contextInfo: {
                     mentionedJid: ["0@s.whatsapp.net"],
                     forwardingScore: 111,
@@ -80,14 +80,14 @@ const handler = async (ctx) => {
             try {
                 geo = await axios.get(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(kota)}&count=1`);
                 loc = geo.data.results?.[0];
-                if (!loc) return ctx.reply({ text: `❌ Kota *${kota}* tidak ditemukan.` });
+                if (!loc) return m.reply({ text: `❌ Kota *${kota}* tidak ditemukan.` });
 
                 response = await axios.get(
                     `https://api.open-meteo.com/v1/forecast?latitude=${loc.latitude}&longitude=${loc.longitude}&current_weather=true`
                 );
                 data = response.data.current_weather;
 
-                await ctx.reply({
+                await m.reply({
                     text: [
                         `🌤️ *Cuaca ${loc.name}* (${loc.country || ''})`,
                         '',
@@ -98,7 +98,7 @@ const handler = async (ctx) => {
                     ].join('\n')
                 });
             } catch {
-                await ctx.reply({ text: '❌ Gagal mengambil data cuaca.' });
+                await m.reply({ text: '❌ Gagal mengambil data cuaca.' });
             }
             break;
 
@@ -106,8 +106,8 @@ const handler = async (ctx) => {
             try {
                 response = await axios.get('https://zenquotes.io/api/random');
                 data = response.data?.[0];
-                if (!data) return ctx.reply({ text: '❌ Gagal mengambil quote.' });
-                await ctx.reply({
+                if (!data) return m.reply({ text: '❌ Gagal mengambil quote.' });
+                await m.reply({
                     text: [
                         `📜 *Quote of the Day*`,
                         '',
@@ -117,7 +117,7 @@ const handler = async (ctx) => {
                     ].join('\n')
                 });
             } catch {
-                await ctx.reply({ text: '❌ Gagal mengambil quote.' });
+                await m.reply({ text: '❌ Gagal mengambil quote.' });
             }
             break;
 
@@ -125,7 +125,7 @@ const handler = async (ctx) => {
             try {
                 response = await axios.get('https://api.exchangerate-api.com/v4/latest/USD');
                 data = response.data.rates;
-                await ctx.reply({
+                await m.reply({
                     text: [
                         `💱 *Kurs Mata Uang* (Base: USD)`,
                         '',
@@ -142,17 +142,17 @@ const handler = async (ctx) => {
                     ].join('\n')
                 });
             } catch {
-                await ctx.reply({ text: '❌ Gagal mengambil data kurs.' });
+                await m.reply({ text: '❌ Gagal mengambil data kurs.' });
             }
             break;
 
         case 'github':
             username = command.args[0];
-            if (!username) return ctx.reply({ text: '❌ Contoh: !github whiskeysockets' });
+            if (!username) return m.reply({ text: '❌ Contoh: !github whiskeysockets' });
             try {
                 response = await axios.get(`https://api.github.com/users/${encodeURIComponent(username)}`);
                 data = response.data;
-                await ctx.reply({
+                await m.reply({
                     text: [
                         `🐙 *GitHub Profile*`,
                         '',
@@ -168,7 +168,7 @@ const handler = async (ctx) => {
                     ].join('\n')
                 });
             } catch {
-                await ctx.reply({ text: `❌ User *${username}* tidak ditemukan.` });
+                await m.reply({ text: `❌ User *${username}* tidak ditemukan.` });
             }
             break;
 
@@ -178,8 +178,8 @@ const handler = async (ctx) => {
                 url = ip ? `https://ipapi.co/${ip}/json/` : 'https://ipapi.co/json/';
                 response = await axios.get(url);
                 data = response.data;
-                if (data.error) return ctx.reply({ text: `❌ ${data.reason || 'Gagal cek IP'}` });
-                await ctx.reply({
+                if (data.error) return m.reply({ text: `❌ ${data.reason || 'Gagal cek IP'}` });
+                await m.reply({
                     text: [
                         `🌐 *IP Information*`,
                         '',
@@ -195,15 +195,15 @@ const handler = async (ctx) => {
                     ].join('\n')
                 });
             } catch {
-                await ctx.reply({ text: '❌ Gagal mengecek IP.' });
+                await m.reply({ text: '❌ Gagal mengecek IP.' });
             }
             break;
 
         case 'qrcode':
             text = command.fullArgs;
-            if (!text) return ctx.reply({ text: '❌ Contoh: !qrcode https://google.com' });
+            if (!text) return m.reply({ text: '❌ Contoh: !qrcode https://google.com' });
             url = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(text)}`;
-            await ctx.reply({ image: { url }, caption: `📱 QR Code untuk:\n_${text.slice(0, 100)}_` });
+            await m.reply({ image: { url }, caption: `📱 QR Code untuk:\n_${text.slice(0, 100)}_` });
             break;
 
         case 'translate':
@@ -211,7 +211,7 @@ const handler = async (ctx) => {
             const isLangCode = (str) => /^[a-zA-Z]{2}(\|[a-zA-Z]{2})?$/.test(str);
 
             if (!command.args.length) {
-                return ctx.reply({
+                return m.reply({
                     text: [
                         '❌ *Cara pakai:*',
                         '',
@@ -246,7 +246,7 @@ const handler = async (ctx) => {
                 text = command.fullArgs;
             }
 
-            if (!text) return ctx.reply({ text: '❌ Masukkan teks yang mau diterjemahkan.' });
+            if (!text) return m.reply({ text: '❌ Masukkan teks yang mau diterjemahkan.' });
 
             try {
                 let res = await axios.get(
@@ -269,10 +269,10 @@ const handler = async (ctx) => {
 
                 result = res.data.responseData;
                 if (!result?.translatedText || res.data.responseStatus !== 200) {
-                    return ctx.reply({ text: '❌ Gagal menerjemahkan. Cek kode bahasa (contoh: id, en, ja, ko, ar).' });
+                    return m.reply({ text: '❌ Gagal menerjemahkan. Cek kode bahasa (contoh: id, en, ja, ko, ar).' });
                 }
 
-                await ctx.reply({
+                await m.reply({
                     text: [
                         `🌐 *Translate* (${from} → ${to})`,
                         '',
@@ -283,13 +283,13 @@ const handler = async (ctx) => {
                 });
             } catch (err) {
                 console.error('Translate error:', err.message);
-                await ctx.reply({ text: '❌ Gagal menerjemahkan.' });
+                await m.reply({ text: '❌ Gagal menerjemahkan.' });
             }
             break;
 
         case 'wiki':
             query = command.fullArgs;
-            if (!query) return ctx.reply({ text: '❌ Contoh: !wiki Node.js' });
+            if (!query) return m.reply({ text: '❌ Contoh: !wiki Node.js' });
             try {
                 const headers = { 'User-Agent': 'Mozilla/5.0 (compatible; WhatsAppBot/1.0; +https://github.com)' };
 
@@ -299,7 +299,7 @@ const handler = async (ctx) => {
                 );
                 const searchResults = searchRes.data?.query?.search;
                 if (!searchResults || !searchResults.length) {
-                    return ctx.reply({ text: `❌ Tidak ada hasil untuk *${query}* di Wikipedia.` });
+                    return m.reply({ text: `❌ Tidak ada hasil untuk *${query}* di Wikipedia.` });
                 }
 
                 const exactTitle = searchResults[0].title;
@@ -310,11 +310,11 @@ const handler = async (ctx) => {
                 data = response.data;
 
                 if (data.type === 'disambiguation') {
-                    await ctx.reply({ text: `🔍 *${exactTitle}* punya banyak artikel. Coba spesifikkan lebih detail.` });
+                    await m.reply({ text: `🔍 *${exactTitle}* punya banyak artikel. Coba spesifikkan lebih detail.` });
                     break;
                 }
 
-                await ctx.reply({
+                await m.reply({
                     text: [
                         `📖 *Wikipedia*`,
                         '',
@@ -327,13 +327,13 @@ const handler = async (ctx) => {
                 });
             } catch (err) {
                 console.error('Wiki error:', err.message);
-                await ctx.reply({ text: `❌ Gagal mengambil artikel *${query}*.` });
+                await m.reply({ text: `❌ Gagal mengambil artikel *${query}*.` });
             }
             break;
 
         case 'npm':
             pkg = command.args[0];
-            if (!pkg) return ctx.reply({ text: '❌ Contoh: !npm axios' });
+            if (!pkg) return m.reply({ text: '❌ Contoh: !npm axios' });
             try {
                 response = await axios.get(`https://registry.npmjs.org/${encodeURIComponent(pkg)}`);
                 data = response.data;
@@ -342,7 +342,7 @@ const handler = async (ctx) => {
                 const author = data.author?.name || data.author || '-';
                 const license = data.license || '-';
                 const homepage = data.homepage || `https://npmjs.com/package/${pkg}`;
-                await ctx.reply({
+                await m.reply({
                     text: [
                         `📦 *NPM Package*`,
                         '',
@@ -356,7 +356,7 @@ const handler = async (ctx) => {
                     ].join('\n')
                 });
             } catch {
-                await ctx.reply({ text: `❌ Package *${pkg}* tidak ditemukan.` });
+                await m.reply({ text: `❌ Package *${pkg}* tidak ditemukan.` });
             }
             break;
 

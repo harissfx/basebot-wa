@@ -47,18 +47,18 @@ function randomString(length = 8) {
 }
 
 /** Ambil metadata grup */
-async function getGroupInfo(sock, jid) {
+async function getGroupInfo(Hanz, jid) {
     try {
-        return await sock.groupMetadata(jid);
+        return await Hanz.groupMetadata(jid);
     } catch {
         return null;
     }
 }
 
 /** Cek apakah user adalah admin di grup */
-async function isGroupAdmin(sock, groupJid, userJid) {
+async function isGroupAdmin(Hanz, groupJid, userJid) {
     try {
-        const { participants } = await sock.groupMetadata(groupJid);
+        const { participants } = await Hanz.groupMetadata(groupJid);
         const p = participants.find(p => p.id === userJid);
         return p?.admin === 'admin' || p?.admin === 'superadmin';
     } catch {
@@ -67,7 +67,7 @@ async function isGroupAdmin(sock, groupJid, userJid) {
 }
 
 /** Ambil JID bot sendiri */
-function getBotJid(sock) { return sock.user?.id || ''; }
+function getBotJid(Hanz) { return Hanz.user?.id || ''; }
 
 const fs = require('fs');
 const path = require('path');

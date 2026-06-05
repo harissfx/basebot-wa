@@ -2,16 +2,16 @@ const fs = require('fs');
 const path = require('path');
 const config = require('../config');
 
-const handler = async (ctx) => {
-    const { command } = ctx
+const handler = async (m) => {
+    const { command } = m
 
     switch (command.name) {
 
         case 'button':
-            await ctx.sendButtons({
+            await m.sendButtons({
                 text: '🎛️ Silakan pilih salah satu:',
                 footer: 'WhatsApp Bot',
-                quoted: ctx.msg,
+                quoted: m.msg,
                 buttons: [
                     { id: 'btn_1', text: '1️⃣  Opsi Pertama' },
                     { id: 'btn_2', text: '2️⃣  Opsi Kedua' },
@@ -20,15 +20,15 @@ const handler = async (ctx) => {
             });
             break;
 
-        case 'btn_1': await ctx.reply({ text: '✅ Kamu pilih *Opsi Pertama*!' }); break;
-        case 'btn_2': await ctx.reply({ text: '✅ Kamu pilih *Opsi Kedua*!' }); break;
-        case 'btn_3': await ctx.reply({ text: '✅ Kamu pilih *Opsi Ketiga*!' }); break;
+        case 'btn_1': await m.reply({ text: '✅ Kamu pilih *Opsi Pertama*!' }); break;
+        case 'btn_2': await m.reply({ text: '✅ Kamu pilih *Opsi Kedua*!' }); break;
+        case 'btn_3': await m.reply({ text: '✅ Kamu pilih *Opsi Ketiga*!' }); break;
 
         case 'list':
-            await ctx.sendInteractive({
+            await m.sendInteractive({
                 text: '📋 Pilih item dari menu ini:',
                 footer: 'WhatsApp Bot Menu',
-                quoted: ctx.msg,
+                quoted: m.msg,
                 buttons: [
                     {
                         name: 'single_select',
@@ -66,10 +66,10 @@ const handler = async (ctx) => {
             break;
 
         case 'interactive':
-            await ctx.sendInteractive({
+            await m.sendInteractive({
                 text: '🚀 Pilih aksi:',
                 footer: 'WhatsApp Bot',
-                quoted: ctx.msg,
+                quoted: m.msg,
                 buttons: [
                     { name: 'quick_reply', buttonParamsJson: JSON.stringify({ display_text: '👋 Halo Bot', id: 'qr_hello' }) },
                     { name: 'cta_url', buttonParamsJson: JSON.stringify({ display_text: '🌐 Buka GitHub', url: 'https://github.com/whiskeysockets/baileys' }) },
@@ -77,41 +77,41 @@ const handler = async (ctx) => {
                 ]
             });
             break;
-        case 'qr_hello': await ctx.reply({ text: '👋 Halo juga! Ada yang bisa saya bantu?' }); break;
+        case 'qr_hello': await m.reply({ text: '👋 Halo juga! Ada yang bisa saya bantu?' }); break;
 
         case 'media':
-            await ctx.reply({ image: { url: 'https://picsum.photos/400/300' }, caption: '🖼️ Gambar dari internet' });
+            await m.reply({ image: { url: 'https://picsum.photos/400/300' }, caption: '🖼️ Gambar dari internet' });
             break;
 
         case 'medialokal':
             const imagePath = path.join(__dirname, '../media/logo.png');
-            if (!fs.existsSync(imagePath)) return ctx.reply({ text: '❌ File tidak ditemukan.\n\nBuat folder `assets/` dan taruh `logo.png`.' });
-            await ctx.reply({ image: fs.readFileSync(imagePath), caption: '🖼️ Gambar lokal dari assets!' });
+            if (!fs.existsSync(imagePath)) return m.reply({ text: '❌ File tidak ditemukan.\n\nBuat folder `assets/` dan taruh `logo.png`.' });
+            await m.reply({ image: fs.readFileSync(imagePath), caption: '🖼️ Gambar lokal dari assets!' });
             break;
 
         case 'buttonimage':
             const imgPath = path.join(__dirname, '../media/logo.png');
-            if (!fs.existsSync(imgPath)) return ctx.reply({ text: '❌ File logo.png tidak ada di folder assets.' });
+            if (!fs.existsSync(imgPath)) return m.reply({ text: '❌ File logo.png tidak ada di folder assets.' });
             const base64Image = fs.readFileSync(imgPath).toString('base64');
-            await ctx.sendButtonWithImage({
+            await m.sendButtonWithImage({
                 text: '🖼️ Button dengan gambar!',
                 footer: 'WhatsApp Bot',
                 imageUrl: `data:image/png;base64,${base64Image}`,
-                quoted: ctx.msg,
+                quoted: m.msg,
                 buttons: [
                     { id: 'like', text: '❤️ Suka' },
                     { id: 'share', text: '📤 Share' },
                 ]
             });
             break;
-        case 'like': await ctx.react('❤️'); break;
-        case 'share': await ctx.reply({ text: '📤 Makasih udah mau share!' }); break;
+        case 'like': await m.react('❤️'); break;
+        case 'share': await m.reply({ text: '📤 Makasih udah mau share!' }); break;
 
         case 'buttoncall':
-            await ctx.sendInteractive({
+            await m.sendInteractive({
                 text: '📞 Hubungi kami:',
                 footer: 'Customer Service',
-                quoted: ctx.msg,
+                quoted: m.msg,
                 buttons: [{ name: 'cta_call', buttonParamsJson: JSON.stringify({ display_text: '📱 Telepon Sekarang', phone_number: '+6281234567890' }) }
 
                 ]
@@ -119,13 +119,13 @@ const handler = async (ctx) => {
             break;
 
         case 'location':
-            await ctx.reply({
+            await m.reply({
                 location: { degreesLatitude: -6.1754, degreesLongitude: 106.8272, name: 'Monumen Nasional', address: 'Jakarta, Indonesia' }
             });
             break;
 
         case 'contact':
-            await ctx.reply({
+            await m.reply({
                 contacts: {
                     displayName: 'Test Contact',
                     contacts: [{ vcard: 'BEGIN:VCARD\nVERSION:3.0\nFN:Test Contact\nTEL;type=CELL;type=VOICE;waid=6281234567890:+62 812-3456-7890\nEND:VCARD' }]
@@ -134,11 +134,11 @@ const handler = async (ctx) => {
             break;
 
         case 'react':
-            await ctx.react(command.args[0] || '👍');
+            await m.react(command.args[0] || '👍');
             break;
 
         case 'poll':
-            await ctx.reply({
+            await m.reply({
                 poll: { name: 'Polling Favorit', values: ['Node.js', 'Python', 'Golang', 'Rust'], selectableCount: 1, toAnnouncementGroup: false }
             });
             break;
