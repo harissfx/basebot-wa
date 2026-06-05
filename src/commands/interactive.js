@@ -84,19 +84,19 @@ const handler = async (m) => {
             break;
 
         case 'medialokal':
-            const imagePath = path.join(__dirname, '../media/logo.png');
-            if (!fs.existsSync(imagePath)) return m.reply({ text: '❌ File tidak ditemukan.\n\nBuat folder `assets/` dan taruh `logo.png`.' });
+            const imagePath = path.join(__dirname, '../media/logo.jpg');
+            if (!fs.existsSync(imagePath)) return m.reply({ text: '❌ File tidak ditemukan.\n\nBuat folder `assets/` dan taruh `logo.jpg`.' });
             await m.reply({ image: fs.readFileSync(imagePath), caption: '🖼️ Gambar lokal dari assets!' });
             break;
 
         case 'buttonimage':
-            const imgPath = path.join(__dirname, '../media/logo.png');
-            if (!fs.existsSync(imgPath)) return m.reply({ text: '❌ File logo.png tidak ada di folder assets.' });
+            const imgPath = path.join(__dirname, '../media/logo.jpg');
+            if (!fs.existsSync(imgPath)) return m.reply({ text: '❌ File logo.pjpgng tidak ada di folder assets.' });
             const base64Image = fs.readFileSync(imgPath).toString('base64');
             await m.sendButtonWithImage({
                 text: '🖼️ Button dengan gambar!',
                 footer: 'WhatsApp Bot',
-                imageUrl: `data:image/png;base64,${base64Image}`,
+                imageUrl: `data:image/jpg;base64,${base64Image}`,
                 quoted: m.msg,
                 buttons: [
                     { id: 'like', text: '❤️ Suka' },

@@ -156,40 +156,6 @@ ${Object.entries(plugins.commandsByFile()).map(([file, cmds]) => `││\n││
             }
          }, { quoted: m.msg })
       break;
-case 'catalog': {
-    try {
-        const {
-            prepareWAMessageMedia,
-            generateWAMessageFromContent,
-            proto
-        } = require('@whiskeysockets/baileys');
-
-        const thumb = getImage();
-        console.log('[CATALOG] thumb:', thumb ? 'OK' : 'NULL');
-
-        const thumbnail = await prepareWAMessageMedia(
-            { image: thumb },
-            { upload: Hanz.waUploadToServer }
-        );
-        console.log('[CATALOG] thumbnail keys:', Object.keys(thumbnail));
-
-        const catalog = generateWAMessageFromContent(sender, proto.Message.fromObject({
-            productMessage: {
-                product: {
-                    productImage: thumbnail.imageMessage,
-                }
-            }
-        }), { userJid: sender, quoted: m.fakeOrder });
-
-        console.log('[CATALOG] catalog keys:', Object.keys(catalog));
-        await Hanz.relayMessage(sender, catalog.message, { messageId: catalog.key.id });
-        console.log('[CATALOG] sent!');
-    } catch(e) {
-        console.error('[CATALOG ERROR]', e.message);
-        await m.reply({ text: '❌ ' + e.message });
-    }
-    break;
-}
 case 'script':
 case 'sc':
     tete = `
