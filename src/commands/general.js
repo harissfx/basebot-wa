@@ -13,6 +13,7 @@ const handler = async (m) => {
     switch (command.name) {
         case 'generalmenu':
             const device = getDevice(msg.key.id);
+            const generalCmds = plugins.commandsByFile()['general'] || [];
             const role = isSuperOwner ? 'Super Owner' : (isOwner ? 'Co-Owner' : 'User');
             let menu = `┌─❖「 𝗜𝗡𝗙𝗢 𝗨𝗦𝗘𝗥 」
 │● 𝘕𝘢𝘮𝘢: ${pushname}
@@ -25,9 +26,7 @@ const handler = async (m) => {
 │└────────────┈ ⳹
 │「 𝗚𝗘𝗡𝗘𝗥𝗔𝗟 𝗠𝗘𝗡𝗨 」
 │
-│⪩ \`${p}𝗆𝖾𝗇𝗎\`
-│⪩ \`${p}𝗉𝗂𝗇𝗀\`
-│⪩ \`${p}𝗈𝗐𝗇𝖾𝗋\`
+${generalCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
 │
 └────────────┈ ⳹`
             await m.sendInteractive({

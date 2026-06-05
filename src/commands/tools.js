@@ -1,16 +1,18 @@
 const axios = require('axios');
 const config = require('../config');
+const plugins = require('../utils/PluginLoader');
 const { getDevice } = require('@whiskeysockets/baileys');
 
 const handler = async (m) => {
     const { command, isSuperOwner, msg, senderNumber, pushname, isOwner } = m;
     let kota, geo, loc, data, response, username, ip, text, from, to, query, pkg, result, url;
     const p = config.prefix;
+    const nomorUser = senderNumber;
     switch (command.name) {
 
         case 'toolsmenu':
             const device = getDevice(msg.key.id);
-            const nomorUser = senderNumber;
+            const toolsCmds = plugins.commandsByFile()['tools'] || [];
             const role = isSuperOwner ? 'Super Owner' : (isOwner ? 'Co-Owner' : 'User');
             let menu = `┌─❖「 𝗜𝗡𝗙𝗢 𝗨𝗦𝗘𝗥 」
 │● 𝘕𝘢𝘮𝘢: ${pushname}
@@ -23,15 +25,7 @@ const handler = async (m) => {
 │└────────────┈ ⳹
 │「 𝗧𝗢𝗢𝗟𝗦 𝗠𝗘𝗡𝗨 」
 │
-│⪩ \`${p}𝖼𝗎𝖺𝖼𝖺 (𝗄𝗈𝗍𝖺)\`
-│⪩ \`${p}𝗊𝗎𝗈𝗍𝖾\`
-│⪩ \`${p}𝗄𝗎𝗋𝗌\`
-│⪩ \`${p}𝗀𝗂𝗍𝗁𝗎𝖻 (𝗎𝗌𝖾𝗋𝗇𝖺𝗆𝖾)\`
-│⪩ \`${p}𝗂𝗉𝖼𝗁𝖾𝖼𝗄 (𝗂𝗉)\`
-│⪩ \`${p}𝗊𝗋𝖼𝗈𝖽𝖾 (𝗍𝖾𝗄𝗌)\`
-│⪩ \`${p}𝗍𝗋𝖺𝗇𝗌𝗅𝖺𝗍𝖾 (𝗍𝖾𝗄𝗌)\`
-│⪩ \`${p}𝗐𝗂𝗄𝗂 (𝗊𝗎𝖾𝗋𝗒)\`
-│⪩ \`${p}𝗇𝗉𝗆 (𝗉𝖺𝖼𝗄𝖺𝗀𝖾)\`
+${toolsCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
 │
 └────────────┈ ⳹`
             await m.sendInteractive({

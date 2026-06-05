@@ -14,6 +14,7 @@
 
 const fs = require('fs');
 const config = require('../config');
+const plugins = require('../utils/PluginLoader');
 const { getDevice } = require('@whiskeysockets/baileys');
 const {
     injectStickerMetadata,
@@ -27,13 +28,14 @@ const {
 const handler = async (m) => {
     const { command, isSuperOwner, msg, Hanz, sender, senderNumber, pushname, isOwner } = m;
     const p = config.prefix;
+    const nomorUser = senderNumber;
     const quotedMsg = msg.message?.extendedTextMessage?.contextInfo?.quotedMessage
         || msg.message;
 
     switch (command.name) {
         case 'ffmpegmenu':
             const device = getDevice(msg.key.id);
-            const nomorUser = senderNumber;
+            const mediaCmds = plugins.commandsByFile()['media'] || [];
             const role = isSuperOwner ? 'Super Owner' : (isOwner ? 'Co-Owner' : 'User');
             let menu = `┌─❖「 𝗜𝗡𝗙𝗢 𝗨𝗦𝗘𝗥 」
 │● 𝘕𝘢𝘮𝘢: ${pushname}
@@ -46,9 +48,7 @@ const handler = async (m) => {
 │└────────────┈ ⳹
 │「 𝗠𝗘𝗗𝗜𝗔 𝗠𝗘𝗡𝗨 」
 │
-│⪩ \`${p}𝗌𝗍𝗂𝖼𝗄𝖾𝗋 (𝗋𝖾𝗉𝗅𝗒 𝖿𝗈𝗍𝗈/𝗏𝗂𝖽𝖾𝗈)\`
-│⪩ \`${p}𝗍𝗈𝗂𝗆𝗀 (𝗋𝖾𝗉𝗅𝗒 𝗌𝗍𝗂𝗄𝖾𝗋)\`
-│⪩ \`${p}𝗍𝗈𝗀𝗂𝖿 (𝗋𝖾𝗉𝗅𝗒 𝗌𝗍𝗂𝗄𝖾𝗋)\`
+${mediaCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
 │
 └────────────┈ ⳹`
             await m.sendInteractive({

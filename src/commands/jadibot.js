@@ -1,4 +1,5 @@
 const config = require('../config');
+const plugins = require('../utils/PluginLoader');
 const { sendInteractiveMessage } = require('../utils/interactiveHelper');
 const { getDevice } = require('@whiskeysockets/baileys');
 
@@ -6,6 +7,7 @@ const handler = async (m) => {
 
     const { command, isSuperOwner, isMain, Hanz, sender, msg, senderNumber, pushname, isOwner } = m;
     const p = config.prefix;
+    const nomorUser = senderNumber;
     if (!isOwner) return m.reply({ text: '❌ Perintah ini khusus untuk Owner Bot!' });
 
     if (!isMain) {
@@ -15,7 +17,7 @@ const handler = async (m) => {
     switch (command.name) {
         case 'jadibotmenu':
             const device = getDevice(msg.key.id);
-            const nomorUser = senderNumber;
+            const jadibotCmds = plugins.commandsByFile()['jadibot'] || [];
             const role = isSuperOwner ? 'Super Owner' : (isOwner ? 'Co-Owner' : 'User');
             let menu = `┌─❖「 𝗜𝗡𝗙𝗢 𝗨𝗦𝗘𝗥 」
 │● 𝘕𝘢𝘮𝘢: ${pushname}
@@ -28,9 +30,7 @@ const handler = async (m) => {
 │└────────────┈ ⳹
 │「 𝗝𝗔𝗗𝗜𝗕𝗢𝗧 𝗠𝗘𝗡𝗨 」
 │
-│⪩ \`${p}𝗃𝖺𝖽𝗂𝖻𝗈𝗍 (𝗇𝗈𝗆𝗈𝗋)\`
-│⪩ \`${p}𝗅𝗂𝗌𝗍𝖻𝗈𝗍\`
-│⪩ \`${p}𝗌𝗍𝗈𝗉𝖻𝗈𝗍 (𝗇𝗈𝗆𝗈𝗋)\`
+${jadibotCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
 │
 └────────────┈ ⳹`
             await m.sendInteractive({

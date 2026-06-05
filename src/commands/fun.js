@@ -1,17 +1,19 @@
 const { delay } = require('../utils/helper');
 const config = require('../config');
+const plugins = require('../utils/PluginLoader');
 const { getDevice } = require('@whiskeysockets/baileys');
 const { pick } = require('../../lib/random');
 
 const handler = async (m) => {
     const { command, isSuperOwner, Hanz, sender, msg, senderNumber, pushname, isOwner } = m;
     const p = config.prefix;
+    const nomorUser = senderNumber;
     let max, answers, jokes, fortunes;
 
     switch (command.name) {
         case 'funmenu':
             const device = getDevice(msg.key.id);
-            const nomorUser = senderNumber;
+            const funCmds = plugins.commandsByFile()['fun'] || [];
             const role = isSuperOwner ? 'Super Owner' : (isOwner ? 'Co-Owner' : 'User');
             let menu = `┌─❖「 𝗜𝗡𝗙𝗢 𝗨𝗦𝗘𝗥 」
 │● 𝘕𝘢𝘮𝘢: ${pushname}
@@ -24,13 +26,7 @@ const handler = async (m) => {
 │└────────────┈ ⳹
 │「 𝗙𝗨𝗡 𝗠𝗘𝗡𝗨 」
 │
-│⪩ \`${p}𝖽𝗂𝖼𝖾\` 
-│⪩ \`${p}𝖼𝗈𝗂𝗇\`
-│⪩ \`${p}𝗋𝖺𝗇𝖽𝗈𝗆\`
-│⪩ \`${p}8𝖻𝖺𝗅𝗅\`
-│⪩ \`${p}𝗃𝗈𝗄𝖾\`
-│⪩ \`${p}𝖿𝗈𝗋𝗍𝗎𝗇𝖾\`
-│⪩ \`${p}𝗍𝗒𝗉𝗂𝗇𝗀\`
+│${funCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
 │
 └────────────┈ ⳹`
             await m.sendInteractive({

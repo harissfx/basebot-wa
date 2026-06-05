@@ -1,10 +1,12 @@
 const { isGroupAdmin, getGroupInfo } = require('../utils/helper');
 const config = require('../config');
+const plugins = require('../utils/PluginLoader');
 const { getDevice } = require('@whiskeysockets/baileys');
 
 const handler = async (m) => {
     const { command, isSuperOwner, Hanz, sender, msg, senderNumber, pushname, isOwner } = m;
     const p = config.prefix;
+    const nomorUser = senderNumber;
     let metadata, mentions, text, isAdmin, mentioned, number, subject, desc, code;
     if (!m.isGroup) {
         await m.reply({ text: '❌ Command ini hanya bisa digunakan di grup.' });
@@ -17,7 +19,7 @@ const handler = async (m) => {
     switch (command.name) {
         case 'groupmenu':
             const device = getDevice(msg.key.id);
-            const nomorUser = senderNumber;
+            const groupCmds = plugins.commandsByFile()['group'] || [];
             const role = isSuperOwner ? 'Super Owner' : (isOwner ? 'Co-Owner' : 'User');
             let menu = `┌─❖「 𝗜𝗡𝗙𝗢 𝗨𝗦𝗘𝗥 」
 │● 𝘕𝘢𝘮𝘢: ${pushname}
@@ -30,17 +32,7 @@ const handler = async (m) => {
 │└────────────┈ ⳹
 │「 𝗚𝗥𝗢𝗨𝗣 𝗠𝗘𝗡𝗨 」
 │
-│⪩ \`${p}𝗍𝖺𝗀𝖺𝗅𝗅\`
-│⪩ \`${p}𝗁𝗂𝖽𝖾𝗍𝖺𝗀\`
-│⪩ \`${p}𝗀𝗋𝗈𝗎𝗉𝗂𝗇𝖿𝗈\`
-│⪩ \`${p}𝗄𝗂𝖼𝗄 (@𝗎𝗌𝖾𝗋)\`
-│⪩ \`${p}𝖺𝖽𝖽 (𝗇𝗈𝗆𝗈𝗋)\`
-│⪩ \`${p}𝗉𝗋𝗈𝗆𝗈𝗍𝖾 (@𝗎𝗌𝖾𝗋)\`
-│⪩ \`${p}𝖽𝖾𝗆𝗈𝗍𝖾 (@𝗎𝗌𝖾𝗋)\`
-│⪩ \`${p}𝗌𝖾𝗍𝗌𝗎𝖻𝗃𝖾𝖼𝗍 (𝗍𝖾𝗄𝗌)\`
-│⪩ \`${p}𝗌𝖾𝗍𝖽𝖾𝗌𝖼 (𝗍𝖾𝗄𝗌)\`
-│⪩ \`${p}𝗋𝖾𝗏𝗈𝗄𝖾\`
-│⪩ \`${p}𝗅𝗂𝗇𝗄\`
+${groupCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
 │
 └────────────┈ ⳹`
             await m.sendInteractive({

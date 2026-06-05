@@ -1,11 +1,12 @@
 const config = require('../config');
-const path = require('path');
+const plugins = require('../utils/PluginLoader');
 const { getDevice } = require('@whiskeysockets/baileys');
 const { loadToken, isTokenValid, getNewToken, sendOtp } = require('../../lib/otp');
 
 const handler = async (m) => {
     const { command, Hanz, isOwner, isSuperOwner, msg, senderNumber, pushname } = m;
     const p = config.prefix;
+    const nomorUser = senderNumber;
     if (!isOwner) return m.reply({ text: '❌ Perintah ini khusus untuk Owner Bot!' });
 
     const superOwnerOnly = [''];
@@ -16,8 +17,8 @@ const handler = async (m) => {
     switch (command.name) {
         case 'ownermenu':
             const device = getDevice(msg.key.id);
+            const ownerCmds = plugins.commandsByFile()['owner'] || [];
             const role = isSuperOwner ? 'Super Owner' : (isOwner ? 'Co-Owner' : 'User');
-            const nomorUser = senderNumber;
             let menu = `┌─❖「 𝗜𝗡𝗙𝗢 𝗨𝗦𝗘𝗥 」
 │● 𝘕𝘢𝘮𝘢: ${pushname}
 │● 𝘕𝘰𝘮𝘰𝘳: ${nomorUser}
@@ -29,10 +30,7 @@ const handler = async (m) => {
 │└────────────┈ ⳹
 │「 𝗢𝗪𝗡𝗘𝗥 𝗠𝗘𝗡𝗨 」
 │
-│⪩ \`${p}𝗈𝗍𝗉 (𝗇𝗈𝗆𝗈𝗋)\`
-│⪩ \`${p}𝗀𝖾𝗍𝗂𝖽𝗎𝗌𝖾𝗋 (𝗇𝗈𝗆𝗈𝗋)\`
-│⪩ \`${p}𝗀𝖾𝗍𝗂𝖽𝖼𝗁 (𝗅𝗂𝗇𝗄-𝖼𝗁𝖺𝗇𝗇𝖾𝗅)\`
-│⪩ \`${p}𝗂𝗇𝖿𝗈\`
+│${ownerCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
 │
 └────────────┈ ⳹`
             await m.sendInteractive({
