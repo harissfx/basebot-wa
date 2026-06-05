@@ -28,7 +28,7 @@ const {
 
 // ─── Handler ──────────────────────────────────────────────────────────────────
 const handler = async (ctx) => {
-    const { command, isSuperOwner, sock, sender, msg, pushname, isOwner, isGroup } = ctx;
+    const { command, isSuperOwner, sock, sender, msg, nomorUser, pushname, isOwner, isGroup } = ctx;
     const url = command.fullArgs?.trim();
     const p = config.prefix;
 
@@ -39,8 +39,10 @@ const handler = async (ctx) => {
             const role = isSuperOwner ? 'Super Owner 👑' : (isOwner ? 'Co-Owner 👥' : 'User 👤');
             const chatType = isGroup ? 'Grup 👥' : 'Pribadi 💬';
             const time = new Date().toLocaleTimeString('id-ID', { timeZone: 'Asia/Jakarta', hour: '2-digit', minute: '2-digit' }) + ' WIB';
+            const nomorUser = sender.split('@')[0]; 
             let menu = `┌─❖「 𝗜𝗡𝗙𝗢 𝗨𝗦𝗘𝗥 」
 │● 𝘕𝘢𝘮𝘢: ${pushname}
+│● 𝘕𝘰𝘮𝘰𝘳: ${nomorUser}
 │● 𝘚𝘵𝘢𝘵𝘶𝘴: ${role}
 │● 𝘗𝘦𝘳𝘢𝘯𝘨𝘬𝘢𝘵: ${device} 📱
 │● 𝘛𝘪𝘱𝘦 𝘊𝘩𝘢𝘵: ${chatType}
