@@ -87,18 +87,18 @@ const handler = async (m) => {
             await m.send({ image: getImage(), caption: '🖼️ Gambar lokal!' });
             break;
 
-        case 'buttonimage':
-            await m.sendButtonWithImage({
-                text: '🖼️ Button dengan gambar!',
-                footer: 'WhatsApp Bot',
-                imageSource: getImage(),
-                quoted: m.msg,
-                buttons: [
-                    { id: 'like', text: '❤️ Suka' },
-                    { id: 'share', text: '📤 Share' },
-                ]
-            });
-            break;
+case 'buttonimage':
+    await m.sendInteractiveWithImage({
+        text: '🖼️ Button dengan gambar!',
+        footer: 'WhatsApp Bot',
+        imageSource: getImage(), // ← Buffer dari getImage()
+        quoted: m.msg,
+        buttons: [
+            { name: 'quick_reply', buttonParamsJson: JSON.stringify({ display_text: '❤️ Suka', id: 'like' }) },
+            { name: 'quick_reply', buttonParamsJson: JSON.stringify({ display_text: '📤 Share', id: 'share' }) },
+        ]
+    });
+    break;
         case 'like': await m.react('❤️'); break;
         case 'share': await m.reply({ text: '📤 Makasih udah mau share!' }); break;
 
