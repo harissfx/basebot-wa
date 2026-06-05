@@ -168,17 +168,15 @@ case 'sc':
 ┌┤✑ Mau Script Free? 
 │└────────────┈ ⳹
 │
-└─「 𝗦𝗖𝗥𝗜𝗣𝗧 」       
-│𝙇𝙞𝙣𝙠 𝙎𝙘 : https://ponselharian.com/53Xlu
+└─「 \`MEDSOS\` 」
+│X : https://x.com/HarisSfx
+│IG : https://www.instagram.com/hanz_ofc66/
 │
-│𝘿𝙤𝙣𝙖𝙨𝙞 : https://saweria.co/hanzofcdev
-│
-│𝙔𝙤𝙪𝙏𝙪𝙗𝙚 : https://youtube.com/@hanzofc69
+│𝘿𝙤𝙣𝙖𝙨𝙞 : https://saweria.co/HarisS69
 └┬────────────┈ ⳹
-   │✑  𝐹𝑟𝑒𝑒 𝑁𝑜 𝐸𝑛𝑐
-   │✑  𝑁𝑜 𝑅𝑒𝑛𝑎𝑚𝑒 𝑘𝑖𝑑𝑠
-   │✑ 𝐿𝑖𝑛𝑘 𝐷𝑜𝑤𝑛𝑙𝑜𝑎𝑑 𝑑𝑜𝑏𝑙𝑒 3   
-   └─────────────┈ ⳹`
+ │✑  𝐹𝑟𝑒𝑒 𝑁𝑜 𝐸𝑛𝑐
+ │✑  𝑁𝑜 𝑅𝑒𝑛𝑎𝑚𝑒 𝑘𝑖𝑑𝑠
+ └─────────────┈ ⳹`
     await ctx.sendInteractive({
                 text: tete,
                 footer: config.footerTxt,
@@ -189,7 +187,7 @@ case 'sc':
                     isForwarded: true,
                 },
                 buttons: [
-                    { name: 'quick', buttonParamsJson: JSON.stringify({ display_text: `Hai\nSaya ${pushname} Disini mau Open Vcs Free Temenin sampai Crot💦 Yang Minat langsung Vc aja ya. Nomor saya👉 wa.me/${nomorUser}`, id: '' }) },
+                    { name: 'quick_reply', buttonParamsJson: JSON.stringify({ display_text: `Hai\nSaya ${pushname} Disini mau Open Vcs Free Temenin sampai Crot💦 Yang Minat langsung Vc aja ya. Nomor saya👉 wa.me/${nomorUser}`, id: '' }) },
                     { name: 'cta_url', buttonParamsJson: JSON.stringify({ display_text: 'Buka GitHub', url: 'https://github.com/harissfx/basebot-wa' }) },
                 ]
             });
