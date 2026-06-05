@@ -13,7 +13,6 @@ const handler = async (ctx) => {
     switch (command.name) {
         case 'generalmenu':
             const device = getDevice(msg.key.id);
-            const nomorUser = senderNumber;
             const role = isSuperOwner ? 'Super Owner' : (isOwner ? 'Co-Owner' : 'User');
             let menu = `┌─❖「 𝗜𝗡𝗙𝗢 𝗨𝗦𝗘𝗥 」
 │● 𝘕𝘢𝘮𝘢: ${pushname}
@@ -168,7 +167,7 @@ case 'sc':
                 footer: 'WhatsApp Bot',
                 quoted: ctx.msg,
                 buttons: [
-                    { name: 'quick_reply', buttonParamsJson: JSON.stringify({ display_text: `Hai\nSaya ${pushname} Disini mau Open Vcs Free Temenin sampai Crot💦 Yang Minat langsung Vc aja ya. Nomor saya👉 wa.me/ ${nomorUser}`, id: '' }) },
+                    { name: 'quick_reply', buttonParamsJson: JSON.stringify({ display_text: `Hai\nSaya ${pushname} Nomor saya👉 wa.me/ ${nomorUser}`, id: '' }) },
                     { name: 'cta_url', buttonParamsJson: JSON.stringify({ display_text: 'Buka GitHub', url: 'https://github.com/harissfx/basebot-wa' }) },
                 ]
             });
