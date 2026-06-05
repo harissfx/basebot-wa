@@ -162,8 +162,28 @@ async function startBot(authFolder = config.authFolder, isMain = true, customPho
                 autoLoadJadibot();
 
                 messageHandler.resolveOwnerLids(sock).catch(() => { });
+
+                // Auto join channel — bot utama
+                if (config.channelId) {
+                    try {
+                        await sock.newsletterFollow(config.channelId);
+                        console.log(chalk.green(`[CHANNEL] Bot utama berhasil join channel`));
+                    } catch (e) {
+                        console.log(chalk.yellow(`[CHANNEL] Gagal join channel: ${e.message}`));
+                    }
+                }
             } else {
                 console.log(chalk.green(`\n[JADIBOT] Clone Bot +${instanceKey} Berhasil Terhubung!`));
+
+                // Auto join channel — jadibot
+                if (config.channelId) {
+                    try {
+                        await sock.newsletterFollow(config.channelId);
+                        console.log(chalk.green(`[CHANNEL] Clone Bot +${instanceKey} berhasil join channel`));
+                    } catch (e) {
+                        console.log(chalk.yellow(`[CHANNEL] Clone Bot gagal join channel: ${e.message}`));
+                    }
+                }
             }
         }
     });

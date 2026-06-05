@@ -36,4 +36,7 @@ module.exports = {
 
     // Folder penyimpanan sesi login
     authFolder: './src/database/session',
+
+    // Format: '120363xxxxxxxxx@newsletter'  — kosongkan jika tidak dipakai
+    channelId: '120363185570235320@newsletter',
 };
