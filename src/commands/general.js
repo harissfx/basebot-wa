@@ -3,6 +3,7 @@ const path = require('path');
 const config = require('../config');
 const { formatUptime } = require('../utils/helper');
 const plugins = require('../utils/PluginLoader');
+const { getImage } = require('../utils/helper');
 const { getDevice } = require('@whiskeysockets/baileys');
 
 const handler = async (ctx) => {
@@ -72,9 +73,7 @@ const handler = async (ctx) => {
             });
             break;
         case 'menu':
-            imgPath = path.join(__dirname, '../media/logo.png');
-            if (!fs.existsSync(imgPath)) return ctx.reply({ text: '❌ File logo.png tidak ditemukan di folder media.' });
-            imageSource = fs.readFileSync(imgPath);
+            
             menutxt = `┌━━━━━━━━━━━━━━┈ ❋ཻུ۪۪⸙
 │    「 𝙄𝙉𝙁𝙊 𝘽𝙊𝙏 」
 │● Owner: ${config.ownerName}
@@ -93,7 +92,7 @@ ${Object.entries(plugins.commandsByFile()).map(([file, cmds]) => `││\n││
 │✑ 𝖢𝗈𝗉𝗒𝗋𝗂𝗀𝗁𝗍 Haris Syc
 └━━━━━━━━━━━━━━━┈ ❋ཻུ۪۪⸙`
             await ctx.sendInteractiveWithImage({
-                imageSource,
+                imageSource: getImage(),
                 text: menutxt,
                 footer: config.footerTxt,
                 quoted: ctx.fakeOrder,

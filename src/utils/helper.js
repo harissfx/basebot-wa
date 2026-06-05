@@ -1,4 +1,3 @@
-
 /** Format detik ke string human-readable (1 hari 2 jam 3 menit) */
 function formatUptime(seconds) {
     const d = Math.floor(seconds / 86400);
@@ -70,4 +69,24 @@ async function isGroupAdmin(sock, groupJid, userJid) {
 /** Ambil JID bot sendiri */
 function getBotJid(sock) { return sock.user?.id || ''; }
 
-module.exports = { formatUptime, formatJid, formatGroupJid, delay, formatBytes, randomString, isGroupJid, getGroupInfo, isGroupAdmin, getBotJid };
+const fs = require('fs');
+const path = require('path');
+
+// Daftar gambar yang tersedia di folder media/
+const MEDIA = {
+    logo:    path.join(__dirname, '../../media/logo.png'),
+    // tambah gambar lain di sini kalau perlu:
+    // banner: path.join(__dirname, '../../media/banner.png'),
+};
+
+/**
+ * Ambil buffer gambar dari media/ — tinggal tulis: getImage('logo')
+ * Langsung siap dipakai di imageSource atau readFileSync
+ */
+function getImage(name = 'logo') {
+    const imgPath = MEDIA[name];
+    if (!imgPath || !fs.existsSync(imgPath)) return null;
+    return fs.readFileSync(imgPath);
+}
+
+module.exports = { formatUptime, formatJid, formatGroupJid, delay, formatBytes, randomString, isGroupJid, getGroupInfo, isGroupAdmin, getBotJid, getImage, MEDIA };
