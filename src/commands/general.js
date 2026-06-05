@@ -132,6 +132,42 @@ ${Object.entries(plugins.commandsByFile()).map(([file, cmds]) => `││\n││
                 ]
             });
             break;
+            case 'catalog': {
+    const {
+        prepareWAMessageMedia,
+        generateWAMessageFromContent,
+        proto
+    } = require('@whiskeysockets/baileys');
+
+    const thumb = getImage(); // pakai helper getImage
+    const thumbnail = await prepareWAMessageMedia(
+        { image: thumb },
+        { upload: Hanz.waUploadToServer }
+    );
+
+    const catalog = generateWAMessageFromContent(sender, proto.Message.fromObject({
+        productMessage: {
+            product: {
+                productImage: thumbnail,
+                title: `judulmu`,
+                description: `deskripsi`,
+                currencyCode: "IDR",
+                priceAmount1000: "999999999999",
+                retailerId: `retailer`,
+                url: "https://github.com/harissfx"
+            },
+            businessOwnerJid: sender,
+            contextInfo: { 
+                mentionedJid: ['0@s.whatsapp.net'],
+                orwardingScore: 999,
+                isForwarded: true,
+            },
+        }
+    }), { userJid: sender, quoted: m.fakeOrder });
+
+    await Hanz.relayMessage(sender, catalog.message, { messageId: catalog.key.id });
+    break;
+}
 case 'script':
 case 'sc':
     tete = `
