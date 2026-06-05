@@ -85,14 +85,14 @@ const handler = async (m) => {
             break;
 
         case 'medialokal':
-            await m.reply({ image: getImage(), caption: '🖼️ Gambar lokal dari assets!' });
+            await m.send({ image: getImage(), caption: '🖼️ Gambar lokal!' });
             break;
 
         case 'buttonimage':
             await m.sendButtonWithImage({
                 text: '🖼️ Button dengan gambar!',
                 footer: 'WhatsApp Bot',
-                imageUrl: getImage(),
+                imageSource: getImage(),
                 quoted: m.msg,
                 buttons: [
                     { id: 'like', text: '❤️ Suka' },
