@@ -101,8 +101,9 @@ ${Object.entries(plugins.commandsByFile()).map(([file, cmds]) => `││\n││
                     forwardingScore: 999,
                     isForwarded: true,
                 },
-                buttons: [
-                    { name: 'quick_reply', buttonParamsJson: JSON.stringify({ display_text: 'Kembali ke Menu', id: 'menu' }) },
+                buttons: [ 
+                    { name: 'cta_url', buttonParamsJson: JSON.stringify({ display_text: 'Join Channel', url: 'https://whatsapp.com/channel/0029VaB6LTrAYlUCe0VINW1r' }) },
+                    { name: 'cta_call', buttonParamsJson: JSON.stringify({ display_text: 'Lapor Bug', phone_number: 'wa.me/6285124014109' }) },
                     { name: 'single_select', buttonParamsJson: JSON.stringify({
                             title: '『 Simpel Menu 』',
                             sections: [{
@@ -132,7 +133,8 @@ ${Object.entries(plugins.commandsByFile()).map(([file, cmds]) => `││\n││
                                 rows: [{ title: "Group Menu", description: "Select to display group menu ", id: "groupmenu" }]
                             }]
                         })
-                    }]
+                    }
+                ]
             });
             break;
 case 'script':
