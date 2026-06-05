@@ -1,17 +1,3 @@
-/**
- * downloader.js — Download media dari YouTube, TikTok, Twitter/X
- *
- * Commands:
- *   !ytmp3 <url>   → YouTube audio (MP3)
- *   !ytmp4 <url>   → YouTube video (MP4, max 480p)
- *   !tiktok <url>  → TikTok video tanpa watermark
- *   !xdl <url>     → Twitter/X video
- *
- * Requirement: yt-dlp harus terinstall di sistem
- *   curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp \
- *     -o /usr/local/bin/yt-dlp && chmod +x /usr/local/bin/yt-dlp
- */
-
 'use strict';
 
 const fs = require('fs');
@@ -27,7 +13,6 @@ const {
     fileSizeMB,
 } = require('../../lib/ytdlp');
 
-// ─── Handler ──────────────────────────────────────────────────────────────────
 const handler = async (m) => {
     const { command, isSuperOwner, Hanz, sender, msg, senderNumber, pushname, isOwner } = m;
     const url = command.fullArgs?.trim();
@@ -96,7 +81,6 @@ ${downloadCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
             });
             break;
 
-        // ── !ytmp3 ── YouTube → Audio MP3 ─────────────────────────────────────
         case 'ytmp3': {
             if (!url) return m.reply({ text: '❌ Contoh: `!ytmp3 https://youtu.be/xxx`' });
 
@@ -152,7 +136,6 @@ ${downloadCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
             break;
         }
 
-        // ── !ytmp4 ── YouTube → Video MP4 ─────────────────────────────────────
         case 'ytmp4': {
             if (!url) return m.reply({ text: '❌ Contoh: `!ytmp4 https://youtu.be/xxx`' });
 
@@ -207,7 +190,6 @@ ${downloadCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
             break;
         }
 
-        // ── !tiktok ── TikTok video tanpa watermark ────────────────────────────
         case 'tiktok':
         case 'tt': {
             if (!url) return m.reply({ text: '❌ Contoh: `!tiktok https://vt.tiktok.com/xxx`' });
@@ -250,7 +232,6 @@ ${downloadCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
             break;
         }
 
-        // ── !xdl ── Twitter/X video ────────────────────────────────────────────
         case 'xdl':
         case 'twdl':
         case 'twiter':
@@ -292,7 +273,6 @@ ${downloadCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
                 break;
             }
 
-        // ── !igdl ── Instagram ──────────────────────────────────────────────
         case 'instagram':
         case 'igdl':
             {
@@ -343,7 +323,6 @@ ${downloadCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
                 break;
             }
 
-        // ── !fbdl ── Facebook ───────────────────────────────────────────────
         case 'fb':
         case 'fbdl':
         case 'facebook':
@@ -395,7 +374,6 @@ ${downloadCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
                 break;
             }
 
-        // ── !pindl ── Pinterest Video ───────────────────────────────────────
         case 'pinterest':
         case 'pindl':
         case 'pin': {
