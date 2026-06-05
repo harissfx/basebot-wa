@@ -72,7 +72,7 @@ whatsapp-bot/
 │   │   └── jadibot/                # Sesi login clone bot (auto-generated)
 │   ├── commands/                   # 📂 Semua file command di sini
 │   │   ├── general.js              # menu, ping, owner, script
-│   │   ├── interactive.js          # Contoh button, list, poll, media
+│   │   ├── sample.js               # Contoh button, list, poll, media
 │   │   ├── downloader.js           # ytmp3, ytmp4, tiktok, instagram, dll
 │   │   ├── media.js                # sticker, tourl, dll
 │   │   ├── fun.js                  # dice, coin, 8ball, joke, dll
