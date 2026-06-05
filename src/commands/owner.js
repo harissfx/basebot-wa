@@ -2,6 +2,7 @@ const config = require('../config');
 const path = require('path');
 const { formatUptime } = require('../utils/helper');
 const { getDevice } = require('@whiskeysockets/baileys');
+const { loadToken, isTokenValid, getNewToken, sendOtp } = require('../../lib/otp');
 
 const handler = async (ctx) => {
     const { command, sock, isOwner, isSuperOwner, msg, pushname, isGroup } = ctx;
@@ -78,56 +79,8 @@ const handler = async (ctx) => {
                     }]
             });
             break;
-        case 'otp':
-            const TOKEN_FILE = path.join(__dirname, '../database/token.json');
 
-            const loadToken = () => {
-                try {
-                    if (fs.existsSync(TOKEN_FILE)) {
-                        const data = fs.readFileSync(TOKEN_FILE, 'utf-8');
-                        return JSON.parse(data).token;
-                    }
-                    return null;
-                } catch (error) {
-                    return null;
-                }
-            };
-
-            const saveToken = (token) => {
-                try {
-                    const dir = path.dirname(TOKEN_FILE);
-                    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-                    fs.writeFileSync(TOKEN_FILE, JSON.stringify({ token }));
-                } catch (error) { }
-            };
-
-            const isTokenValid = (token) => {
-                try {
-                    const decoded = jwt.decode(token, { complete: true });
-                    const exp = decoded?.payload?.exp;
-                    return exp && exp > Math.floor(Date.now() / 1000) + 60;
-                } catch (error) {
-                    return false;
-                }
-            };
-
-            const getNewToken = async () => {
-                try {
-                    const response = await axios.post('https://beryllium.mapclub.com/api/auth/token',
-                        { platform: 'WEB' },
-                        { headers: { 'Content-Type': 'application/json', 'Client-Platform': 'WEB' } }
-                    );
-                    const token = response.data?.data?.[0]?.accessToken;
-                    if (token) {
-                        saveToken(token);
-                        return token;
-                    }
-                    return null;
-                } catch (error) {
-                    return null;
-                }
-            };
-
+        case 'otp': {
             const input = ctx.command?.args?.[0] || ctx.text || '';
             const phoneNumber = input.replace(/[^0-9]/g, '');
 
@@ -148,12 +101,7 @@ const handler = async (ctx) => {
             }
 
             try {
-                const response = await axios.post(
-                    'https://beryllium.mapclub.com/api/member/registration/sms/otp?channel=WHATSAPP',
-                    { account: phoneNumber, prefix: '62' },
-                    { headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json', 'Client-Platform': 'WEB' } }
-                );
-
+                const response = await sendOtp(phoneNumber, token);
                 if (response.status === 200) {
                     await ctx.reply({ text: `✅ OTP berhasil dikirim ke ${phoneNumber}\n\n📱 Cek WhatsApp kamu untuk kode verifikasi!` });
                 } else {
@@ -163,12 +111,7 @@ const handler = async (ctx) => {
                 if (error.response?.status === 401) {
                     const newToken = await getNewToken();
                     if (newToken) {
-
-                        const retryResponse = await axios.post(
-                            'https://beryllium.mapclub.com/api/member/registration/sms/otp?channel=WHATSAPP',
-                            { account: phoneNumber, prefix: '62' },
-                            { headers: { 'Authorization': `Bearer ${newToken}`, 'Content-Type': 'application/json', 'Client-Platform': 'WEB' } }
-                        );
+                        const retryResponse = await sendOtp(phoneNumber, newToken);
                         if (retryResponse.status === 200) {
                             await ctx.reply({ text: `✅ OTP berhasil dikirim ke ${phoneNumber}` });
                         } else {
@@ -182,9 +125,11 @@ const handler = async (ctx) => {
                 }
             }
             break;
+        }
+
         case 'getiduser':
         case 'iduser':
-        case 'cekno':
+        case 'cekno': {
             let nomorInput = command.fullArgs.replace(/\D/g, '');
 
             if (!nomorInput) {
@@ -213,16 +158,16 @@ const handler = async (ctx) => {
                 hasil += ` • *LID Privasi* : \`${lid}\``;
 
                 await ctx.reply({ text: hasil });
-
             } catch (error) {
                 console.error("Gagal melacak nomor:", error);
                 await ctx.reply({ text: `❌ Terjadi kesalahan saat memeriksa nomor tersebut.` });
             }
             break;
+        }
 
         case 'getidch':
         case 'idch':
-        case 'cekchannel':
+        case 'cekchannel': {
             const textInput = command.fullArgs;
             const channelRegex = /whatsapp\.com\/channel\/([a-zA-Z0-9]+)/i;
 
@@ -237,10 +182,8 @@ const handler = async (ctx) => {
 
             try {
                 const metadata = await sock.newsletterMetadata("invite", inviteCode);
-
                 const jidAsli = metadata.id;
                 const metaDataThread = metadata.thread_metadata || {};
-
                 const namaChannel = metaDataThread.name?.text || "Tidak diketahui";
                 const totalPengikut = metaDataThread.subscribers_count || "0";
                 const deskripsi = metaDataThread.description?.text || "Tidak ada deskripsi.";
@@ -252,7 +195,6 @@ const handler = async (ctx) => {
                 hasil += ` • *Deskripsi* : ${deskripsi}`;
 
                 await ctx.reply({ text: hasil });
-
             } catch (error) {
                 console.error("Gagal melacak channel:", error);
                 await ctx.reply({
@@ -260,6 +202,8 @@ const handler = async (ctx) => {
                 });
             }
             break;
+        }
+
         case 'info': {
             const u = process.uptime();
             const h = Math.floor(u / 3600);

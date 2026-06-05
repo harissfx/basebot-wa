@@ -1,8 +1,7 @@
 const { delay } = require('../utils/helper');
 const config = require('../config');
 const { getDevice } = require('@whiskeysockets/baileys');
-
-const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+const { pick } = require('../../lib/random');
 
 const handler = async (ctx) => {
     const { command, isSuperOwner, sock, sender, msg, pushname, isOwner, isGroup } = ctx;
@@ -77,6 +76,7 @@ const handler = async (ctx) => {
                     }]
             });
             break;
+
         case 'dice':
             await ctx.reply({ text: `🎲 Dadu: *${Math.floor(Math.random() * 6) + 1}*` });
             break;
