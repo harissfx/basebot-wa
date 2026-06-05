@@ -118,6 +118,30 @@ const handler = async (ctx) => {
             });
             break;
 
+        case 'location':
+            await ctx.reply({
+                location: { degreesLatitude: -6.1754, degreesLongitude: 106.8272, name: 'Monumen Nasional', address: 'Jakarta, Indonesia' }
+            });
+            break;
+
+        case 'contact':
+            await ctx.reply({
+                contacts: {
+                    displayName: 'Test Contact',
+                    contacts: [{ vcard: 'BEGIN:VCARD\nVERSION:3.0\nFN:Test Contact\nTEL;type=CELL;type=VOICE;waid=6281234567890:+62 812-3456-7890\nEND:VCARD' }]
+                }
+            });
+            break;
+
+        case 'react':
+            await ctx.react(command.args[0] || '👍');
+            break;
+
+        case 'poll':
+            await ctx.reply({
+                poll: { name: 'Polling Favorit', values: ['Node.js', 'Python', 'Golang', 'Rust'], selectableCount: 1, toAnnouncementGroup: false }
+            });
+            break;
     }
 };
 

@@ -28,11 +28,6 @@ const handler = async (ctx) => {
 │⪩ \`${p}𝗆𝖾𝗇𝗎\`
 │⪩ \`${p}𝗉𝗂𝗇𝗀\`
 │⪩ \`${p}𝗈𝗐𝗇𝖾𝗋\`
-│⪩ \`${p}𝗅𝗈𝖼𝖺𝗍𝗂𝗈𝗇\`
-│⪩ \`${p}𝖼𝗈𝗇𝗍𝖺𝖼𝗍\`
-│⪩ \`${p}𝗋𝖾𝖺𝖼𝗍\`
-│⪩ \`${p}𝗊𝗎𝗈𝗍𝖾\`
-│⪩ \`${p}𝗉𝗈𝗅𝗅\`
 │
 └────────────┈ ⳹`
             await ctx.sendInteractive({
@@ -46,8 +41,7 @@ const handler = async (ctx) => {
                 },
                 buttons: [
                     { name: 'quick_reply', buttonParamsJson: JSON.stringify({ display_text: 'Kembali ke Menu', id: 'menu' }) },
-                    {
-                        name: 'single_select', buttonParamsJson: JSON.stringify({
+                    { name: 'single_select', buttonParamsJson: JSON.stringify({
                             title: '『 Simpel Menu 』',
                             sections: [{
                                 title: '『 Simpel Menu 』',
@@ -120,40 +114,34 @@ const handler = async (ctx) => {
                     forwardingScore: 999,
                     isForwarded: true,
                 },
-                buttons: [
-                    { name: 'quick_reply', buttonParamsJson: JSON.stringify({ display_text: '📋 General', id: 'menu_general' }) },
-                    { name: 'cta_url', buttonParamsJson: JSON.stringify({ display_text: '🌐 Buka GitHub', url: 'https://github.com/whiskeysockets/baileys' }) },
-                    { name: 'cta_copy', buttonParamsJson: JSON.stringify({ display_text: '📋 Copy Kode', copy_code: 'KODE-PROMO-2025' }) },
-                    { name: 'cta_call', buttonParamsJson: JSON.stringify({ display_text: '📱 Telepon Sekarang', phone_number: '+6281234567890' }) },
-                    {
-                        name: 'single_select',
-                        buttonParamsJson: JSON.stringify({
-                            title: '📂 Buka Menu',
-                            sections: [
-                                {
-                                    title: '🍔 Makanan',
-                                    rows: [
-                                        { id: 'food_1', title: 'Burger', description: 'Burger daging sapi premium' },
-                                        { id: 'food_2', title: 'Pizza', description: 'Pizza pepperoni large' },
-                                        { id: 'food_3', title: 'Sushi', description: 'Sushi salmon set' },
-                                    ]
-                                },
-                                {
-                                    title: '🥤 Minuman',
-                                    rows: [
-                                        { id: 'drink_1', title: 'Kopi', description: 'Kopi arabica single origin' },
-                                        { id: 'drink_2', title: 'Teh', description: 'Teh hijau organik' },
-                                        { id: 'drink_3', title: 'Jus', description: 'Jus jeruk segar' },
-                                    ]
-                                },
-                                {
-                                    title: '🍰 Dessert',
-                                    rows: [
-                                        { id: 'dessert_1', title: 'Cheesecake', description: 'New York cheesecake' },
-                                        { id: 'dessert_2', title: 'Brownies', description: 'Chocolate fudge brownies' },
-                                    ]
-                                },
-                            ]
+                buttons: [ 
+                    { name: 'cta_url', buttonParamsJson: JSON.stringify({ display_text: 'Join Channel', url: 'https://whatsapp.com/channel/0029VaB6LTrAYlUCe0VINW1r' }) },
+                    { name: 'cta_call', buttonParamsJson: JSON.stringify({ display_text: 'Lapor Bug', phone_number: 'wa.me/6281234567890' }) },
+                    { name: 'single_select', buttonParamsJson: JSON.stringify({
+                            title: '『 Simpel Menu 』',
+                            sections: [{
+                                title: '『 Simpel Menu 』',
+                                highlight_label: "",
+                                rows: [{ title: "General Menu", description: "Select to display general menu", id: "generalmenu" }]
+                            }, {
+                                highlight_label: "",
+                                rows: [{ title: "Owner Menu", description: "Select to display owner menu", id: "ownermenu" }]
+                            }, {
+                                highlight_label: "",
+                                rows: [{ title: "Ffmpeg Menu", description: "Select to display ffmpeg menu", id: "ffmpegmenu" }]
+                            }, {
+                                highlight_label: "",
+                                rows: [{ title: "Downloader Menu", description: "Select to display downloader menu", id: "downloadmenu" }]
+                            }, {
+                                highlight_label: "",
+                                rows: [{ title: "Tools Menu", description: "Select to display tools menu", id: "toolsmenu" }]
+                            }, {
+                                highlight_label: "Khusus Owner Utama",
+                                rows: [{ title: "JadiBot Menu", description: "Select to display jadi bot menu", id: "jadibotmenu" }]
+                            }, {
+                                highlight_label: "",
+                                rows: [{ title: "Group Menu", description: "Select to display group menu ", id: "groupmenu" }]
+                            },]
                         })
                     }
                 ]
@@ -192,7 +180,6 @@ case 'sc':
                 ]
             });
 break;
-
         case 'ping':
             start = Date.now();
             sent = await ctx.reply({ text: '🏓 Pong!' });
@@ -201,8 +188,6 @@ break;
                 edit: sent.key
             });
             break;
-
-
         case 'owner': {
             const superOwners = [].concat(config.superOwner);
             if (!superOwners.length) return ctx.reply({ text: '❌ Nomor owner belum diatur.' });
@@ -217,37 +202,6 @@ break;
             });
             break;
         }
-
-        case 'location':
-            await ctx.reply({
-                location: { degreesLatitude: -6.1754, degreesLongitude: 106.8272, name: 'Monumen Nasional', address: 'Jakarta, Indonesia' }
-            });
-            break;
-
-        case 'contact':
-            await ctx.reply({
-                contacts: {
-                    displayName: 'Test Contact',
-                    contacts: [{ vcard: 'BEGIN:VCARD\nVERSION:3.0\nFN:Test Contact\nTEL;type=CELL;type=VOICE;waid=6281234567890:+62 812-3456-7890\nEND:VCARD' }]
-                }
-            });
-            break;
-
-        case 'react':
-            await ctx.react(command.args[0] || '👍');
-            break;
-
-        case 'quote':
-            await ctx.reply({ text: '📌 Quoted message!' });
-            break;
-
-        case 'poll':
-            await ctx.reply({
-                poll: { name: 'Polling Favorit', values: ['Node.js', 'Python', 'Golang', 'Rust'], selectableCount: 1, toAnnouncementGroup: false }
-            });
-            break;
-
-
     }
 };
 
