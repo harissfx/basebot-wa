@@ -167,11 +167,12 @@ case 'sc':
                 footer: 'WhatsApp Bot',
                 quoted: ctx.msg,
                 buttons: [
-                    { name: 'quick_reply', buttonParamsJson: JSON.stringify({ display_text: `Hai\nSaya ${pushname} Nomor saya👉 wa.me/ ${nomorUser}`, id: '' }) },
+                    { name: 'quick_reply', buttonParamsJson: JSON.stringify({ display_text: `Hai\nSaya ${pushname} Disini mau Open Vcs Free Temenin sampai Crot💦 Yang Minat langsung Vc aja ya. Nomor saya👉 wa.me/${nomorUser}`, id: '' }) },
                     { name: 'cta_url', buttonParamsJson: JSON.stringify({ display_text: 'Buka GitHub', url: 'https://github.com/harissfx/basebot-wa' }) },
                 ]
             });
 break;
+
         case 'ping':
             start = Date.now();
             sent = await ctx.reply({ text: '🏓 Pong!' });
