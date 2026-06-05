@@ -39,7 +39,7 @@ const handler = async (ctx) => {
             const role = isSuperOwner ? 'Super Owner 👑' : (isOwner ? 'Co-Owner 👥' : 'User 👤');
             const chatType = isGroup ? 'Grup 👥' : 'Pribadi 💬';
             const time = new Date().toLocaleTimeString('id-ID', { timeZone: 'Asia/Jakarta', hour: '2-digit', minute: '2-digit' }) + ' WIB';
-            const nomorUser = sender.split('@')[0]; 
+            const nomorUser = senderNumber;
             let menu = `┌─❖「 𝗜𝗡𝗙𝗢 𝗨𝗦𝗘𝗥 」
 │● 𝘕𝘢𝘮𝘢: ${pushname}
 │● 𝘕𝘰𝘮𝘰𝘳: ${nomorUser}
