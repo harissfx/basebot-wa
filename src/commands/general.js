@@ -132,40 +132,38 @@ ${Object.entries(plugins.commandsByFile()).map(([file, cmds]) => `││\n││
                 ]
             });
             break;
-            case 'catalog': {
-    const {
-        prepareWAMessageMedia,
-        generateWAMessageFromContent,
-        proto
-    } = require('@whiskeysockets/baileys');
+case 'catalog': {
+    try {
+        const {
+            prepareWAMessageMedia,
+            generateWAMessageFromContent,
+            proto
+        } = require('@whiskeysockets/baileys');
 
-    const thumb = getImage(); // pakai helper getImage
-    const thumbnail = await prepareWAMessageMedia(
-        { image: thumb },
-        { upload: Hanz.waUploadToServer }
-    );
+        const thumb = getImage();
+        console.log('[CATALOG] thumb:', thumb ? 'OK' : 'NULL');
 
-    const catalog = generateWAMessageFromContent(sender, proto.Message.fromObject({
-        productMessage: {
-            product: {
-                productImage: thumbnail,
-                title: `judulmu`,
-                description: `deskripsi`,
-                currencyCode: "IDR",
-                priceAmount1000: "999999999999",
-                retailerId: `retailer`,
-                url: "https://github.com/harissfx"
-            },
-            businessOwnerJid: sender,
-            contextInfo: { 
-                mentionedJid: ['0@s.whatsapp.net'],
-                orwardingScore: 999,
-                isForwarded: true,
-            },
-        }
-    }), { userJid: sender, quoted: m.fakeOrder });
+        const thumbnail = await prepareWAMessageMedia(
+            { image: thumb },
+            { upload: Hanz.waUploadToServer }
+        );
+        console.log('[CATALOG] thumbnail keys:', Object.keys(thumbnail));
 
-    await Hanz.relayMessage(sender, catalog.message, { messageId: catalog.key.id });
+        const catalog = generateWAMessageFromContent(sender, proto.Message.fromObject({
+            productMessage: {
+                product: {
+                    productImage: thumbnail.imageMessage,
+                }
+            }
+        }), { userJid: sender, quoted: m.fakeOrder });
+
+        console.log('[CATALOG] catalog keys:', Object.keys(catalog));
+        await Hanz.relayMessage(sender, catalog.message, { messageId: catalog.key.id });
+        console.log('[CATALOG] sent!');
+    } catch(e) {
+        console.error('[CATALOG ERROR]', e.message);
+        await m.reply({ text: '❌ ' + e.message });
+    }
     break;
 }
 case 'script':
