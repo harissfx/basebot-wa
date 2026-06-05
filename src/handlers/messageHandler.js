@@ -61,6 +61,8 @@ function isGroup(jid) { return jid.endsWith('@g.us'); }
 function isFromMe(msg) { return msg.key.fromMe; }
 
 function getSenderNumber(sender, msg) {
+    // DEBUG — hapus setelah ketahuan isi msg.key
+    console.log('[DEBUG msg.key]', JSON.stringify(msg?.key, null, 2));
     // Cari nomor asli — skip kalau formatnya LID (@lid)
     const candidates = [
         msg?.key?.participantAlt,
