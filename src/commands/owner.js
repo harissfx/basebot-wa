@@ -7,6 +7,7 @@ const handler = async (m) => {
     const { command, Hanz, isOwner, isSuperOwner, msg, senderNumber, pushname } = m;
     const p = config.prefix;
     const nomorUser = senderNumber;
+    
     if (!isOwner) return m.reply({ text: '❌ Perintah ini khusus untuk Owner Bot!' });
 
     const superOwnerOnly = [''];
