@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const config = require('../config');
 const { formatUptime } = require('../utils/helper');
+const plugins = require('../utils/PluginLoader');
 const { getDevice } = require('@whiskeysockets/baileys');
 
 const handler = async (ctx) => {
@@ -83,20 +84,7 @@ const handler = async (ctx) => {
 └┬━━━━━━━━━━━━━━┈ ⳹
 ┌┤  「 𝙈𝙀𝙉𝙐 𝘽𝙊𝙏 」
 ││
-││⪩ 𝗍𝗈𝗆𝖾𝗇𝗎
-││⪩ 𝖼𝗎𝖼𝗂𝗆𝖺𝗍𝖺
-││⪩ 𝗅𝗂𝗌𝗍𝗆𝗎𝗌𝗂𝗄
-││⪩ 𝗍𝖾𝗑𝗍𝗆𝖺𝗄𝖾𝗋
-││⪩ 𝖿𝗎𝗇𝗆𝖾𝗇𝗎
-││⪩ 𝖺𝖽𝖽𝗆𝖾𝗇𝗎
-││⪩ 𝗀𝖺𝗌𝗆𝖾𝗇𝗎
-││⪩ 𝖻𝗎𝗀𝗆𝖾𝗇𝗎
-││⪩ 𝗂𝗌𝗅𝖺𝗆𝗆𝖾𝗇𝗎
-││⪩ 𝖻𝖾𝗋𝗂𝗍𝖺𝗆𝖾𝗇𝗎
-││⪩ 𝗀𝖺𝗆𝖾𝗆𝖾𝗇𝗎
-││⪩ 𝗀𝗋𝗈𝗎𝗉𝗆𝖾𝗇𝗎
-││⪩ 𝗋𝖺𝗇𝖽𝗈𝗆𝗆𝖾𝗇𝗎
-││⪩ 𝖽𝗈𝗐𝗇𝗅𝗈𝖺𝖽𝗆𝖾𝗇𝗎
+${plugins.commandList().map(cmd => `││⪩ ${cmd}`).join('\n')}
 ││
 │└────────────┈ ⳹
 │›⟩ ∘ 𝘓𝘢𝘯𝘨𝘶𝘢𝘨𝘦: 𝘑𝘢𝘷𝘢𝘚𝘤𝘳𝘪𝘱𝘵

@@ -1,11 +1,10 @@
 const config = require('../config');
 const path = require('path');
-const { formatUptime } = require('../utils/helper');
 const { getDevice } = require('@whiskeysockets/baileys');
 const { loadToken, isTokenValid, getNewToken, sendOtp } = require('../../lib/otp');
 
 const handler = async (ctx) => {
-    const { command, sock, isOwner, isSuperOwner, msg, pushname, isGroup } = ctx;
+    const { command, sock, isOwner, isSuperOwner, msg, senderNumber, pushname } = ctx;
     const p = config.prefix;
     if (!isOwner) return ctx.reply({ text: '❌ Perintah ini khusus untuk Owner Bot!' });
 
@@ -17,15 +16,13 @@ const handler = async (ctx) => {
     switch (command.name) {
         case 'ownermenu':
             const device = getDevice(msg.key.id);
-            const role = isSuperOwner ? 'Super Owner 👑' : (isOwner ? 'Co-Owner 👥' : 'User 👤');
-            const chatType = isGroup ? 'Grup 👥' : 'Pribadi 💬';
-            const time = new Date().toLocaleTimeString('id-ID', { timeZone: 'Asia/Jakarta', hour: '2-digit', minute: '2-digit' }) + ' WIB';
+            const role = isSuperOwner ? 'Super Owner' : (isOwner ? 'Co-Owner' : 'User');
+            const nomorUser = senderNumber;
             let menu = `┌─❖「 𝗜𝗡𝗙𝗢 𝗨𝗦𝗘𝗥 」
 │● 𝘕𝘢𝘮𝘢: ${pushname}
+│● 𝘕𝘰𝘮𝘰𝘳: ${nomorUser}
 │● 𝘚𝘵𝘢𝘵𝘶𝘴: ${role}
-│● 𝘗𝘦𝘳𝘢𝘯𝘨𝘬𝘢𝘵: ${device} 📱
-│● 𝘛𝘪𝘱𝒆 𝘊𝘩𝘢𝘵: ${chatType}
-│● 𝘞𝘢𝘬𝘵𝘶: ${time}
+│● 𝘗𝘦𝘳𝘢𝘯𝘨𝘬𝘢𝘵: ${device}
 │
 └┬❖ 
 ┌┤𝖧𝖺𝗒 𝗄𝖺𝗄 ${pushname} 👋
@@ -162,8 +159,8 @@ const handler = async (ctx) => {
                     footer: config.footerTxt,
                     quoted: ctx.msg,
                     buttons: [
-                        { name: 'cta_copy', buttonParamsJson: JSON.stringify({ display_text: '📋 Copy JID Klasik', copy_code: jidKlasik }) },
-                        { name: 'cta_copy', buttonParamsJson: JSON.stringify({ display_text: '📋 Copy LID', copy_code: lid }) },
+                        { name: 'cta_copy', buttonParamsJson: JSON.stringify({ display_text: 'Copy JID Klasik', copy_code: jidKlasik }) },
+                        { name: 'cta_copy', buttonParamsJson: JSON.stringify({ display_text: 'Copy LID', copy_code: lid }) },
                     ]
                 });
             } catch (error) {
@@ -207,7 +204,7 @@ const handler = async (ctx) => {
                     footer: config.footerTxt,
                     quoted: ctx.msg,
                     buttons: [
-                        { name: 'cta_copy', buttonParamsJson: JSON.stringify({ display_text: '📋 Copy ID Channel', copy_code: jidAsli }) },
+                        { name: 'cta_copy', buttonParamsJson: JSON.stringify({ display_text: 'Copy ID Channel', copy_code: jidAsli }) },
                     ]
                 });
             } catch (error) {
@@ -236,8 +233,8 @@ const handler = async (ctx) => {
                     footer: config.footerTxt,
                     quoted: ctx.msg,
                     buttons: [
-                        { name: 'quick_reply', buttonParamsJson: JSON.stringify({ display_text: '🌐 Set Public', id: 'setmode public' }) },
-                        { name: 'quick_reply', buttonParamsJson: JSON.stringify({ display_text: '🔒 Set Self', id: 'setmode self' }) },
+                        { name: 'quick_reply', buttonParamsJson: JSON.stringify({ display_text: 'Set Public', id: 'setmode public' }) },
+                        { name: 'quick_reply', buttonParamsJson: JSON.stringify({ display_text: 'Set Self', id: 'setmode self' }) },
                     ]
                 });
             }
@@ -245,11 +242,7 @@ const handler = async (ctx) => {
             if (modeInput === (global.botMode || config.botMode)) {
                 return ctx.reply({ text: `ℹ️ Mode bot sudah dalam mode *${modeInput.toUpperCase()}*.` });
             }
-
-            // Update langsung di memori — efek instan tanpa restart
             global.botMode = modeInput;
-
-            // Simpan ke config.js supaya tetap setelah restart
             try {
                 const configPath = require('path').join(__dirname, '..', 'config.js');
                 let configFile = require('fs').readFileSync(configPath, 'utf8');
