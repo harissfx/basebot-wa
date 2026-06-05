@@ -7,7 +7,7 @@ const handler = async (m) => {
     const { command, Hanz, isOwner, isSuperOwner, msg, senderNumber, pushname } = m;
     const p = config.prefix;
     const nomorUser = senderNumber;
-    
+
     if (!isOwner) return m.reply({ text: '❌ Perintah ini khusus untuk Owner Bot!' });
 
     const superOwnerOnly = [''];
@@ -223,7 +223,7 @@ const handler = async (m) => {
 
             if (!['public', 'self'].includes(modeInput)) {
                 return m.sendInteractive({
-                    text: `⚙️ *MODE BOT SAAT INI:* ${(global.botMode || config.botMode).toUpperCase()}
+                    text: `*MODE BOT SAAT INI:* ${(global.botMode || config.botMode).toUpperCase()}
 
 ` +
                         `• *public* → semua orang bisa pakai bot
@@ -239,7 +239,7 @@ const handler = async (m) => {
             }
 
             if (modeInput === (global.botMode || config.botMode)) {
-                return m.reply({ text: `ℹ️ Mode bot sudah dalam mode *${modeInput.toUpperCase()}*.` });
+                return m.reply({ text: `Mode bot sudah dalam mode *${modeInput.toUpperCase()}*.` });
             }
             global.botMode = modeInput;
             try {
@@ -250,8 +250,8 @@ const handler = async (m) => {
             } catch (e) { }
 
             await m.reply({
-                text: `✅ Mode bot berhasil diubah ke *${modeInput.toUpperCase()}*!\n\n` +
-                    `${modeInput === 'self' ? '🔒 Sekarang hanya owner yang bisa pakai bot.' : '🌐 Sekarang semua orang bisa pakai bot.'}`
+                text: `Mode bot berhasil diubah ke *${modeInput.toUpperCase()}*!\n\n` +
+                    `${modeInput === 'self' ? 'Sekarang hanya owner yang bisa pakai bot.' : 'Sekarang semua orang bisa pakai bot.'}`
             });
                         break;
         }
