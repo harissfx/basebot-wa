@@ -61,7 +61,15 @@ function isGroup(jid) { return jid.endsWith('@g.us'); }
 function isFromMe(msg) { return msg.key.fromMe; }
 
 function getSenderNumber(sender, msg) {
-    const raw = msg?.key?.participantAlt || msg?.key?.remoteJidAlt || msg?.key?.participant || msg?.key?.remoteJid || sender || '';
+    // Cari nomor asli — skip kalau formatnya LID (@lid)
+    const candidates = [
+        msg?.key?.participantAlt,
+        msg?.key?.remoteJidAlt,
+        msg?.key?.participant,
+        msg?.key?.remoteJid,
+        sender,
+    ];
+    const raw = candidates.find(v => v && !v.endsWith('@lid')) || candidates.find(v => v) || '';
     return raw.replace(/\D/g, '').replace(/@.+$/, '').split(':')[0];
 }
 
