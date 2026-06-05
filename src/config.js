@@ -1,9 +1,3 @@
-// ============================================================
-//                     PENGATURAN BOT
-//  Edit langsung di sini, simpan (Ctrl+S)
-//  Bot akan otomatis reload tanpa restart
-// ============================================================
-
 module.exports = {
     //Nama owner
     ownerName: 'Haris s',
