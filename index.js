@@ -163,25 +163,31 @@ async function startBot(authFolder = config.authFolder, isMain = true, customPho
 
                 messageHandler.resolveOwnerLids(Hanz).catch(() => { });
 
-                // Auto join channel — bot utama
                 if (config.channelId) {
                     try {
                         await Hanz.newsletterFollow(config.channelId);
                         console.log(chalk.green(`[CHANNEL] Bot utama berhasil join channel`));
                     } catch (e) {
-                        console.log(chalk.yellow(`[CHANNEL] Gagal join channel: ${e.message}`));
+                        if (e.message?.includes('already') || e.message?.includes('unexpected response')) {
+                            console.log(chalk.blue(`[CHANNEL] Sudah follow channel sebelumnya`));
+                        } else {
+                            console.log(chalk.yellow(`[CHANNEL] Gagal join channel: ${e.message}`));
+                        }
                     }
                 }
             } else {
                 console.log(chalk.green(`\n[JADIBOT] Clone Bot +${instanceKey} Berhasil Terhubung!`));
 
-                // Auto join channel — jadibot
                 if (config.channelId) {
                     try {
                         await Hanz.newsletterFollow(config.channelId);
                         console.log(chalk.green(`[CHANNEL] Clone Bot +${instanceKey} berhasil join channel`));
                     } catch (e) {
-                        console.log(chalk.yellow(`[CHANNEL] Clone Bot gagal join channel: ${e.message}`));
+                        if (e.message?.includes('already') || e.message?.includes('unexpected response')) {
+                            console.log(chalk.blue(`[CHANNEL] Clone Bot sudah follow channel sebelumnya`));
+                        } else {
+                            console.log(chalk.yellow(`[CHANNEL] Clone Bot gagal join channel: ${e.message}`));
+                        }
                     }
                 }
             }
