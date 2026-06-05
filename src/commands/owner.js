@@ -125,59 +125,68 @@ const handler = async (ctx) => {
             break;
         }
 
+       
         case 'getiduser':
         case 'iduser':
         case 'cekno': {
             let nomorInput = command.fullArgs.replace(/\D/g, '');
-
+ 
             if (!nomorInput) {
                 return ctx.reply({
                     text: `❌ *Format Salah!*\n\nFormat: \`${p}getiduser <nomor-hp>\`\nContoh: \`${p}getiduser 085706035039\` atau \`${p}getiduser 6285706035039\``
                 });
             }
-
+ 
             if (nomorInput.startsWith('0')) {
                 nomorInput = '62' + nomorInput.slice(1);
             }
-
+ 
             try {
                 const [result] = await sock.onWhatsApp(nomorInput);
-
+ 
                 if (!result || !result.exists) {
                     return ctx.reply({ text: `❌ Nomor *${nomorInput}* tidak terdaftar di WhatsApp.` });
                 }
-
+ 
                 const jidKlasik = result.jid;
                 const lid = result.lid || "Tidak tersedia";
-
+ 
                 let hasil = `🔍 *DATA USER WHATSAPP* 🔍\n\n`;
                 hasil += ` • *Nomor Asli* : +${nomorInput}\n`;
-                hasil += ` • *JID Klasik* : \`${jidKlasik}\` (Copy ini)\n`;
+                hasil += ` • *JID Klasik* : \`${jidKlasik}\`\n`;
                 hasil += ` • *LID Privasi* : \`${lid}\``;
-
-                await ctx.reply({ text: hasil });
+ 
+                await ctx.sendInteractive({
+                    text: hasil,
+                    footer: config.footerTxt,
+                    quoted: ctx.msg,
+                    buttons: [
+                        { name: 'cta_copy', buttonParamsJson: JSON.stringify({ display_text: 'Copy JID Klasik', copy_code: jidKlasik }) },
+                        { name: 'cta_copy', buttonParamsJson: JSON.stringify({ display_text: 'Copy LID', copy_code: lid }) },
+                    ]
+                });
             } catch (error) {
                 console.error("Gagal melacak nomor:", error);
                 await ctx.reply({ text: `❌ Terjadi kesalahan saat memeriksa nomor tersebut.` });
             }
             break;
         }
-
+ 
         case 'getidch':
         case 'idch':
         case 'cekchannel': {
             const textInput = command.fullArgs;
             const channelRegex = /whatsapp\.com\/channel\/([a-zA-Z0-9]+)/i;
-
+ 
             if (!textInput || !channelRegex.test(textInput)) {
                 return ctx.reply({
                     text: `❌ *Format Salah!*\n\nFormat: \`${p}getidch <link-channel>\`\nContoh: \`${p}getidch https://whatsapp.com/channel/0029VaXXXXX\``
                 });
             }
-
+ 
             const match = textInput.match(channelRegex);
             const inviteCode = match[1];
-
+ 
             try {
                 const metadata = await sock.newsletterMetadata("invite", inviteCode);
                 const jidAsli = metadata.id;
@@ -185,14 +194,21 @@ const handler = async (ctx) => {
                 const namaChannel = metaDataThread.name?.text || "Tidak diketahui";
                 const totalPengikut = metaDataThread.subscribers_count || "0";
                 const deskripsi = metaDataThread.description?.text || "Tidak ada deskripsi.";
-
+ 
                 let hasil = `🔍 *DATA WHATSAPP CHANNEL* 🔍\n\n`;
                 hasil += ` • *Nama Channel* : ${namaChannel}\n`;
-                hasil += ` • *ID Internal* : \`${jidAsli}\` (Copy ini)\n`;
+                hasil += ` • *ID Internal* : \`${jidAsli}\`\n`;
                 hasil += ` • *Followers* : ${totalPengikut} pengikut\n`;
                 hasil += ` • *Deskripsi* : ${deskripsi}`;
-
-                await ctx.reply({ text: hasil });
+ 
+                await ctx.sendInteractive({
+                    text: hasil,
+                    footer: config.footerTxt,
+                    quoted: ctx.msg,
+                    buttons: [
+                        { name: 'cta_copy', buttonParamsJson: JSON.stringify({ display_text: 'Copy ID Channel', copy_code: jidAsli }) },
+                    ]
+                });
             } catch (error) {
                 console.error("Gagal melacak channel:", error);
                 await ctx.reply({

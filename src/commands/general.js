@@ -116,7 +116,7 @@ const handler = async (ctx) => {
                 },
                 buttons: [ 
                     { name: 'cta_url', buttonParamsJson: JSON.stringify({ display_text: 'Join Channel', url: 'https://whatsapp.com/channel/0029VaB6LTrAYlUCe0VINW1r' }) },
-                    { name: 'cta_call', buttonParamsJson: JSON.stringify({ display_text: 'Lapor Bug', phone_number: 'wa.me/6281234567890' }) },
+                    { name: 'cta_call', buttonParamsJson: JSON.stringify({ display_text: 'Lapor Bug', phone_number: 'wa.me/6285124014109' }) },
                     { name: 'single_select', buttonParamsJson: JSON.stringify({
                             title: '『 Simpel Menu 』',
                             sections: [{
