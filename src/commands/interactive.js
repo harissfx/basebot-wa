@@ -1,8 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const config = require('../config');
-const { getImage } = require('../utils/helper');s
-
+const { getImage } = require('../utils/helper');
 const handler = async (m) => {
     const { command } = m
 
