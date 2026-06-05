@@ -246,25 +246,22 @@ const handler = async (ctx) => {
                 return ctx.reply({ text: `ℹ️ Mode bot sudah dalam mode *${modeInput.toUpperCase()}*.` });
             }
 
+            // Update langsung di memori — efek instan tanpa restart
+            global.botMode = modeInput;
+
+            // Simpan ke config.js supaya tetap setelah restart
             try {
                 const configPath = require('path').join(__dirname, '..', 'config.js');
                 let configFile = require('fs').readFileSync(configPath, 'utf8');
-                configFile = configFile.replace(
-                    /botMode:\s*'(public|self)'/,
-                    `botMode: '${modeInput}'`
-                );
+                configFile = configFile.replace(/botMode:\s*'(public|self)'/, `botMode: '${modeInput}'`);
                 require('fs').writeFileSync(configPath, configFile, 'utf8');
+            } catch (e) { }
 
-                await ctx.reply({
-                    text: `✅ Mode bot berhasil diubah ke *${modeInput.toUpperCase()}*!
-
-` +
-                        `${modeInput === 'self' ? '🔒 Sekarang hanya owner yang bisa pakai bot.' : '🌐 Sekarang semua orang bisa pakai bot.'}`
-                });
-            } catch (e) {
-                await ctx.reply({ text: `❌ Gagal mengubah mode: ${e.message}` });
-            }
-            break;
+            await ctx.reply({
+                text: `✅ Mode bot berhasil diubah ke *${modeInput.toUpperCase()}*!\n\n` +
+                    `${modeInput === 'self' ? '🔒 Sekarang hanya owner yang bisa pakai bot.' : '🌐 Sekarang semua orang bisa pakai bot.'}`
+            });
+                        break;
         }
 
         case 'info': {
