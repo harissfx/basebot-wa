@@ -36,12 +36,11 @@ const handler = async (m) => {
     switch (command.name) {
 
         case 'downloadmenu':
-    const device = getDevice(msg.key.id);
-    const role = isSuperOwner ? 'Super Owner' : (isOwner ? 'Co-Owner' : 'User');
-    const nomorUser = senderNumber;
-    // Ambil otomatis semua command dari file ini saja
-    const downloadCmds = plugins.commandsByFile()['downloader'] || [];
-    let menu = `┌─❖「 𝗜𝗡𝗙𝗢 𝗨𝗦𝗘𝗥 」
+            const device = getDevice(msg.key.id);
+            const role = isSuperOwner ? 'Super Owner' : (isOwner ? 'Co-Owner' : 'User');
+            const nomorUser = senderNumber;
+            const downloadCmds = plugins.commandsByFile()['downloader'] || [];
+            let menu = `┌─❖「 𝗜𝗡𝗙𝗢 𝗨𝗦𝗘𝗥 」
 │● 𝘕𝘢𝘮𝘢: ${pushname}
 │● 𝘕𝘰𝘮𝘰𝘳: ${nomorUser}
 │● 𝘚𝘵𝘢𝘵𝘮𝘴: ${role}
@@ -55,6 +54,47 @@ const handler = async (m) => {
 ${downloadCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
 │
 └────────────┈ ⳹`
+            await m.sendInteractive({
+                text: menu,
+                footer: config.footerTxt,
+                quoted: m.fakeOrder,
+                contextInfo: {
+                    mentionedJid: ["0@s.whatsapp.net"],
+                    forwardingScore: 111,
+                    isForwarded: true
+                },
+                buttons: [
+                    { name: 'quick_reply', buttonParamsJson: JSON.stringify({ display_text: 'Kembali ke Menu', id: 'menu' }) },
+                    {
+                        name: 'single_select', buttonParamsJson: JSON.stringify({
+                            title: '『 Simpel Menu 』',
+                            sections: [{
+                                title: '『 Simpel Menu 』',
+                                highlight_label: "",
+                                rows: [{ title: "General Menu", description: "Select to display general menu", id: "generalmenu" }]
+                            }, {
+                                highlight_label: "",
+                                rows: [{ title: "Owner Menu", description: "Select to display owner menu", id: "ownermenu" }]
+                            }, {
+                                highlight_label: "",
+                                rows: [{ title: "Ffmpeg Menu", description: "Select to display ffmpeg menu", id: "ffmpegmenu" }]
+                            }, {
+                                highlight_label: "",
+                                rows: [{ title: "Downloader Menu", description: "Select to display downloader menu", id: "downloadmenu" }]
+                            }, {
+                                highlight_label: "",
+                                rows: [{ title: "Tools Menu", description: "Select to display tools menu", id: "toolsmenu" }]
+                            }, {
+                                highlight_label: "Khusus Owner Utama",
+                                rows: [{ title: "JadiBot Menu", description: "Select to display jadi bot menu", id: "jadibotmenu" }]
+                            }, {
+                                highlight_label: "",
+                                rows: [{ title: "Group Menu", description: "Select to display group menu ", id: "groupmenu" }]
+                            },]
+                        })
+                    }]
+            });
+            break;
 
         // ── !ytmp3 ── YouTube → Audio MP3 ─────────────────────────────────────
         case 'ytmp3': {
