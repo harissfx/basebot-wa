@@ -142,7 +142,7 @@ ${Object.entries(plugins.commandsByFile()).map(([file, cmds]) => `││\n││
                productId: "PROD001",
                retailerId: "RETAIL001",
                url: "https://rxhlofficial.com/",
-               body: str,
+               body: "body",
                footer: `© since 2##9`,
                priceAmount1000: 777777,
                currencyCode: "USD",
