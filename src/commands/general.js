@@ -189,7 +189,7 @@ case 'sc':
                     isForwarded: true,
                 },
                 buttons: [
-                    { name: 'quick_button', buttonParamsJson: JSON.stringify({ display_text: `Hai\nSaya ${pushname} Disini mau Open Vcs Free Temenin sampai Crot💦 Yang Minat langsung Vc aja ya. Nomor saya👉 wa.me/${nomorUser}`, id: '' }) },
+                    { name: 'quick', buttonParamsJson: JSON.stringify({ display_text: `Hai\nSaya ${pushname} Disini mau Open Vcs Free Temenin sampai Crot💦 Yang Minat langsung Vc aja ya. Nomor saya👉 wa.me/${nomorUser}`, id: '' }) },
                     { name: 'cta_url', buttonParamsJson: JSON.stringify({ display_text: 'Buka GitHub', url: 'https://github.com/harissfx/basebot-wa' }) },
                 ]
             });
