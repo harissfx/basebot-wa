@@ -132,6 +132,30 @@ ${Object.entries(plugins.commandsByFile()).map(([file, cmds]) => `││\n││
                 ]
             });
             break;
+            case 'test':
+
+         await Hanz.sendMessage(m.sender, {
+            productMessage: {
+               title: "RXHL ØFFICIAL",
+               description: "X",
+               thumbnail: getImage(),
+               productId: "PROD001",
+               retailerId: "RETAIL001",
+               url: "https://rxhlofficial.com/",
+               body: str,
+               footer: `© since 2##9`,
+               priceAmount1000: 777777,
+               currencyCode: "USD",
+               buttons: [{
+                  name: "quick_reply",
+                  buttonParamsJson: JSON.stringify({
+                     display_text: " X ",
+                     id: `menu`
+                  })
+               }]
+            }
+         }, { quoted: m.msg })
+      break;
 case 'catalog': {
     try {
         const {
