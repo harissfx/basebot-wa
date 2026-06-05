@@ -84,7 +84,7 @@ const handler = async (ctx) => {
 └┬━━━━━━━━━━━━━━┈ ⳹
 ┌┤  「 𝙈𝙀𝙉𝙐 𝘽𝙊𝙏 」
 ││
-${plugins.commandList().map(cmd => `││⪩ ${cmd}`).join('\n')}
+${Object.entries(plugins.commandsByFile()).map(([file, cmds]) => `││\n││  〘 ${file} 〙\n` + cmds.map(cmd => `││⪩ ${cmd}`).join('\n')).join('\n')}
 ││
 │└────────────┈ ⳹
 │›⟩ ∘ 𝘓𝘢𝘯𝘨𝘶𝘢𝘨𝘦: 𝘑𝘢𝘷𝘢𝘚𝘤𝘳𝘪𝘱𝘵

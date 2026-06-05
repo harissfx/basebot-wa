@@ -198,6 +198,14 @@ class PluginLoader {
     get(commandName)  { return this.plugins[commandName] || null; }
     has(commandName)  { return commandName in this.plugins; }
     commandList()     { return Object.keys(this.plugins); }
+    commandsByFile()  {
+        const result = {};
+        for (const [filePath, cmds] of Object.entries(this.files)) {
+            const name = path.basename(filePath, '.js');
+            result[name] = cmds;
+        }
+        return result;
+    }
 }
 
 module.exports = new PluginLoader();
