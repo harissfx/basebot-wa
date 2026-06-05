@@ -3,7 +3,7 @@ const config = require('../config');
 const { getDevice } = require('@whiskeysockets/baileys');
 
 const handler = async (ctx) => {
-    const { command, isSuperOwner, sock, sender, msg, pushname, isOwner, isGroup } = ctx;
+    const { command, isSuperOwner, sock, sender, msg, senderNumber, pushname, isOwner } = ctx;
     const p = config.prefix;
     let metadata, mentions, text, isAdmin, mentioned, number, subject, desc, code;
     if (!ctx.isGroup) {
@@ -17,15 +17,13 @@ const handler = async (ctx) => {
     switch (command.name) {
         case 'groupmenu':
             const device = getDevice(msg.key.id);
-            const role = isSuperOwner ? 'Super Owner 👑' : (isOwner ? 'Co-Owner 👥' : 'User 👤');
-            const chatType = isGroup ? 'Grup 👥' : 'Pribadi 💬';
-            const time = new Date().toLocaleTimeString('id-ID', { timeZone: 'Asia/Jakarta', hour: '2-digit', minute: '2-digit' }) + ' WIB';
+            const nomorUser = senderNumber;
+            const role = isSuperOwner ? 'Super Owner' : (isOwner ? 'Co-Owner' : 'User');
             let menu = `┌─❖「 𝗜𝗡𝗙𝗢 𝗨𝗦𝗘𝗥 」
 │● 𝘕𝘢𝘮𝘢: ${pushname}
+│● 𝘕𝘰𝘮𝘰𝘳: ${nomorUser}
 │● 𝘚𝘵𝘢𝘵𝘶𝘴: ${role}
-│● 𝘗𝘦𝘳𝘢𝘯𝘨𝘬𝘢𝘵: ${device} 📱
-│● 𝘛𝘪𝘱𝘦 𝘊𝘩𝘢𝘵: ${chatType}
-│● 𝘞𝘢𝘬𝘵𝘶: ${time}
+│● 𝘗𝘦𝘳𝘢𝘯𝘨𝘬𝘢𝘵: ${device}
 │
 └┬❖ 
 ┌┤𝖧𝖺𝗒 𝗄𝖺𝗄 ${pushname} 👋

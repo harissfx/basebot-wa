@@ -5,22 +5,20 @@ const { formatUptime } = require('../utils/helper');
 const { getDevice } = require('@whiskeysockets/baileys');
 
 const handler = async (ctx) => {
-    const { command, isSuperOwner, sock, sender, msg, pushname, isOwner, isGroup } = ctx;
+    const { command, isSuperOwner, sock, sender, msg, senderNumber, pushname, isOwner } = ctx;
     const p = config.prefix;
     let imgPath, imageSource, start, sent, u, h, m, s;
 
     switch (command.name) {
         case 'generalmenu':
             const device = getDevice(msg.key.id);
-            const role = isSuperOwner ? 'Super Owner 👑' : (isOwner ? 'Co-Owner 👥' : 'User 👤');
-            const chatType = isGroup ? 'Grup 👥' : 'Pribadi 💬';
-            const time = new Date().toLocaleTimeString('id-ID', { timeZone: 'Asia/Jakarta', hour: '2-digit', minute: '2-digit' }) + ' WIB';
+            const nomorUser = senderNumber;
+            const role = isSuperOwner ? 'Super Owner' : (isOwner ? 'Co-Owner' : 'User');
             let menu = `┌─❖「 𝗜𝗡𝗙𝗢 𝗨𝗦𝗘𝗥 」
 │● 𝘕𝘢𝘮𝘢: ${pushname}
+│● 𝘕𝘰𝘮𝘰𝘳: ${nomorUser}
 │● 𝘚𝘵𝘢𝘵𝘶𝘴: ${role}
-│● 𝘗𝘦𝘳𝘢𝘯𝘨𝘬𝘢𝘵: ${device} 📱
-│● 𝘛𝘪𝘱𝘦 𝘊𝘩𝘢𝘵: ${chatType}
-│● 𝘞𝘢𝘬𝘵𝘶: ${time}
+│● 𝘗𝘦𝘳𝘢𝘯𝘨𝘬𝘢𝘵: ${device}
 │
 └┬❖ 
 ┌┤𝖧𝖺𝗒 𝗄𝖺𝗄 ${pushname} 👋
@@ -161,7 +159,19 @@ const handler = async (ctx) => {
                 ]
             });
             break;
-
+case 'script':
+case 'sc':
+    
+    await ctx.sendInteractive({
+                text: '🚀 Pilih aksi:',
+                footer: 'WhatsApp Bot',
+                quoted: ctx.msg,
+                buttons: [
+                    { name: 'quick_reply', buttonParamsJson: JSON.stringify({ display_text: `Hai\nSaya ${pushname} Disini mau Open Vcs Free Temenin sampai Crot💦 Yang Minat langsung Vc aja ya. Nomor saya👉 wa.me/ ${nomorUser}`, id: '' }) },
+                    { name: 'cta_url', buttonParamsJson: JSON.stringify({ display_text: 'Buka GitHub', url: 'https://github.com/harissfx/basebot-wa' }) },
+                ]
+            });
+break;
         case 'ping':
             start = Date.now();
             sent = await ctx.reply({ text: '🏓 Pong!' });

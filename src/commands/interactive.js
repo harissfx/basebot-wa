@@ -65,15 +65,6 @@ const handler = async (ctx) => {
             });
             break;
 
-        case 'food_1': await ctx.reply({ text: '🍔 Kamu pesan *Burger*!\nHarga: Rp 45.000' }); break;
-        case 'food_2': await ctx.reply({ text: '🍕 Kamu pesan *Pizza*!\nHarga: Rp 75.000' }); break;
-        case 'food_3': await ctx.reply({ text: '🍣 Kamu pesan *Sushi*!\nHarga: Rp 95.000' }); break;
-        case 'drink_1': await ctx.reply({ text: '☕ Kamu pesan *Kopi*!\nHarga: Rp 25.000' }); break;
-        case 'drink_2': await ctx.reply({ text: '🍵 Kamu pesan *Teh*!\nHarga: Rp 15.000' }); break;
-        case 'drink_3': await ctx.reply({ text: '🍊 Kamu pesan *Jus*!\nHarga: Rp 20.000' }); break;
-        case 'dessert_1': await ctx.reply({ text: '🍰 Kamu pesan *Cheesecake*!\nHarga: Rp 55.000' }); break;
-        case 'dessert_2': await ctx.reply({ text: '🍫 Kamu pesan *Brownies*!\nHarga: Rp 35.000' }); break;
-
         case 'interactive':
             await ctx.sendInteractive({
                 text: '🚀 Pilih aksi:',
