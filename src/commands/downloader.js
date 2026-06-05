@@ -28,7 +28,7 @@ const {
 
 // ─── Handler ──────────────────────────────────────────────────────────────────
 const handler = async (ctx) => {
-    const { command, isSuperOwner, sock, sender, msg, nomorUser, pushname, isOwner, isGroup } = ctx;
+    const { command, isSuperOwner, sock, sender, msg, senderNumber, pushname, isOwner, isGroup } = ctx;
     const url = command.fullArgs?.trim();
     const p = config.prefix;
 
