@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const config = require('../config');
+const { getImage } = require('../utils/helper');s
 
 const handler = async (m) => {
     const { command } = m
@@ -84,19 +85,14 @@ const handler = async (m) => {
             break;
 
         case 'medialokal':
-            const imagePath = path.join(__dirname, '../media/logo.jpg');
-            if (!fs.existsSync(imagePath)) return m.reply({ text: '❌ File tidak ditemukan.\n\nBuat folder `assets/` dan taruh `logo.jpg`.' });
-            await m.reply({ image: fs.readFileSync(imagePath), caption: '🖼️ Gambar lokal dari assets!' });
+            await m.reply({ image: getImage(), caption: '🖼️ Gambar lokal dari assets!' });
             break;
 
         case 'buttonimage':
-            const imgPath = path.join(__dirname, '../media/logo.jpg');
-            if (!fs.existsSync(imgPath)) return m.reply({ text: '❌ File logo.pjpgng tidak ada di folder assets.' });
-            const base64Image = fs.readFileSync(imgPath).toString('base64');
             await m.sendButtonWithImage({
                 text: '🖼️ Button dengan gambar!',
                 footer: 'WhatsApp Bot',
-                imageUrl: `data:image/jpg;base64,${base64Image}`,
+                imageUrl: getImage(),
                 quoted: m.msg,
                 buttons: [
                     { id: 'like', text: '❤️ Suka' },
