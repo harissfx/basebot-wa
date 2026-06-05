@@ -7,6 +7,7 @@ const { getDevice } = require('@whiskeysockets/baileys');
 const handler = async (ctx) => {
     const { command, isSuperOwner, sock, sender, msg, senderNumber, pushname, isOwner } = ctx;
     const p = config.prefix;
+    const nomorUser = senderNumber;
     let imgPath, imageSource, start, sent, u, h, m, s;
 
     switch (command.name) {
