@@ -16,6 +16,7 @@
 
 const fs = require('fs');
 const config = require('../config');
+const plugins = require('../utils/PluginLoader');
 const { getDevice } = require('@whiskeysockets/baileys');
 const {
     MAX_SIZE_MB,
