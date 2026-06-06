@@ -260,6 +260,7 @@ ${ownerCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
 
         case 'info': {
     const u = process.uptime();
+    const hari = Math.floor(u / 86400);
     const jam = Math.floor(u / 3600);
     const menit = Math.floor((u % 3600) / 60);
     const detik = Math.floor(u % 60);
@@ -269,7 +270,7 @@ ${ownerCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
 │● 𝘕𝘢𝘮𝘢    : ${config.botName}
 │● 𝘖𝘸𝘯𝘦𝘳   : ${[].concat(config.superOwner).join(', ')}
 │● 𝘗𝘳𝘦𝘧𝘪𝘹  : ${config.prefix}
-│● 𝘜𝘱𝘵𝘪𝘮𝘦  : ${jam}j ${menit}m ${detik}d
+│● 𝘜𝘱𝘵𝘪𝘮𝘦  : ${hari}h ${jam}j ${menit}m ${detik}d
 │● 𝘕𝘰𝘥𝘦    : ${process.version}
 │● 𝘗𝘭𝘢𝘵𝘧𝘰𝘳𝘮 : ${process.platform}
 │● 𝘔𝘰𝘥𝘦    : ${(global.botMode || config.botMode).toUpperCase()}
