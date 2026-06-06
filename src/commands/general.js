@@ -1,7 +1,6 @@
 const config = require('../config');
 const { formatUptime } = require('../utils/helper');
 const plugins = require('../utils/PluginLoader');
-const { getImage } = require('../utils/helper');
 const { getDevice } = require('@whiskeysockets/baileys');
 
 const handler = async (m) => {
@@ -73,7 +72,7 @@ ${generalCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
                     }]
             });
             break;
-        
+
 case 'script':
 case 'sc':
     tete = `
