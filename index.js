@@ -154,8 +154,7 @@ async function startBot(authFolder = config.authFolder, isMain = true, customPho
                 console.log(chalk.white(` • ID/No   : ${name}`));
                 console.log(chalk.white(` • Prefix  : ${config.prefix}`));
                 console.log(chalk.white(` • Commands: ${plugins.commandList().length} fitur aktif`));
-                console.log(chalk.blue(`\n💡 Edit file di src/commands/ untuk auto-reload tanpa restart.\n`));
-
+                
                 try { spinnies.remove("waiting"); } catch (e) { }
                 spinnies.add("waiting", { text: "Menunggu Pesan..." });
 
