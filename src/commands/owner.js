@@ -263,7 +263,7 @@ ${ownerCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
             const h = Math.floor(u / 3600);
             const m = Math.floor((u % 3600) / 60);
             const s = Math.floor(u % 60);
-            await m.send({
+            await m.reply({
                 text: [
                     '╔═══ *Bot Info* ═══╗',
                     `║ 🤖 *Nama:* ${config.botName}`,
