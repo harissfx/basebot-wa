@@ -11,11 +11,11 @@ module.exports = {
     prefix: '!',
 
     // Super Owner — hanya 1 nomor, akses penuh termasuk manage co-owner
-    superOwner: '6285124014109',
+    superOwner: '6289999999999',
 
     // Co-Owner — bisa lebih dari satu, akses owner biasa
     coOwner: [
-        '6285124014109',
+        '6289999999999',
         // '6289999999999',
     ],
 
