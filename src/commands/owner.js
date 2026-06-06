@@ -259,24 +259,24 @@ ${ownerCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
         }
 
         case 'info': {
-            const u = process.uptime();
-            const h = Math.floor(u / 3600);
-            const m = Math.floor((u % 3600) / 60);
-            const s = Math.floor(u % 60);
-            await m.reply({
-                text: [
-                    '╔═══ *Bot Info* ═══╗',
-                    `║ 🤖 *Nama:* ${config.botName}`,
-                    `║ 👤 *Owner:* ${[].concat(config.superOwner).join(', ')}`,
-                    `║ ⚙️ *Prefix:* ${config.prefix}`,
-                    `║ 🔄 *Uptime:* ${h}j ${m}m ${s}d`,
-                    `║ 📦 *Node:* ${process.version}`,
-                    `║ 🖥️ *Platform:* ${process.platform}`,
-                    '╚════════════════════╝',
-                ].join('\n')
-            });
-            break;
-        }
+    const u = process.uptime();
+    const jam = Math.floor(u / 3600);
+    const menit = Math.floor((u % 3600) / 60);
+    const detik = Math.floor(u % 60);
+    await m.send({
+        text: [
+            '╔═══ *Bot Info* ═══╗',
+            `║ 🤖 *Nama:* ${config.botName}`,
+            `║ 👤 *Owner:* ${[].concat(config.superOwner).join(', ')}`,
+            `║ ⚙️ *Prefix:* ${config.prefix}`,
+            `║ 🔄 *Uptime:* ${jam}j ${menit}m ${detik}d`,
+            `║ 📦 *Node:* ${process.version}`,
+            `║ 🖥️ *Platform:* ${process.platform}`,
+            '╚════════════════════╝',
+        ].join('\n')
+    });
+    break;
+}
 
     }
 };
