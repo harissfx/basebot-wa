@@ -1,5 +1,5 @@
 {
-  "name": "whatsapp-bot-base",
+  "name": "HanzOfc-Bot",
   "version": "1.0.0",
   "description": "Base bot WhatsApp dengan Node.js & Baileys - Support Button, List, Media, Poll",
   "main": "index.js",
