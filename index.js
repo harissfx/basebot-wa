@@ -1,3 +1,19 @@
+/*
+Powered By Hanz Ofc
+
+Created 6,6,2026
+
+Support Team
+
+|Wong Hore Team
+|TDR Group
+|Pancuran Group
+
+Thank To
+........
+
+
+*/
 const makeWASocket = require('@whiskeysockets/baileys').default;
 const {
     useMultiFileAuthState,
