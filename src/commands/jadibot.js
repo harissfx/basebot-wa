@@ -17,7 +17,8 @@ const handler = async (m) => {
     switch (command.name) {
         case 'jadibotmenu':
             const device = getDevice(msg.key.id);
-            const jadibotCmds = plugins.commandsByFile()['jadibot'] || [];
+            const jadibotCmds = (plugins.commandsByFile()['jadibot'] || [])
+            .filter(cmd => !['jadibotmenu'].includes(cmd));
             const role = isSuperOwner ? 'Super Owner' : (isOwner ? 'Co-Owner' : 'User biasa');
             let menu = `┌─❖「 𝗜𝗡𝗙𝗢 𝗨𝗦𝗘𝗥 」
 │● 𝘕𝘢𝘮𝘢: ${pushname}

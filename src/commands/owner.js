@@ -18,7 +18,8 @@ const handler = async (m) => {
     switch (command.name) {
         case 'ownermenu':
             const device = getDevice(msg.key.id);
-            const ownerCmds = plugins.commandsByFile()['owner'] || [];
+            const ownerCmds = (plugins.commandsByFile()['owner'] || [])
+            .filter(cmd => !['ownermenu'].includes(cmd));
             const role = isSuperOwner ? 'Super Owner' : (isOwner ? 'Co-Owner' : 'User biasa');
             let menu = `┌─❖「 𝗜𝗡𝗙𝗢 𝗨𝗦𝗘𝗥 」
 │● 𝘕𝘢𝘮𝘢: ${pushname}

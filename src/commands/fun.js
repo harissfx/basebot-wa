@@ -180,7 +180,8 @@ const handler = async (m) => {
         // ══════════════════════════════════════════════════════
         case 'funmenu': {
             const device = getDevice(msg.key.id);
-            const funCmds = plugins.commandsByFile()['fun'] || [];
+            const funCmds = (plugins.commandsByFile()['fun'] || [])
+            .filter(cmd => !['funmenu'].includes(cmd));
             const role = isSuperOwner ? 'Super Owner' : (isOwner ? 'Co-Owner' : 'User biasa');
             let menu = `┌─❖「 𝗜𝗡𝗙𝗢 𝗨𝗦𝗘𝗥 」
 │● 𝘕𝘢𝘮𝘢: ${pushname}
