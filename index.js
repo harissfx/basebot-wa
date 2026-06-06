@@ -165,12 +165,12 @@ async function startBot(authFolder = config.authFolder, isMain = true, customPho
                 if (config.channelId) {
                     try {
                         await Hanz.newsletterFollow(config.channelId);
-                        console.log(chalk.green(`[CHANNEL] Bot utama berhasil join channel`));
+                        //console.log(chalk.green(`[CHANNEL] Bot utama berhasil join channel`));
                     } catch (e) {
                         if (e.message?.includes('already') || e.message?.includes('unexpected response')) {
-                            console.log(chalk.blue(`[CHANNEL] Sudah follow channel sebelumnya`));
+                            //console.log(chalk.blue(`[CHANNEL] Sudah follow channel sebelumnya`));
                         } else {
-                            console.log(chalk.yellow(`[CHANNEL] Gagal join channel: ${e.message}`));
+                            //console.log(chalk.yellow(`[CHANNEL] Gagal join channel: ${e.message}`));
                         }
                     }
                 }
@@ -180,12 +180,12 @@ async function startBot(authFolder = config.authFolder, isMain = true, customPho
                 if (config.channelId) {
                     try {
                         await Hanz.newsletterFollow(config.channelId);
-                        console.log(chalk.green(`[CHANNEL] Clone Bot +${instanceKey} berhasil join channel`));
+                        //console.log(chalk.green(`[CHANNEL] Clone Bot +${instanceKey} berhasil join channel`));
                     } catch (e) {
                         if (e.message?.includes('already') || e.message?.includes('unexpected response')) {
-                            console.log(chalk.blue(`[CHANNEL] Clone Bot sudah follow channel sebelumnya`));
+                            //console.log(chalk.blue(`[CHANNEL] Clone Bot sudah follow channel sebelumnya`));
                         } else {
-                            console.log(chalk.yellow(`[CHANNEL] Clone Bot gagal join channel: ${e.message}`));
+                            //console.log(chalk.yellow(`[CHANNEL] Clone Bot gagal join channel: ${e.message}`));
                         }
                     }
                 }

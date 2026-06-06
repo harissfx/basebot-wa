@@ -142,8 +142,8 @@ class PluginLoader {
         for (const f of this._scanFiles()) this._loadFile(f);
         const watchTarget = [SRC_ROOT, LIB_ROOT];
 
-        console.log(chalk.blue(`[WATCHER] Monitoring src/ dan lib/ (kecuali node_modules & database)`));
-        console.log(chalk.blue(`[LOADER] Total command aktif: ${Object.keys(this.plugins).length} fitur`));
+        //console.log(chalk.blue(`[WATCHER] Monitoring src/ dan lib/ (kecuali node_modules & database)`));
+        //console.log(chalk.blue(`[LOADER] Total command aktif: ${Object.keys(this.plugins).length} fitur`));
 
         const watcher = chokidar.watch(watchTarget, {
             persistent: true,
