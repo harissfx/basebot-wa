@@ -263,17 +263,19 @@ ${ownerCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
     const jam = Math.floor(u / 3600);
     const menit = Math.floor((u % 3600) / 60);
     const detik = Math.floor(u % 60);
-    await m.send({
-        text: [
-            '╔═══ *Bot Info* ═══╗',
-            `║ 🤖 *Nama:* ${config.botName}`,
-            `║ 👤 *Owner:* ${[].concat(config.superOwner).join(', ')}`,
-            `║ ⚙️ *Prefix:* ${config.prefix}`,
-            `║ 🔄 *Uptime:* ${jam}j ${menit}m ${detik}d`,
-            `║ 📦 *Node:* ${process.version}`,
-            `║ 🖥️ *Platform:* ${process.platform}`,
-            '╚════════════════════╝',
-        ].join('\n')
+    await m.reply({
+        text: `┌─❖「 𝗜𝗡𝗙𝗢 𝗕𝗢𝗧 」
+│
+│● 𝘕𝘢𝘮𝘢    : ${config.botName}
+│● 𝘖𝘸𝘯𝘦𝘳   : ${[].concat(config.superOwner).join(', ')}
+│● 𝘗𝘳𝘦𝘧𝘪𝘹  : ${config.prefix}
+│● 𝘜𝘱𝘵𝘪𝘮𝘦  : ${jam}j ${menit}m ${detik}d
+│● 𝘕𝘰𝘥𝘦    : ${process.version}
+│● 𝘗𝘭𝘢𝘵𝘧𝘰𝘳𝘮 : ${process.platform}
+│● 𝘔𝘰𝘥𝘦    : ${(global.botMode || config.botMode).toUpperCase()}
+│● 𝘊𝘰𝘮𝘮𝘢𝘯𝘥  : ${plugins.commandList().length} fitur aktif
+│
+└────────────┈ ⳹`
     });
     break;
 }
