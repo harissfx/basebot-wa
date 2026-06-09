@@ -121,8 +121,8 @@ ${mediaCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
 
             const rawArgs = (command.fullArgs || '').trim();
             const [packName, authorName] = rawArgs
-                ? rawArgs.split('|').map(s => s.trim())
-                : ['Bot', 'WaBot'];
+            ? rawArgs.split('|').map(s => s.trim())
+            : [config.botName, config.ownerName];
 
             let inputPath, outputPath;
             try {

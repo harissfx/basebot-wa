@@ -110,20 +110,20 @@ async function startBot(authFolder = config.authFolder, isMain = true, customPho
     }
 
     const Hanz = makeWASocket({
-        version,
-        logger,
-        printQRInTerminal: false,
-        auth: state,
-        browser: ['Ubuntu', 'Chrome', '20.0.04'],
-        generateHighQualityLinkPreview: true,
-        syncFullHistory: false,
-        markOnlineOnConnect: true,
-        connectTimeoutMs: 60000,
-        defaultQueryTimeoutMs: 120000,
-        keepAliveIntervalMs: 30000,
-        retryRequestDelayMs: 250,
-        maxMsgRetryCount: 5,
-    });
+    version,
+    logger,
+    printQRInTerminal: false,
+    auth: state,
+    browser: ['Linux', 'Firefox', '120.0'],
+    generateHighQualityLinkPreview: true,
+    syncFullHistory: false,
+    markOnlineOnConnect: true,
+    connectTimeoutMs: 60000,
+    defaultQueryTimeoutMs: 120000,
+    keepAliveIntervalMs: 30000,
+    retryRequestDelayMs: 250,
+    maxMsgRetryCount: 5,
+});
 
     const instanceKey = path.basename(authFolder);
     global.conns[instanceKey] = Hanz;
