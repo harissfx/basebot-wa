@@ -110,20 +110,20 @@ async function startBot(authFolder = config.authFolder, isMain = true, customPho
     }
 
     const Hanz = makeWASocket({
-    version,
-    logger,
-    printQRInTerminal: false,
-    auth: state,
-    browser: ['Linux', 'Firefox', '120.0'],
-    generateHighQualityLinkPreview: true,
-    syncFullHistory: false,
-    markOnlineOnConnect: true,
-    connectTimeoutMs: 60000,
-    defaultQueryTimeoutMs: 120000,
-    keepAliveIntervalMs: 30000,
-    retryRequestDelayMs: 250,
-    maxMsgRetryCount: 5,
-});
+        version,
+        logger,
+        printQRInTerminal: false,
+        auth: state,
+        browser: ['Linux', 'Firefox', '120.0'],
+        generateHighQualityLinkPreview: true,
+        syncFullHistory: false,
+        markOnlineOnConnect: true,
+        connectTimeoutMs: 60000,
+        defaultQueryTimeoutMs: 120000,
+        keepAliveIntervalMs: 30000,
+        retryRequestDelayMs: 250,
+        maxMsgRetryCount: 5,
+    });
 
     const instanceKey = path.basename(authFolder);
     global.conns[instanceKey] = Hanz;
@@ -134,8 +134,29 @@ async function startBot(authFolder = config.authFolder, isMain = true, customPho
     Hanz.ev.on('messages.upsert', (m) => {
         messageHandler(Hanz, m, isMain);
     });
+
+    // Promise yang resolve saat koneksi siap untuk pairing
+    let pairingReady = null;
+    let pairingReadyResolve = null;
+
+    if (!Hanz.authState.creds.registered && isMain) {
+        pairingReady = new Promise(resolve => { pairingReadyResolve = resolve; });
+    }
+
     Hanz.ev.on('connection.update', async (update) => {
-        const { connection, lastDisconnect } = update;
+        const { connection, lastDisconnect, qr } = update;
+
+        // Saat socket mulai connecting, ini saat yang tepat untuk request pairing code
+        if (connection === 'connecting' && pairingReadyResolve) {
+            // Beri sedikit waktu agar handshake selesai
+            setTimeout(() => {
+                if (pairingReadyResolve) {
+                    const fn = pairingReadyResolve;
+                    pairingReadyResolve = null;
+                    fn();
+                }
+            }, 5000);
+        }
 
         if (connection === 'close') {
             if (isMain) {
@@ -182,14 +203,7 @@ async function startBot(authFolder = config.authFolder, isMain = true, customPho
                 if (config.channelId) {
                     try {
                         await Hanz.newsletterFollow(config.channelId);
-                        //console.log(chalk.green(`[CHANNEL] Bot utama berhasil join channel`));
-                    } catch (e) {
-                        if (e.message?.includes('already') || e.message?.includes('unexpected response')) {
-                            //console.log(chalk.blue(`[CHANNEL] Sudah follow channel sebelumnya`));
-                        } else {
-                            //console.log(chalk.yellow(`[CHANNEL] Gagal join channel: ${e.message}`));
-                        }
-                    }
+                    } catch (e) { }
                 }
             } else {
                 console.log(chalk.green(`\n[JADIBOT] Clone Bot +${instanceKey} Berhasil Terhubung!`));
@@ -197,14 +211,7 @@ async function startBot(authFolder = config.authFolder, isMain = true, customPho
                 if (config.channelId) {
                     try {
                         await Hanz.newsletterFollow(config.channelId);
-                        //console.log(chalk.green(`[CHANNEL] Clone Bot +${instanceKey} berhasil join channel`));
-                    } catch (e) {
-                        if (e.message?.includes('already') || e.message?.includes('unexpected response')) {
-                            //console.log(chalk.blue(`[CHANNEL] Clone Bot sudah follow channel sebelumnya`));
-                        } else {
-                            //console.log(chalk.yellow(`[CHANNEL] Clone Bot gagal join channel: ${e.message}`));
-                        }
-                    }
+                    } catch (e) { }
                 }
             }
         }
@@ -225,14 +232,18 @@ async function startBot(authFolder = config.authFolder, isMain = true, customPho
                 }
             }
 
+            // Tunggu sampai koneksi WebSocket siap sebelum request pairing code
+            console.log(chalk.gray('⏳ Menunggu koneksi ke server WhatsApp...'));
+            await pairingReady;
+
             for (let attempt = 1; attempt <= 3; attempt++) {
                 try {
-                    await delay(3000);
                     const pairingCode = await Hanz.requestPairingCode(phoneNumber);
                     console.log(chalk.magenta(`\n[➔] PAIRING CODE ANDA: `) + chalk.white.bold(pairingCode));
                     console.log(chalk.gray('Silakan masukkan kode di atas pada menu: Linked Devices -> Link with phone number\n'));
                     break;
-                } catch {
+                } catch (err) {
+                    console.log(chalk.yellow(`[!] Percobaan ${attempt}/3 gagal: ${err.message}`));
                     if (attempt >= 3) {
                         console.log(chalk.red('❌ Gagal generate pairing code setelah 3 percobaan.'));
                         process.exit(1);
