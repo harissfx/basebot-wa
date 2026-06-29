@@ -377,6 +377,171 @@ ${downloadCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
                 break;
             }
 
+case 'shorts':
+case 'ytshorts': {
+    if (!url) return m.reply({ text: '❌ Contoh: `!shorts https://youtube.com/shorts/xxx`' });
+
+    await m.react('⏳');
+    let filePath;
+    try {
+        await m.reply({ text: '⬇️ Mendownload Shorts...' });
+
+        filePath = await download(url, [
+            '-f', 'best[ext=mp4][height<=1080]/best[ext=mp4]/best',
+            '--merge-output-format', 'mp4',
+        ], 'mp4');
+
+        const sizeMB = fileSizeMB(filePath);
+        if (sizeMB > MAX_SIZE_MB) {
+            cleanTmp(filePath);
+            await m.react('❌');
+            return m.reply({ text: `❌ File terlalu besar (${sizeMB.toFixed(1)} MB).` });
+        }
+
+        let info;
+        try { info = await getInfo(url); } catch { }
+
+        await Hanz.sendMessage(sender, {
+            video: fs.readFileSync(filePath),
+            mimetype: 'video/mp4',
+            caption: info?.title ? `📱 *${info.title}*` : '✅ Shorts downloaded!',
+        }, { quoted: msg });
+
+        cleanTmp(filePath);
+        await m.react('✅');
+
+    } catch (err) {
+        cleanTmp(filePath);
+        console.error('[SHORTS ERROR]', err.message);
+        await m.react('❌');
+        await m.reply({ text: `❌ Gagal download Shorts.\nError: ${err.message.slice(0, 200)}` });
+    }
+    break;
+}
+case 'gitclone': {
+    if (!url) return m.reply({ text: '❌ Contoh: `!gitclone https://github.com/user/repo`' });
+
+    const repoMatch = url.match(/github\.com\/([^\/]+)\/([^\/]+)/);
+    if (!repoMatch) return m.reply({ text: '❌ Link GitHub tidak valid!' });
+
+    await m.react('⏳');
+    try {
+        const [, user, repo] = repoMatch;
+        const repoName = repo.replace(/\.git$/, '');
+        const zipUrl = `https://github.com/${user}/${repoName}/archive/refs/heads/main.zip`;
+
+        await m.reply({ text: `⬇️ Mendownload repository *${repoName}*...` });
+
+        const { execSync } = require('child_process');
+        const tmpFile = path.join(require('os').tmpdir(), `${repoName}.zip`);
+
+        execSync(`curl -L -o "${tmpFile}" "${zipUrl}"`, { timeout: 60000 });
+
+        const stats = fs.statSync(tmpFile);
+        const sizeMB = stats.size / 1024 / 1024;
+
+        if (sizeMB > MAX_SIZE_MB) {
+            fs.unlinkSync(tmpFile);
+            await m.react('❌');
+            return m.reply({ text: `❌ Repo terlalu besar (${sizeMB.toFixed(1)} MB).` });
+        }
+
+        await Hanz.sendMessage(sender, {
+            document: fs.readFileSync(tmpFile),
+            mimetype: 'application/zip',
+            fileName: `${repoName}.zip`,
+            caption: `📦 *${repoName}*\n💾 ${sizeMB.toFixed(2)} MB`,
+        }, { quoted: msg });
+
+        fs.unlinkSync(tmpFile);
+        await m.react('✅');
+
+    } catch (err) {
+        console.error('[GITCLONE ERROR]', err.message);
+        await m.react('❌');
+        await m.reply({ text: `❌ Gagal clone repo.\nError: ${err.message.slice(0, 200)}` });
+    }
+    break;
+}
+case 'mediafire': {
+    if (!url) return m.reply({ text: '❌ Contoh: `!mediafire https://mediafire.com/...`' });
+
+    await m.react('⏳');
+    let filePath;
+    try {
+        await m.reply({ text: '⬇️ Mendownload dari MediaFire...' });
+
+        filePath = await download(url, [], 'bin');
+
+        const sizeMB = fileSizeMB(filePath);
+        if (sizeMB > MAX_SIZE_MB) {
+            cleanTmp(filePath);
+            await m.react('❌');
+            return m.reply({ text: `❌ File terlalu besar (${sizeMB.toFixed(1)} MB).` });
+        }
+
+        const fileName = path.basename(filePath);
+        await Hanz.sendMessage(sender, {
+            document: fs.readFileSync(filePath),
+            mimetype: 'application/octet-stream',
+            fileName: fileName,
+            caption: `📁 *${fileName}*\n💾 ${sizeMB.toFixed(2)} MB`,
+        }, { quoted: msg });
+
+        cleanTmp(filePath);
+        await m.react('✅');
+
+    } catch (err) {
+        cleanTmp(filePath);
+        console.error('[MEDIAFIRE ERROR]', err.message);
+        await m.react('❌');
+        await m.reply({ text: `❌ Gagal download MediaFire.\nError: ${err.message.slice(0, 200)}` });
+    }
+    break;
+}
+case 'soundcloud':
+case 'scloud': {
+    if (!url) return m.reply({ text: '❌ Contoh: `!scloud https://soundcloud.com/...`' });
+
+    await m.react('⏳');
+    let filePath;
+    try {
+        await m.reply({ text: '⬇️ Mendownload dari SoundCloud...' });
+
+        filePath = await download(url, [
+            '-x',
+            '--audio-format', 'mp3',
+            '--audio-quality', '128K',
+        ], 'mp3');
+
+        const sizeMB = fileSizeMB(filePath);
+        if (sizeMB > MAX_SIZE_MB) {
+            cleanTmp(filePath);
+            await m.react('❌');
+            return m.reply({ text: `❌ File terlalu besar.` });
+        }
+
+        let info;
+        try { info = await getInfo(url); } catch { }
+
+        await Hanz.sendMessage(sender, {
+            audio: fs.readFileSync(filePath),
+            mimetype: 'audio/mpeg',
+            fileName: info?.title ? `${info.title}.mp3` : 'soundcloud.mp3',
+            ptt: false,
+        }, { quoted: msg });
+
+        cleanTmp(filePath);
+        await m.react('✅');
+
+    } catch (err) {
+        cleanTmp(filePath);
+        console.error('[SOUNDCLOUD ERROR]', err.message);
+        await m.react('❌');
+        await m.reply({ text: `❌ Gagal download SoundCloud.\nError: ${err.message.slice(0, 200)}` });
+    }
+    break;
+}
         case 'pinterest':
         case 'pindl':
         case 'pin': {
