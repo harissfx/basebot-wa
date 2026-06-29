@@ -12,6 +12,24 @@ const { fakeOrder } = require('../utils/fquoted');
 const superOwnerLidCache = new Set();
 const coOwnerLidCache = new Set();
 
+// Anti-spam cooldown
+const COOLDOWN_MS = 5000;
+const COOLDOWN_EXEMPT = new Set([
+    'menu', 'ping',
+    'generalmenu', 'ownermenu', 'ffmpegmenu',
+    'downloadmenu', 'toolsmenu', 'jadibotmenu',
+    'funmenu', 'groupmenu',
+]);
+const cooldownMap = new Map();
+
+// Cleanup cooldownMap setiap 5 menit — hapus entry yang sudah expired
+setInterval(() => {
+    const now = Date.now();
+    for (const [key, timestamp] of cooldownMap) {
+        if (now - timestamp > COOLDOWN_MS) cooldownMap.delete(key);
+    }
+}, 5 * 60 * 1000);
+
 async function resolveOwnerLids(Hanz) {
     const resolveList = [
         { numbers: [].concat(config.superOwner), cache: superOwnerLidCache, label: 'SUPER' },
@@ -148,6 +166,22 @@ async function handleMessages(Hanz, m, isMain = true) {
             const handler = plugins.get(command.name);
 
             if (handler) {
+                // Cek cooldown (owner bebas dari cooldown)
+                if (!checkSuperOwner && !checkOwner && !COOLDOWN_EXEMPT.has(command.name)) {
+                    const cooldownKey = `${sender}:${command.name}`;
+                    const lastUsed = cooldownMap.get(cooldownKey) || 0;
+                    const remaining = COOLDOWN_MS - (Date.now() - lastUsed);
+
+                    if (remaining > 0) {
+                        await Hanz.sendMessage(sender, {
+                            text: `⏳ Sabar dulu! Tunggu *${(remaining / 1000).toFixed(1)} detik* lagi sebelum pakai command ini.`
+                        }, { quoted: msg });
+                        continue;
+                    }
+
+                    cooldownMap.set(cooldownKey, Date.now());
+                }
+
                 const cmdArgs = command.args.length ? ' ' + command.args.join(' ') : '';
 
                 readline.clearLine(process.stdout, 0);
