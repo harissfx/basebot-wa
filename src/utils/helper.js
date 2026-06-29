@@ -20,14 +20,6 @@ function formatJid(number) {
     return n + '@s.whatsapp.net';
 }
 
-/** Format group ID ke JID grup */
-function formatGroupJid(groupId) {
-    return groupId.endsWith('@g.us') ? groupId : groupId + '@g.us';
-}
-
-/** Cek apakah JID adalah grup */
-function isGroupJid(jid) { return jid.endsWith('@g.us'); }
-
 /** Delay/pause execution */
 function delay(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
 
@@ -66,8 +58,6 @@ async function isGroupAdmin(Hanz, groupJid, userJid) {
     }
 }
 
-/** Ambil JID bot sendiri */
-function getBotJid(Hanz) { return Hanz.user?.id || ''; }
 
 const fs = require('fs');
 const path = require('path');
@@ -89,4 +79,4 @@ function getImage(name = 'logo') {
     return fs.readFileSync(imgPath);
 }
 
-module.exports = { formatUptime, formatJid, formatGroupJid, delay, formatBytes, randomString, isGroupJid, getGroupInfo, isGroupAdmin, getBotJid, getImage, MEDIA };
+module.exports = { formatUptime, formatJid, delay, formatBytes, randomString, getGroupInfo, isGroupAdmin, getImage, MEDIA };
