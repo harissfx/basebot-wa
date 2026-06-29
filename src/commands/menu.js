@@ -3,14 +3,28 @@ const { formatUptime } = require('../utils/helper');
 const plugins = require('../utils/PluginLoader');
 const { getImage } = require('../utils/helper');
 
+// Command-command sub-menu yang tidak perlu ditampilkan di menu utama
+const EXCLUDED_CMDS = [
+    'menu',
+    'generalmenu',
+    'ownermenu',
+    'ffmpegmenu',
+    'downloadmenu',
+    'toolsmenu',
+    'jadibotmenu',
+    'funmenu',
+    'groupmenu',
+    'mediamenu',
+];
+
 const handler = async (m) => {
     const { command } = m;
-        const p = config.prefix;
+    const p = config.prefix;
 
     switch (command.name) {
-case 'menu':
-            
-            menutxt = `┌━━━━━━━━━━━━━━┈ ❋ཻུ۪۪⸙
+        case 'menu':
+
+            menutxt = `┌━━━━━━━━━━━━━━┈ ❋ཻུ۪۪⸙
 │    「 𝙄𝙉𝙁𝙊 𝘽𝙊𝙏 」
 │● Owner: ${config.ownerName}
 │● Nomor: ${[].concat(config.superOwner).join(', ')}
@@ -19,14 +33,18 @@ case 'menu':
 └┬━━━━━━━━━━━━━━┈ ⳹
 ┌┤  「 𝙈𝙀𝙉𝙐 𝘽𝙊𝙏 」
 ││
-${Object.entries(plugins.commandsByFile()).map(([file, cmds]) => `││\n││  〘 ${file} 〙\n` + cmds.map(cmd => `││⪩ \`${p}${cmd}\``).join('\n')).join('\n')}
+${Object.entries(plugins.commandsByFile()).map(([file, cmds]) => {
+    const filtered = cmds.filter(cmd => !EXCLUDED_CMDS.includes(cmd));
+    if (filtered.length === 0) return null;
+    return `││\n││  〘 ${file} 〙\n` + filtered.map(cmd => `││⪩ \`${p}${cmd}\``).join('\n');
+}).filter(Boolean).join('\n')}
 ││
 │└────────────┈ ⳹
 │›⟩ ∘ 𝘓𝘢𝘯𝘨𝘶𝘢𝘨𝘦: 𝘑𝘢𝘷𝘢𝘚𝘤𝘳𝘪𝘱𝘵
 │›⟩ ∘ 𝘚𝘤𝘳𝘪𝘱𝘵?: ketik ${p}script ( ͡° ͜ʖ ͡°)
 ├───────────────
 │✑ 𝖢𝗈𝗉𝗒𝗋𝗂𝗀𝗁𝗍 Haris Syc
-└━━━━━━━━━━━━━━━┈ ❋ཻུ۪۪⸙`
+└━━━━━━━━━━━━━━━┈ ❋ཻུ۪۪⸙`
             await m.sendInteractiveWithImage({
                 imageSource: getImage(),
                 text: menutxt,
