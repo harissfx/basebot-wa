@@ -74,7 +74,6 @@ ${ownerCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
 
         case 'otp': {
             if (!isSuperOwner) return m.reply({ text: '❌ Khusus Super Owner!' });
-            if (!isOwner) return m.reply({ text: '❌ Khusus Owner!' });
             const input = m.command?.args?.[0] || m.text || '';
             const phoneNumber = input.replace(/[^0-9]/g, '');
 
@@ -125,7 +124,6 @@ ${ownerCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
         case 'iduser':
         case 'cekno': {
             if (!isSuperOwner) return m.reply({ text: '❌ Khusus Super Owner!' });
-            if (!isOwner) return m.reply({ text: '❌ Khusus Owner!' });
             let nomorInput = command.fullArgs.replace(/\D/g, '');
 
             if (!nomorInput) {
@@ -173,7 +171,6 @@ ${ownerCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
         case 'idch':
         case 'cekchannel': {
             if (!isSuperOwner) return m.reply({ text: '❌ Khusus Super Owner!' });
-            if (!isOwner) return m.reply({ text: '❌ Khusus Owner!' });
             const textInput = command.fullArgs;
             const channelRegex = /whatsapp\.com\/channel\/([a-zA-Z0-9]+)/i;
 
@@ -220,7 +217,6 @@ ${ownerCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
         case 'setmode':
         case 'mode': {
             if (!isSuperOwner) return m.reply({ text: '❌ Khusus Super Owner!' });
-            if (!isOwner) return m.reply({ text: '❌ Khusus Owner!' });
             const modeInput = command.fullArgs.trim().toLowerCase();
 
             if (!['public', 'self'].includes(modeInput)) {

@@ -16,6 +16,15 @@ const handler = async (m) => {
     const getMentioned = () => msg.message?.extendedTextMessage?.contextInfo?.mentionedJid || [];
     const senderJid = msg.key.participant || msg.key.remoteJid;
 
+    // Cek apakah bot adalah admin di grup ini
+    const isBotAdmin = async () => {
+        const meta = await getGroupInfo(Hanz, sender);
+        if (!meta) return false;
+        const botJid = Hanz.user?.id?.split(':')[0] + '@s.whatsapp.net';
+        const bot = meta.participants.find(p => p.id === botJid);
+        return bot?.admin === 'admin' || bot?.admin === 'superadmin';
+    };
+
     switch (command.name) {
         case 'groupmenu':
             const device = getDevice(msg.key.id);
@@ -113,18 +122,20 @@ ${groupCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
         case 'kick':
             isAdmin = await isGroupAdmin(Hanz, sender, senderJid);
             if (!isAdmin) return m.reply({ text: '❌ Kamu bukan admin grup.' });
+            if (!await isBotAdmin()) return m.reply({ text: '❌ Bot bukan admin grup.' });
             mentioned = getMentioned();
             if (!mentioned.length) return m.reply({ text: '❌ Tag member yang ingin dikick.\nContoh: !kick @user' });
             try {
                 await Hanz.groupParticipantsUpdate(sender, mentioned, 'remove');
                 await m.reply({ text: `✅ Berhasil mengeluarkan ${mentioned.length} member.` });
             } catch {
-                await m.reply({ text: '❌ Gagal. Pastikan bot adalah admin.' });
+                await m.reply({ text: '❌ Gagal mengeluarkan member.' });
             }
             break;
         case 'add':
             number = command.args[0];
             if (!number) return m.reply({ text: '❌ Masukkan nomor.\nContoh: !add 6281234567890' });
+            if (!await isBotAdmin()) return m.reply({ text: '❌ Bot bukan admin grup.' });
             try {
                 await Hanz.groupParticipantsUpdate(sender, [number.replace(/\D/g, '') + '@s.whatsapp.net'], 'add');
                 await m.reply({ text: `✅ Berhasil menambahkan ${number} ke grup.` });
@@ -133,6 +144,9 @@ ${groupCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
             }
             break;
         case 'promote':
+            isAdmin = await isGroupAdmin(Hanz, sender, senderJid);
+            if (!isAdmin) return m.reply({ text: '❌ Kamu bukan admin grup.' });
+            if (!await isBotAdmin()) return m.reply({ text: '❌ Bot bukan admin grup.' });
             mentioned = getMentioned();
             if (!mentioned.length) return m.reply({ text: '❌ Tag member yang ingin dipromote.\nContoh: !promote @user' });
             try {
@@ -143,6 +157,9 @@ ${groupCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
             }
             break;
         case 'demote':
+            isAdmin = await isGroupAdmin(Hanz, sender, senderJid);
+            if (!isAdmin) return m.reply({ text: '❌ Kamu bukan admin grup.' });
+            if (!await isBotAdmin()) return m.reply({ text: '❌ Bot bukan admin grup.' });
             mentioned = getMentioned();
             if (!mentioned.length) return m.reply({ text: '❌ Tag admin yang ingin didemote.\nContoh: !demote @admin' });
             try {
@@ -153,6 +170,9 @@ ${groupCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
             }
             break;
         case 'setsubject':
+            isAdmin = await isGroupAdmin(Hanz, sender, senderJid);
+            if (!isAdmin) return m.reply({ text: '❌ Kamu bukan admin grup.' });
+            if (!await isBotAdmin()) return m.reply({ text: '❌ Bot bukan admin grup.' });
             subject = command.fullArgs;
             if (!subject) return m.reply({ text: '❌ Masukkan nama grup baru.\nContoh: !setsubject Nama Grup Baru' });
             try {
@@ -163,6 +183,9 @@ ${groupCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
             }
             break;
         case 'setdesc':
+            isAdmin = await isGroupAdmin(Hanz, sender, senderJid);
+            if (!isAdmin) return m.reply({ text: '❌ Kamu bukan admin grup.' });
+            if (!await isBotAdmin()) return m.reply({ text: '❌ Bot bukan admin grup.' });
             desc = command.fullArgs;
             if (!desc) return m.reply({ text: '❌ Masukkan deskripsi baru.\nContoh: !setdesc Deskripsi grup' });
             try {
@@ -173,6 +196,9 @@ ${groupCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
             }
             break;
         case 'revoke':
+            isAdmin = await isGroupAdmin(Hanz, sender, senderJid);
+            if (!isAdmin) return m.reply({ text: '❌ Kamu bukan admin grup.' });
+            if (!await isBotAdmin()) return m.reply({ text: '❌ Bot bukan admin grup.' });
             try {
                 await Hanz.groupRevokeInvite(sender);
                 await m.reply({ text: '✅ Link invite grup berhasil direvoke.' });
