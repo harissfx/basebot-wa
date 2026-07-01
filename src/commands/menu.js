@@ -3,7 +3,6 @@ const { formatUptime } = require('../utils/helper');
 const plugins = require('../utils/PluginLoader');
 const { getImage } = require('../utils/helper');
 
-// Command-command sub-menu yang tidak perlu ditampilkan di menu utama
 const EXCLUDED_CMDS = [
     'menu',
     'generalmenu',
