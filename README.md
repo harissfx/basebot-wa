@@ -1,4 +1,4 @@
-# 🤖 WhatsApp Bot Base
+# WhatsApp Bot Base
 
 Bot WhatsApp berbasis **Node.js** dan **Baileys** dengan sistem plugin otomatis, hot-reload tanpa restart, button interaktif, jadibot, dan struktur yang mudah dikembangkan.
 
@@ -6,25 +6,25 @@ Bot WhatsApp berbasis **Node.js** dan **Baileys** dengan sistem plugin otomatis,
 
 ---
 
-## ✨ Fitur Unggulan
+## Fitur Unggulan
 
-- 🔄 **Hot-reload otomatis** — edit file command, langsung aktif tanpa restart bot
-- 🔌 **Plugin system** — tambah/hapus file command, otomatis terdaftar
-- 🤖 **JadiBot** — kloning bot ke nomor lain via pairing code
-- 🎛️ **Button interaktif** — quick reply, URL, call, copy, list/dropdown
-- 🖼️ **Media lokal** — sistem `getImage()` untuk gambar lokal yang simpel
-- 👑 **Multi-level owner** — Super Owner, Co-Owner, User
-- 🔒 **Mode self/public** — bisa diubah via command tanpa restart
-- 📡 **Auto join channel** — bot otomatis join channel WA saat connect
-- 🛡️ **LID support** — handle sistem LID terbaru WhatsApp
-- 🛡️ **Anti-spam cooldown** — jeda 5 detik antar command per user
-- 👋 **Welcome/Goodbye** — pesan otomatis saat member masuk/keluar grup
-- 🚫 **Antilink** — auto hapus pesan berisi link di grup
-- 💤 **AFK** — status AFK dengan auto-reply saat di-mention
+- **Hot-reload otomatis** — edit file command, langsung aktif tanpa restart bot
+- **Plugin system** — tambah/hapus file command, otomatis terdaftar
+- **JadiBot** — kloning bot ke nomor lain via pairing code
+- **Button interaktif** — quick reply, URL, call, copy, list/dropdown
+- **Media lokal** — sistem `getImage()` untuk gambar lokal yang simpel
+- **Multi-level owner** — Super Owner, Co-Owner, User
+- **Mode self/public** — bisa diubah via command tanpa restart
+- **Auto join channel** — bot otomatis join channel WA saat connect
+- **LID support** — handle sistem LID terbaru WhatsApp
+- **Anti-spam cooldown** — jeda 5 detik antar command per user
+- **Welcome/Goodbye** — pesan otomatis saat member masuk/keluar grup
+- **Antilink** — auto hapus pesan berisi link di grup
+- **AFK** — status AFK dengan auto-reply saat di-mention
 
 ---
 
-## ⚙️ Prasyarat
+## Prasyarat
 
 - **Node.js** v18 atau lebih baru → [Download](https://nodejs.org)
 - **npm** (sudah termasuk bersama Node.js)
@@ -32,7 +32,7 @@ Bot WhatsApp berbasis **Node.js** dan **Baileys** dengan sistem plugin otomatis,
 
 ---
 
-## 🚀 Instalasi
+## Instalasi
 
 ```bash
 # 1. Clone project
@@ -70,13 +70,13 @@ whatsapp-bot/
 │   ├── random.js                   # Fungsi random
 │   └── mone.js                     # [OBFUSCATED] Logic monetisasi link
 ├── src/
-│   ├── config.js                   # ⚙️ Konfigurasi utama bot
+│   ├── config.js                   # Konfigurasi utama bot
 │   ├── media/
 │   │   └── logo.png                # Gambar default bot
 │   ├── database/
 │   │   ├── session/                # Sesi login bot utama (auto-generated)
 │   │   └── jadibot/                # Sesi login clone bot (auto-generated)
-│   ├── commands/                   # 📂 Semua file command di sini
+│   ├── commands/                   # Semua file command di sini
 │   │   ├── general.js              # menu, ping, owner, script
 │   │   ├── sample.js               # Contoh button, list, poll, media
 │   │   ├── downloader.js           # ytmp3, ytmp4, tiktok, instagram, dll
@@ -86,7 +86,7 @@ whatsapp-bot/
 │   │   ├── owner.js                # Fitur khusus owner
 │   │   ├── group.js                # Fitur grup (tagall, kick, promote, dll)
 │   │   ├── jadibot.js              # jadibot, listbot, stopbot
-│   │   └── extra.js                # afk, gp, shortlink, sholat, welcome, goodbye, antilink
+│   │   └── extra.js                # afk, gp, shortlink, sholat
 │   ├── handlers/
 │   │   └── messageHandler.js       # Routing & parsing pesan masuk
 │   └── utils/
@@ -98,7 +98,7 @@ whatsapp-bot/
 
 ---
 
-## 🔧 Konfigurasi (`src/config.js`)
+## Konfigurasi (`src/config.js`)
 
 Edit langsung `src/config.js` — bot **otomatis reload** tanpa restart karena dipantau oleh PluginLoader.
 
@@ -131,7 +131,7 @@ Gunakan command `!cekchannel https://whatsapp.com/channel/xxxxx` — bot akan ta
 
 ---
 
-## ➕ Menambah Command Baru
+## Menambah Command Baru
 
 Ada 2 cara — pilih sesuai selera:
 
@@ -178,7 +178,7 @@ Simpan file → PluginLoader **otomatis mendeteksi** file baru dan mendaftarkan 
 
 ---
 
-## 📦 Parameter `m` (Context Object)
+## Parameter `m` (Context Object)
 
 Setiap handler menerima satu parameter `m` yang berisi semua info dan fungsi yang dibutuhkan command.
 
@@ -229,7 +229,7 @@ Setiap handler menerima satu parameter `m` yang berisi semua info dan fungsi yan
 
 ---
 
-## 🎛️ Tipe Button Interaktif
+## Tipe Button Interaktif
 
 Digunakan di `m.sendInteractive()` dan `m.sendInteractiveWithImage()`.
 
@@ -299,7 +299,7 @@ await m.sendInteractive({
 
 ---
 
-## 🖼️ Menggunakan Gambar Lokal (`getImage`)
+## Menggunakan Gambar Lokal (`getImage`)
 
 Semua gambar disimpan di `src/media/`. Sistem `getImage()` mempermudah pemanggilan tanpa perlu path panjang.
 
@@ -336,7 +336,7 @@ case 'buttongambar':
 
 ---
 
-## 👑 Sistem Level Akses
+## Sistem Level Akses
 
 | Level | Siapa | Akses |
 |---|---|---|
@@ -354,7 +354,7 @@ if (!m.isMain)       return m.reply({ text: '❌ Hanya bisa dari bot utama!' });
 
 ---
 
-## 🔒 Mode Self / Public
+## Mode Self / Public
 
 ```
 !setmode public   → semua orang bisa pakai bot
@@ -364,7 +364,7 @@ if (!m.isMain)       return m.reply({ text: '❌ Hanya bisa dari bot utama!' });
 
 ---
 
-## 🤖 JadiBot (Clone Bot)
+## JadiBot (Clone Bot)
 
 | Command | Keterangan |
 |---|---|
@@ -376,7 +376,7 @@ Clone bot otomatis hidup kembali saat bot utama di-restart.
 
 ---
 
-## 🔗 Fitur Shortlink (`extra.js`)
+## Fitur Shortlink (`extra.js`)
 
 ### `!shortlink` / `!short`
 Mempersingkat URL menggunakan **TinyURL** — gratis, tanpa iklan, tanpa perlu akun.
@@ -392,10 +392,10 @@ Mempersingkat URL menggunakan **GPLinks** — link hasil shorten akan menampilka
 !gp https://link-panjang.com/path
 ```
 
-> **ℹ️ Transparansi:** Fitur `!gp` menggunakan API key GPLinks milik developer (Haris Sfx). Setiap klik pada link yang dihasilkan akan menghasilkan pendapatan iklan yang masuk ke akun developer, bukan ke pengguna bot. Jika kamu tidak setuju dengan hal ini disable aja fitur ini
+> **Transparansi:** Fitur `!gp` menggunakan API key GPLinks milik developer (Haris Sfx). Setiap klik pada link yang dihasilkan akan menghasilkan pendapatan iklan yang masuk ke akun developer, bukan ke pengguna bot. Jika kamu tidak setuju dengan hal ini disable aja fitur ini
 ---
 
-## 🔄 Sistem Hot-Reload
+## Sistem Hot-Reload
 
 | Aksi | File | Efek |
 |---|---|---|
@@ -409,7 +409,7 @@ Mempersingkat URL menggunakan **GPLinks** — link hasil shorten akan menampilka
 
 ---
 
-## 🛠️ Fungsi Utilitas (`src/utils/helper.js`)
+## Fungsi Utilitas (`src/utils/helper.js`)
 
 ```js
 const {
@@ -426,7 +426,7 @@ const {
 
 ---
 
-## 📦 Dependencies
+## Dependencies
 
 | Package | Kegunaan |
 |---|---|
@@ -443,7 +443,7 @@ const {
 
 ---
 
-## 🔄 Reset Sesi
+## Reset Sesi
 
 ```bash
 # Bot utama
