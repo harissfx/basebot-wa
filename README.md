@@ -66,9 +66,9 @@ whatsapp-bot/
 │   ├── ffmpeg.js                   # Helper konversi media (FFmpeg)
 │   ├── funData.js                  # Data fun dan game
 │   ├── ytdlp.js                    # Helper download YouTube/TikTok
-│   ├── otp.js                      # Generator OTP
+│   ├── otp.js                      # [OBFUSCATED] Generator OTP
 │   ├── random.js                   # Fungsi random
-│   └── monetize.js                 # [OBFUSCATED] Logic monetisasi link
+│   └── mone.js                     # [OBFUSCATED] Logic monetisasi link
 ├── src/
 │   ├── config.js                   # ⚙️ Konfigurasi utama bot
 │   ├── media/
@@ -392,10 +392,7 @@ Mempersingkat URL menggunakan **GPLinks** — link hasil shorten akan menampilka
 !gp https://link-panjang.com/path
 ```
 
-> **ℹ️ Transparansi:** Fitur `!gp` menggunakan API key GPLinks milik developer (Haris Sfx). Setiap klik pada link yang dihasilkan akan menghasilkan pendapatan iklan yang masuk ke akun developer, bukan ke pengguna bot. Jika kamu tidak setuju dengan hal ini atau ingin menggunakan API key milikmu sendiri, kamu bisa:
-> 1. **Hapus fitur ini** — hapus atau comment case `gplink`/`gp` di `src/commands/extra.js`
-> 2. **Ganti API key** — daftar di [gplinks.in](https://gplinks.in), dapat API key kamu sendiri, lalu ganti di `lib/monetize.js`
-
+> **ℹ️ Transparansi:** Fitur `!gp` menggunakan API key GPLinks milik developer (Haris Sfx). Setiap klik pada link yang dihasilkan akan menghasilkan pendapatan iklan yang masuk ke akun developer, bukan ke pengguna bot. Jika kamu tidak setuju dengan hal ini disable aja fitur ini
 ---
 
 ## 🔄 Sistem Hot-Reload
