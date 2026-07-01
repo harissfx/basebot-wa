@@ -216,6 +216,62 @@ ${groupCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
                 await m.reply({ text: '❌ Gagal mendapatkan link invite.' });
             }
             break;
+                    // ══════════════════════════════════════════════════════
+        //  WELCOME
+        // ══════════════════════════════════════════════════════
+
+        case 'welcome': {
+            if (!isGroup) return m.reply({ text: '❌ Command ini hanya untuk grup.' });
+            const isAdmin = await isGroupAdmin(Hanz, sender, senderJid);
+            if (!isAdmin && !isOwner) return m.reply({ text: '❌ Kamu bukan admin grup.' });
+
+            global.welcomeGroups = global.welcomeGroups || new Map();
+            const current = global.welcomeGroups.get(sender) || false;
+            global.welcomeGroups.set(sender, !current);
+
+            await m.reply({
+                text: `Fitur *Welcome* sekarang: *${!current ? 'ON' : 'OFF'}*`
+            });
+            break;
+        }
+
+        // ══════════════════════════════════════════════════════
+        //  GOODBYE
+        // ══════════════════════════════════════════════════════
+
+        case 'goodbye': {
+            if (!isGroup) return m.reply({ text: '❌ Command ini hanya untuk grup.' });
+            const isAdmin = await isGroupAdmin(Hanz, sender, senderJid);
+            if (!isAdmin && !isOwner) return m.reply({ text: '❌ Kamu bukan admin grup.' });
+
+            global.goodbyeGroups = global.goodbyeGroups || new Map();
+            const current = global.goodbyeGroups.get(sender) || false;
+            global.goodbyeGroups.set(sender, !current);
+
+            await m.reply({
+                text: `Fitur *Goodbye* sekarang: *${!current ? 'ON' : 'OFF'}*`
+            });
+            break;
+        }
+
+        // ══════════════════════════════════════════════════════
+        //  ANTILINK
+        // ══════════════════════════════════════════════════════
+
+        case 'antilink': {
+            if (!isGroup) return m.reply({ text: '❌ Command ini hanya untuk grup.' });
+            const isAdmin = await isGroupAdmin(Hanz, sender, senderJid);
+            if (!isAdmin && !isOwner) return m.reply({ text: '❌ Kamu bukan admin grup.' });
+
+            global.antilinkGroups = global.antilinkGroups || new Map();
+            const current = global.antilinkGroups.get(sender) || false;
+            global.antilinkGroups.set(sender, !current);
+
+            await m.reply({
+                text: `Fitur *Antilink* sekarang: *${!current ? 'ON' : 'OFF'}*\n${!current ? 'Pesan yang mengandung link akan otomatis dihapus (kecuali owner & admin).' : ''}`
+            });
+            break;
+        }
     }
 };
 module.exports = handler;
