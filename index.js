@@ -134,6 +134,9 @@ async function startBot(authFolder = config.authFolder, isMain = true, customPho
     Hanz.ev.on('messages.upsert', (m) => {
         messageHandler(Hanz, m, isMain);
     });
+    Hanz.ev.on('group-participants.update', (update) => {
+        messageHandler.handleGroupParticipants(Hanz, update);
+    });
 
     // Promise yang resolve saat koneksi siap untuk pairing
     let pairingReady = null;
