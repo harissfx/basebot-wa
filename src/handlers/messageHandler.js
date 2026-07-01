@@ -12,7 +12,6 @@ const { fakeOrder } = require('../utils/fquoted');
 const superOwnerLidCache = new Set();
 const coOwnerLidCache = new Set();
 
-// Anti-spam cooldown
 const COOLDOWN_MS = 5000;
 const COOLDOWN_EXEMPT = new Set([
     'menu', 'ping',
@@ -23,20 +22,16 @@ const COOLDOWN_EXEMPT = new Set([
 ]);
 const cooldownMap = new Map();
 
-// State untuk fitur grup
-const welcomeGroups = new Map();  // groupJid -> true/false
+const welcomeGroups = new Map();
 const goodbyeGroups = new Map();
 const antilinkGroups = new Map();
 
-// Expose state agar bisa diakses dari command files
 global.welcomeGroups = welcomeGroups;
 global.goodbyeGroups = goodbyeGroups;
 global.antilinkGroups = antilinkGroups;
 
-// State AFK
 global.afkUsers = global.afkUsers || new Map(); // senderNumber -> { reason, time }
 
-// Cleanup cooldownMap setiap 5 menit — hapus entry yang sudah expired
 setInterval(() => {
     const now = Date.now();
     for (const [key, timestamp] of cooldownMap) {
@@ -174,7 +169,6 @@ async function handleMessages(Hanz, m, isMain = true) {
         if (config.autoRead) await Hanz.readMessages([msg.key]);
         if (config.autoTyping && !isGroup(sender)) await Hanz.sendPresenceUpdate('composing', sender);
 
-        // Antilink
         if (isGroup(sender) && global.antilinkGroups?.get(sender) && !checkOwner) {
             const linkRegex = /https?:\/\/|wa\.me\/|chat\.whatsapp\.com\/|bit\.ly\/|t\.me\//i;
             if (linkRegex.test(text)) {
@@ -189,7 +183,6 @@ async function handleMessages(Hanz, m, isMain = true) {
             }
         }
 
-        // Cek mention user AFK
         if (isGroup(sender) && global.afkUsers?.size > 0) {
             const mentioned = msg.message?.extendedTextMessage?.contextInfo?.mentionedJid || [];
             for (const jid of mentioned) {
@@ -206,7 +199,6 @@ async function handleMessages(Hanz, m, isMain = true) {
             }
         }
 
-        // Hapus AFK kalau user yang AFK kirim pesan sendiri
         if (!fromMe && global.afkUsers?.has(getSenderNumber(sender, msg))) {
             const num = getSenderNumber(sender, msg);
             global.afkUsers.delete(num);
@@ -222,7 +214,6 @@ async function handleMessages(Hanz, m, isMain = true) {
             const handler = plugins.get(command.name);
 
             if (handler) {
-                // Cek cooldown (owner bebas dari cooldown)
                 if (!checkSuperOwner && !checkOwner && !COOLDOWN_EXEMPT.has(command.name)) {
                     const cooldownKey = `${sender}:${command.name}`;
                     const lastUsed = cooldownMap.get(cooldownKey) || 0;
@@ -299,7 +290,6 @@ async function handleMessages(Hanz, m, isMain = true) {
     }
 }
 
-// Handler welcome/goodbye saat participant update
 async function handleGroupParticipants(Hanz, update) {
     const { id: groupJid, participants, action } = update;
 
