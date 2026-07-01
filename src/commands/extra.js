@@ -4,7 +4,7 @@ const { isGroupAdmin } = require('../utils/helper');
 const { gplink } = require('../../lib/mone');
 
 const handler = async (m) => {
-    const { command, sender, senderNumber, pushname, isGroup, isOwner, Hanz, msg } = m;
+    const { command, sender, senderNumber, pushname, msg } = m;
     const p = config.prefix;
     const senderJid = msg.key.participant || msg.key.remoteJid;
 
