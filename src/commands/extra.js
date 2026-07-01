@@ -1,18 +1,12 @@
 const axios = require('axios');
 const config = require('../config');
-const { isGroupAdmin } = require('../utils/helper');
 const { gplink } = require('../../lib/mone');
 
 const handler = async (m) => {
-    const { command, sender, senderNumber, pushname, msg } = m;
+    const { command, senderNumber, pushname, msg } = m;
     const p = config.prefix;
-    const senderJid = msg.key.participant || msg.key.remoteJid;
-
+    
     switch (command.name) {
-
-        // ══════════════════════════════════════════════════════
-        //  AFK
-        // ══════════════════════════════════════════════════════
 
         case 'afk': {
             const reason = command.fullArgs || 'Tidak ada alasan';
@@ -23,10 +17,6 @@ const handler = async (m) => {
             });
             break;
         }
-
-        // ══════════════════════════════════════════════════════
-        //  GPLINKS
-        // ══════════════════════════════════════════════════════
 
         case 'gplink':
         case 'gp': {
@@ -50,10 +40,6 @@ const handler = async (m) => {
             }
             break;
         }
-
-        // ══════════════════════════════════════════════════════
-        //  SHORTLINK
-        // ══════════════════════════════════════════════════════
 
         case 'shortlink':
         case 'short': {
@@ -83,15 +69,10 @@ const handler = async (m) => {
             break;
         }
 
-        // ══════════════════════════════════════════════════════
-        //  JADWAL SHOLAT
-        // ══════════════════════════════════════════════════════
-
         case 'sholat':
         case 'jadwalsholat': {
             const kota = command.fullArgs || 'Jakarta';
             try {
-                // Cari ID kota
                 const searchRes = await axios.get(`https://api.myquran.com/v2/sholat/kota/cari/${encodeURIComponent(kota)}`);
                 const kotaList = searchRes.data?.data;
                 if (!kotaList || kotaList.length === 0) {
@@ -101,7 +82,6 @@ const handler = async (m) => {
                 const kotaId = kotaList[0].id;
                 const kotaNama = kotaList[0].lokasi;
 
-                // Ambil jadwal hari ini
                 const now = new Date();
                 const tanggal = `${now.getFullYear()}/${String(now.getMonth() + 1).padStart(2, '0')}/${String(now.getDate()).padStart(2, '0')}`;
                 const jadwalRes = await axios.get(`https://api.myquran.com/v2/sholat/jadwal/${kotaId}/${tanggal}`);
