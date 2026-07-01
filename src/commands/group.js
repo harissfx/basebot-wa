@@ -16,13 +16,34 @@ const handler = async (m) => {
     const getMentioned = () => msg.message?.extendedTextMessage?.contextInfo?.mentionedJid || [];
     const senderJid = msg.key.participant || msg.key.remoteJid;
 
+    const norm = (jid) => jid?.replace(/:[0-9]+/, '').split('@')[0];
+    const botIds = () => [Hanz.user?.id, Hanz.user?.lid].filter(Boolean).map(norm);
+    const isBotJid = (jid) => botIds().includes(norm(jid));
+
+    // Resolve status ON/OFF baru dari argumen ('on'/'off') atau toggle kalau kosong
+    const resolveToggleState = (current, arg) => {
+        const a = arg?.toLowerCase();
+        if (a === 'on') return true;
+        if (a === 'off') return false;
+        return !current; // tanpa argumen -> toggle
+    };
+
     // Cek apakah bot adalah admin di grup ini
     const isBotAdmin = async () => {
         const meta = await getGroupInfo(Hanz, sender);
         if (!meta) return false;
-        // Ambil nomor bot saja (tanpa device suffix dan domain)
-        const botNumber = Hanz.user?.id?.replace(/:[0-9]+/, '').split('@')[0];
-        const bot = meta.participants.find(p => p.id.split('@')[0] === botNumber);
+
+        // WhatsApp sekarang bisa mengirim id partisipan dalam format @lid
+        // (bukan cuma @s.whatsapp.net), termasuk untuk akun bot sendiri.
+        // Kalau cuma dicocokkan lewat Hanz.user.id, ini bisa gagal match
+        // walau bot beneran admin. Jadi kita kumpulkan semua kemungkinan
+        // identitas bot (id & lid) lalu cocokkan ke semua kemungkinan
+        // identitas tiap partisipan (id, lid, jid).
+        const bot = meta.participants.find((p) => {
+            const pIds = [p.id, p.lid, p.jid].filter(Boolean).map(norm);
+            return pIds.some((id) => botIds().includes(id));
+        });
+
         return bot?.admin === 'admin' || bot?.admin === 'superadmin';
     };
 
@@ -134,6 +155,8 @@ ${groupCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
             }
             break;
         case 'add':
+            isAdmin = await isGroupAdmin(Hanz, sender, senderJid);
+            if (!isAdmin) return m.reply({ text: '❌ Kamu bukan admin grup.' });
             number = command.args[0];
             if (!number) return m.reply({ text: '❌ Masukkan nomor.\nContoh: !add 6281234567890' });
             if (!await isBotAdmin()) return m.reply({ text: '❌ Bot bukan admin grup.' });
@@ -151,8 +174,15 @@ ${groupCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
             mentioned = getMentioned();
             if (!mentioned.length) return m.reply({ text: '❌ Tag member yang ingin dipromote.\nContoh: !promote @user' });
             try {
-                await Hanz.groupParticipantsUpdate(sender, mentioned, 'promote');
-                await m.reply({ text: `✅ Berhasil promote ${mentioned.length} member.` });
+                const result = await Hanz.groupParticipantsUpdate(sender, mentioned, 'promote');
+                const success = result.filter(r => r.status === '200').length;
+                if (success === 0) {
+                    await m.reply({ text: '❌ Gagal promote member.' });
+                } else if (success < mentioned.length) {
+                    await m.reply({ text: `⚠️ Berhasil promote ${success} dari ${mentioned.length} member.` });
+                } else {
+                    await m.reply({ text: `✅ Berhasil promote ${success} member.` });
+                }
             } catch {
                 await m.reply({ text: '❌ Gagal promote member.' });
             }
@@ -163,9 +193,20 @@ ${groupCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
             if (!await isBotAdmin()) return m.reply({ text: '❌ Bot bukan admin grup.' });
             mentioned = getMentioned();
             if (!mentioned.length) return m.reply({ text: '❌ Tag admin yang ingin didemote.\nContoh: !demote @admin' });
+            // Proteksi: bot tidak boleh demote dirinya sendiri
+            if (mentioned.some(isBotJid)) {
+                return m.reply({ text: '❌ Bot tidak bisa demote dirinya sendiri.' });
+            }
             try {
-                await Hanz.groupParticipantsUpdate(sender, mentioned, 'demote');
-                await m.reply({ text: `✅ Berhasil demote ${mentioned.length} admin.` });
+                const result = await Hanz.groupParticipantsUpdate(sender, mentioned, 'demote');
+                const success = result.filter(r => r.status === '200').length;
+                if (success === 0) {
+                    await m.reply({ text: '❌ Gagal demote admin.' });
+                } else if (success < mentioned.length) {
+                    await m.reply({ text: `⚠️ Berhasil demote ${success} dari ${mentioned.length} admin.` });
+                } else {
+                    await m.reply({ text: `✅ Berhasil demote ${success} admin.` });
+                }
             } catch {
                 await m.reply({ text: '❌ Gagal demote admin.' });
             }
@@ -221,16 +262,17 @@ ${groupCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
         // ══════════════════════════════════════════════════════
 
         case 'welcome': {
-            if (!isGroup) return m.reply({ text: '❌ Command ini hanya untuk grup.' });
+            if (!m.isGroup) return m.reply({ text: '❌ Command ini hanya untuk grup.' });
             const isAdmin = await isGroupAdmin(Hanz, sender, senderJid);
             if (!isAdmin && !isOwner) return m.reply({ text: '❌ Kamu bukan admin grup.' });
 
             global.welcomeGroups = global.welcomeGroups || new Map();
             const current = global.welcomeGroups.get(sender) || false;
-            global.welcomeGroups.set(sender, !current);
+            const next = resolveToggleState(current, command.args?.[0]);
+            global.welcomeGroups.set(sender, next);
 
             await m.reply({
-                text: `Fitur *Welcome* sekarang: *${!current ? 'ON' : 'OFF'}*`
+                text: `Fitur *Welcome* sekarang: *${next ? 'ON' : 'OFF'}*`
             });
             break;
         }
@@ -240,16 +282,17 @@ ${groupCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
         // ══════════════════════════════════════════════════════
 
         case 'goodbye': {
-            if (!isGroup) return m.reply({ text: '❌ Command ini hanya untuk grup.' });
+            if (!m.isGroup) return m.reply({ text: '❌ Command ini hanya untuk grup.' });
             const isAdmin = await isGroupAdmin(Hanz, sender, senderJid);
             if (!isAdmin && !isOwner) return m.reply({ text: '❌ Kamu bukan admin grup.' });
 
             global.goodbyeGroups = global.goodbyeGroups || new Map();
             const current = global.goodbyeGroups.get(sender) || false;
-            global.goodbyeGroups.set(sender, !current);
+            const next = resolveToggleState(current, command.args?.[0]);
+            global.goodbyeGroups.set(sender, next);
 
             await m.reply({
-                text: `Fitur *Goodbye* sekarang: *${!current ? 'ON' : 'OFF'}*`
+                text: `Fitur *Goodbye* sekarang: *${next ? 'ON' : 'OFF'}*`
             });
             break;
         }
@@ -259,16 +302,17 @@ ${groupCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
         // ══════════════════════════════════════════════════════
 
         case 'antilink': {
-            if (!isGroup) return m.reply({ text: '❌ Command ini hanya untuk grup.' });
+            if (!m.isGroup) return m.reply({ text: '❌ Command ini hanya untuk grup.' });
             const isAdmin = await isGroupAdmin(Hanz, sender, senderJid);
             if (!isAdmin && !isOwner) return m.reply({ text: '❌ Kamu bukan admin grup.' });
 
             global.antilinkGroups = global.antilinkGroups || new Map();
             const current = global.antilinkGroups.get(sender) || false;
-            global.antilinkGroups.set(sender, !current);
+            const next = resolveToggleState(current, command.args?.[0]);
+            global.antilinkGroups.set(sender, next);
 
             await m.reply({
-                text: `Fitur *Antilink* sekarang: *${!current ? 'ON' : 'OFF'}*\n${!current ? 'Pesan yang mengandung link akan otomatis dihapus (kecuali owner & admin).' : ''}`
+                text: `Fitur *Antilink* sekarang: *${next ? 'ON' : 'OFF'}*\n${next ? 'Pesan yang mengandung link akan otomatis dihapus (kecuali owner & admin).' : ''}`
             });
             break;
         }
