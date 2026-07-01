@@ -1,15 +1,3 @@
-/**
- * media.js — Fitur konversi media pakai FFmpeg
- *
- * Commands:
- *   !sticker / !s  → foto/gif/video (reply) jadi stiker
- *   !toimg         → stiker (reply) jadi foto
- *   !togif         → stiker/video (reply) jadi GIF
- *
- * Install dependency:
- *   npm install fluent-ffmpeg @ffmpeg-installer/ffmpeg sharp node-webpmux
- */
-
 'use strict';
 
 const fs = require('fs');
@@ -24,7 +12,6 @@ const {
     cleanTmp,
 } = require('../../lib/ffmpeg');
 
-// ─── Handler ──────────────────────────────────────────────────────────────────
 const handler = async (m) => {
     const { command, isSuperOwner, msg, Hanz, sender, senderNumber, pushname, isOwner } = m;
     const p = config.prefix;
@@ -96,7 +83,6 @@ ${mediaCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
             });
             break;
 
-        // ── !sticker / !s ─────────────────────────────────────────────────────
         case 'sticker':
         case 's': {
             const mediaResult = await downloadMedia(quotedMsg);
@@ -181,7 +167,6 @@ ${mediaCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
             break;
         }
 
-        // ── !toimg ────────────────────────────────────────────────────────────
         case 'toimg': {
             const mediaResult = await downloadMedia(quotedMsg);
             if (!mediaResult || mediaResult.mediaType !== 'sticker') {
@@ -226,7 +211,6 @@ ${mediaCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
             break;
         }
 
-        // ── !togif ────────────────────────────────────────────────────────────
         case 'togif': {
             const mediaResult = await downloadMedia(quotedMsg);
             if (!mediaResult) {
