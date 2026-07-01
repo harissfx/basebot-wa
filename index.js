@@ -138,7 +138,6 @@ async function startBot(authFolder = config.authFolder, isMain = true, customPho
         messageHandler.handleGroupParticipants(Hanz, update);
     });
 
-    // Promise yang resolve saat koneksi siap untuk pairing
     let pairingReady = null;
     let pairingReadyResolve = null;
 
@@ -148,10 +147,7 @@ async function startBot(authFolder = config.authFolder, isMain = true, customPho
 
     Hanz.ev.on('connection.update', async (update) => {
         const { connection, lastDisconnect, qr } = update;
-
-        // Saat socket mulai connecting, ini saat yang tepat untuk request pairing code
         if (connection === 'connecting' && pairingReadyResolve) {
-            // Beri sedikit waktu agar handshake selesai
             setTimeout(() => {
                 if (pairingReadyResolve) {
                     const fn = pairingReadyResolve;
@@ -235,7 +231,6 @@ async function startBot(authFolder = config.authFolder, isMain = true, customPho
                 }
             }
 
-            // Tunggu sampai koneksi WebSocket siap sebelum request pairing code
             console.log(chalk.gray('⏳ Menunggu koneksi ke server WhatsApp...'));
             await pairingReady;
 
