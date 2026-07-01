@@ -20,8 +20,9 @@ const handler = async (m) => {
     const isBotAdmin = async () => {
         const meta = await getGroupInfo(Hanz, sender);
         if (!meta) return false;
-        const botJid = Hanz.user?.id?.split(':')[0] + '@s.whatsapp.net';
-        const bot = meta.participants.find(p => p.id === botJid);
+        // Ambil nomor bot saja (tanpa device suffix dan domain)
+        const botNumber = Hanz.user?.id?.replace(/:[0-9]+/, '').split('@')[0];
+        const bot = meta.participants.find(p => p.id.split('@')[0] === botNumber);
         return bot?.admin === 'admin' || bot?.admin === 'superadmin';
     };
 
