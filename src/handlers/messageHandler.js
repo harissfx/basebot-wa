@@ -19,8 +19,22 @@ const COOLDOWN_EXEMPT = new Set([
     'generalmenu', 'ownermenu', 'ffmpegmenu',
     'downloadmenu', 'toolsmenu', 'jadibotmenu',
     'funmenu', 'groupmenu',
+    'afk', 'welcome', 'goodbye', 'antilink',
 ]);
 const cooldownMap = new Map();
+
+// State untuk fitur grup
+const welcomeGroups = new Map();  // groupJid -> true/false
+const goodbyeGroups = new Map();
+const antilinkGroups = new Map();
+
+// Expose state agar bisa diakses dari command files
+global.welcomeGroups = welcomeGroups;
+global.goodbyeGroups = goodbyeGroups;
+global.antilinkGroups = antilinkGroups;
+
+// State AFK
+global.afkUsers = global.afkUsers || new Map(); // senderNumber -> { reason, time }
 
 // Cleanup cooldownMap setiap 5 menit — hapus entry yang sudah expired
 setInterval(() => {
@@ -160,6 +174,48 @@ async function handleMessages(Hanz, m, isMain = true) {
         if (config.autoRead) await Hanz.readMessages([msg.key]);
         if (config.autoTyping && !isGroup(sender)) await Hanz.sendPresenceUpdate('composing', sender);
 
+        // Antilink
+        if (isGroup(sender) && global.antilinkGroups?.get(sender) && !checkOwner) {
+            const linkRegex = /https?:\/\/|wa\.me\/|chat\.whatsapp\.com\/|bit\.ly\/|t\.me\//i;
+            if (linkRegex.test(text)) {
+                try {
+                    await Hanz.sendMessage(sender, { delete: msg.key });
+                    await Hanz.sendMessage(sender, {
+                        text: `@${getSenderNumber(sender, msg)} dilarang mengirim link di grup ini!`,
+                        mentions: [msg.key.participant || sender]
+                    });
+                } catch { }
+                continue;
+            }
+        }
+
+        // Cek mention user AFK
+        if (isGroup(sender) && global.afkUsers?.size > 0) {
+            const mentioned = msg.message?.extendedTextMessage?.contextInfo?.mentionedJid || [];
+            for (const jid of mentioned) {
+                const num = jid.split('@')[0];
+                if (global.afkUsers.has(num)) {
+                    const { reason, time } = global.afkUsers.get(num);
+                    const elapsed = Math.floor((Date.now() - time) / 1000);
+                    const dur = elapsed < 60 ? `${elapsed} detik` : elapsed < 3600 ? `${Math.floor(elapsed/60)} menit` : `${Math.floor(elapsed/3600)} jam`;
+                    await Hanz.sendMessage(sender, {
+                        text: `@${num} sedang AFK selama ${dur}\nAlasan: ${reason}`,
+                        mentions: [jid]
+                    });
+                }
+            }
+        }
+
+        // Hapus AFK kalau user yang AFK kirim pesan sendiri
+        if (!fromMe && global.afkUsers?.has(getSenderNumber(sender, msg))) {
+            const num = getSenderNumber(sender, msg);
+            global.afkUsers.delete(num);
+            await Hanz.sendMessage(sender, {
+                text: `Selamat datang kembali @${num}! Status AFK kamu telah dihapus.`,
+                mentions: [msg.key.participant || sender]
+            });
+        }
+
         const command = parseCommand(text);
 
         if (command) {
@@ -243,5 +299,29 @@ async function handleMessages(Hanz, m, isMain = true) {
     }
 }
 
+// Handler welcome/goodbye saat participant update
+async function handleGroupParticipants(Hanz, update) {
+    const { id: groupJid, participants, action } = update;
+
+    for (const jid of participants) {
+        const number = jid.split('@')[0];
+
+        if (action === 'add' && global.welcomeGroups?.get(groupJid)) {
+            await Hanz.sendMessage(groupJid, {
+                text: `Selamat datang @${number} di grup ini!`,
+                mentions: [jid]
+            });
+        }
+
+        if (action === 'remove' && global.goodbyeGroups?.get(groupJid)) {
+            await Hanz.sendMessage(groupJid, {
+                text: `Sampai jumpa @${number}, semoga sukses!`,
+                mentions: [jid]
+            });
+        }
+    }
+}
+
 module.exports = handleMessages;
 module.exports.resolveOwnerLids = resolveOwnerLids;
+module.exports.handleGroupParticipants = handleGroupParticipants;
