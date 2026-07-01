@@ -17,6 +17,10 @@ Bot WhatsApp berbasis **Node.js** dan **Baileys** dengan sistem plugin otomatis,
 - 🔒 **Mode self/public** — bisa diubah via command tanpa restart
 - 📡 **Auto join channel** — bot otomatis join channel WA saat connect
 - 🛡️ **LID support** — handle sistem LID terbaru WhatsApp
+- 🛡️ **Anti-spam cooldown** — jeda 5 detik antar command per user
+- 👋 **Welcome/Goodbye** — pesan otomatis saat member masuk/keluar grup
+- 🚫 **Antilink** — auto hapus pesan berisi link di grup
+- 💤 **AFK** — status AFK dengan auto-reply saat di-mention
 
 ---
 
@@ -60,10 +64,11 @@ whatsapp-bot/
 ├── package.json
 ├── lib/                            # Library utilitas eksternal
 │   ├── ffmpeg.js                   # Helper konversi media (FFmpeg)
-│   ├── funData.js                  # Data fun dan game 
+│   ├── funData.js                  # Data fun dan game
 │   ├── ytdlp.js                    # Helper download YouTube/TikTok
 │   ├── otp.js                      # Generator OTP
-│   └── random.js                   # Fungsi random
+│   ├── random.js                   # Fungsi random
+│   └── monetize.js                 # [OBFUSCATED] Logic monetisasi link
 ├── src/
 │   ├── config.js                   # ⚙️ Konfigurasi utama bot
 │   ├── media/
@@ -80,7 +85,8 @@ whatsapp-bot/
 │   │   ├── tools.js                # cekno, cekchannel, setmode, dll
 │   │   ├── owner.js                # Fitur khusus owner
 │   │   ├── group.js                # Fitur grup (tagall, kick, promote, dll)
-│   │   └── jadibot.js              # jadibot, listbot, stopbot
+│   │   ├── jadibot.js              # jadibot, listbot, stopbot
+│   │   └── extra.js                # afk, gp, shortlink, sholat, welcome, goodbye, antilink
 │   ├── handlers/
 │   │   └── messageHandler.js       # Routing & parsing pesan masuk
 │   └── utils/
@@ -231,7 +237,7 @@ Digunakan di `m.sendInteractive()` dan `m.sendInteractiveWithImage()`.
 ```js
 { name: 'quick_reply', buttonParamsJson: JSON.stringify({
     display_text: 'Kembali ke Menu',
-    id: 'menu'   // ← teks ini dikirim ke bot saat ditekan
+    id: 'menu'
 })}
 ```
 
@@ -278,7 +284,7 @@ Digunakan di `m.sendInteractive()` dan `m.sendInteractiveWithImage()`.
 await m.sendInteractive({
     text: 'Teks pesan',
     footer: 'Footer pesan',
-    quoted: m.fakeOrder,     // atau m.msg untuk quoted ke pesan asli
+    quoted: m.fakeOrder,
     contextInfo: {
         mentionedJid: ['0@s.whatsapp.net'],
         forwardingScore: 111,
@@ -305,26 +311,23 @@ Semua gambar disimpan di `src/media/`. Sistem `getImage()` mempermudah pemanggil
 ```js
 const MEDIA = {
     logo:   path.join(__dirname, '../media/logo.png'),
-    banner: path.join(__dirname, '../media/banner.png'), // ← tambah ini
+    banner: path.join(__dirname, '../media/banner.png'),
 };
 ```
 
 ### Menggunakan di command
 
 ```js
-// Import di atas file command
 const { getImage } = require('../utils/helper');
 
-// Pakai di dalam case
 case 'kirimgambar':
-    await m.send({ image: getImage(),          caption: 'Ini logo' });   // default = logo
-    await m.send({ image: getImage('banner'),  caption: 'Ini banner' }); // gambar lain
+    await m.send({ image: getImage(),          caption: 'Ini logo' });
+    await m.send({ image: getImage('banner'),  caption: 'Ini banner' });
     break;
 
-// Untuk sendInteractiveWithImage
 case 'buttongambar':
     await m.sendInteractiveWithImage({
-        imageSource: getImage(),   // Buffer langsung, tanpa ribet
+        imageSource: getImage(),
         text: 'Teks pesan',
         buttons: [...]
     });
@@ -343,24 +346,15 @@ case 'buttongambar':
 
 ### Cara cek di command
 ```js
-// Hanya super owner
 if (!m.isSuperOwner) return m.reply({ text: '❌ Khusus Super Owner!' });
-
-// Hanya owner (super atau co)
-if (!m.isOwner) return m.reply({ text: '❌ Khusus Owner!' });
-
-// Hanya dari grup
-if (!m.isGroup) return m.reply({ text: '❌ Command ini hanya untuk grup!' });
-
-// Hanya dari bot utama (bukan clone jadibot)
-if (!m.isMain) return m.reply({ text: '❌ Hanya bisa dari bot utama!' });
+if (!m.isOwner)      return m.reply({ text: '❌ Khusus Owner!' });
+if (!m.isGroup)      return m.reply({ text: '❌ Command ini hanya untuk grup!' });
+if (!m.isMain)       return m.reply({ text: '❌ Hanya bisa dari bot utama!' });
 ```
 
 ---
 
 ## 🔒 Mode Self / Public
-
-Ubah via command — tidak perlu restart:
 
 ```
 !setmode public   → semua orang bisa pakai bot
@@ -368,13 +362,9 @@ Ubah via command — tidak perlu restart:
 !setmode          → lihat mode saat ini + tombol pilihan
 ```
 
-Perubahan langsung aktif dan tersimpan ke `config.js` sehingga tetap berlaku setelah restart.
-
 ---
 
 ## 🤖 JadiBot (Clone Bot)
-
-Fitur untuk menjalankan bot di nomor lain tanpa server tambahan.
 
 | Command | Keterangan |
 |---|---|
@@ -382,13 +372,33 @@ Fitur untuk menjalankan bot di nomor lain tanpa server tambahan.
 | `!listbot` | Lihat daftar clone bot yang aktif |
 | `!stopbot 628xxx` | Matikan clone bot |
 
-Clone bot otomatis hidup kembali saat bot utama di-restart (via `autoLoadJadibot`).
+Clone bot otomatis hidup kembali saat bot utama di-restart.
+
+---
+
+## 🔗 Fitur Shortlink (`extra.js`)
+
+### `!shortlink` / `!short`
+Mempersingkat URL menggunakan **TinyURL** — gratis, tanpa iklan, tanpa perlu akun.
+
+```
+!shortlink https://link-panjang.com/path/yang/sangat/panjang
+```
+
+### `!gp` / `!gplink`
+Mempersingkat URL menggunakan **GPLinks** — link hasil shorten akan menampilkan halaman iklan singkat sebelum mengarahkan ke URL tujuan.
+
+```
+!gp https://link-panjang.com/path
+```
+
+> **ℹ️ Transparansi:** Fitur `!gp` menggunakan API key GPLinks milik developer (Haris Sfx). Setiap klik pada link yang dihasilkan akan menghasilkan pendapatan iklan yang masuk ke akun developer, bukan ke pengguna bot. Jika kamu tidak setuju dengan hal ini atau ingin menggunakan API key milikmu sendiri, kamu bisa:
+> 1. **Hapus fitur ini** — hapus atau comment case `gplink`/`gp` di `src/commands/extra.js`
+> 2. **Ganti API key** — daftar di [gplinks.in](https://gplinks.in), dapat API key kamu sendiri, lalu ganti di `lib/monetize.js`
 
 ---
 
 ## 🔄 Sistem Hot-Reload
-
-PluginLoader memantau perubahan file secara otomatis menggunakan **chokidar**:
 
 | Aksi | File | Efek |
 |---|---|---|
@@ -398,24 +408,21 @@ PluginLoader memantau perubahan file secara otomatis menggunakan **chokidar**:
 | Tambah file baru | `src/commands/` | Command baru otomatis terdaftar |
 | Hapus file | `src/commands/` | Command otomatis terhapus dari daftar |
 
-> ⚠️ Perubahan di `index.js` **tidak** hot-reload — butuh restart manual karena `index.js` adalah entry point koneksi Baileys.
+> ⚠️ Perubahan di `index.js` **tidak** hot-reload — butuh restart manual.
 
 ---
 
 ## 🛠️ Fungsi Utilitas (`src/utils/helper.js`)
 
 ```js
-const { 
+const {
     formatUptime,    // formatUptime(seconds) → '1 hari 2 jam 3 menit'
     formatJid,       // formatJid('08xx') → '628xx@s.whatsapp.net'
-    formatGroupJid,  // formatGroupJid('xxx') → 'xxx@g.us'
     formatBytes,     // formatBytes(1024) → '1 KB'
     delay,           // await delay(3000) → tunggu 3 detik
     randomString,    // randomString(8) → 'aB3xKp9z'
-    isGroupJid,      // isGroupJid(jid) → true/false
     getGroupInfo,    // await getGroupInfo(Hanz, jid) → metadata grup
     isGroupAdmin,    // await isGroupAdmin(Hanz, groupJid, userJid) → true/false
-    getBotJid,       // getBotJid(Hanz) → JID bot sendiri
     getImage,        // getImage('logo') → Buffer gambar
 } = require('../utils/helper');
 ```
@@ -428,7 +435,7 @@ const {
 |---|---|
 | `@whiskeysockets/baileys` | Library koneksi WhatsApp |
 | `@hapi/boom` | HTTP error handling |
-| `axios` | HTTP client (download gambar dari URL) |
+| `axios` | HTTP client |
 | `chalk` | Warna teks di terminal |
 | `chokidar` | Watch perubahan file (hot-reload) |
 | `figlet` | Banner ASCII saat bot start |
@@ -440,8 +447,6 @@ const {
 ---
 
 ## 🔄 Reset Sesi
-
-Jika bot ter-logout atau bermasalah:
 
 ```bash
 # Bot utama
