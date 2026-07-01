@@ -20,25 +20,16 @@ const handler = async (m) => {
     const botIds = () => [Hanz.user?.id, Hanz.user?.lid].filter(Boolean).map(norm);
     const isBotJid = (jid) => botIds().includes(norm(jid));
 
-    // Resolve status ON/OFF baru dari argumen ('on'/'off') atau toggle kalau kosong
     const resolveToggleState = (current, arg) => {
         const a = arg?.toLowerCase();
         if (a === 'on') return true;
         if (a === 'off') return false;
-        return !current; // tanpa argumen -> toggle
+        return !current;
     };
 
-    // Cek apakah bot adalah admin di grup ini
     const isBotAdmin = async () => {
         const meta = await getGroupInfo(Hanz, sender);
         if (!meta) return false;
-
-        // WhatsApp sekarang bisa mengirim id partisipan dalam format @lid
-        // (bukan cuma @s.whatsapp.net), termasuk untuk akun bot sendiri.
-        // Kalau cuma dicocokkan lewat Hanz.user.id, ini bisa gagal match
-        // walau bot beneran admin. Jadi kita kumpulkan semua kemungkinan
-        // identitas bot (id & lid) lalu cocokkan ke semua kemungkinan
-        // identitas tiap partisipan (id, lid, jid).
         const bot = meta.participants.find((p) => {
             const pIds = [p.id, p.lid, p.jid].filter(Boolean).map(norm);
             return pIds.some((id) => botIds().includes(id));
@@ -193,7 +184,6 @@ ${groupCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
             if (!await isBotAdmin()) return m.reply({ text: '❌ Bot bukan admin grup.' });
             mentioned = getMentioned();
             if (!mentioned.length) return m.reply({ text: '❌ Tag admin yang ingin didemote.\nContoh: !demote @admin' });
-            // Proteksi: bot tidak boleh demote dirinya sendiri
             if (mentioned.some(isBotJid)) {
                 return m.reply({ text: '❌ Bot tidak bisa demote dirinya sendiri.' });
             }
@@ -257,9 +247,6 @@ ${groupCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
                 await m.reply({ text: '❌ Gagal mendapatkan link invite.' });
             }
             break;
-                    // ══════════════════════════════════════════════════════
-        //  WELCOME
-        // ══════════════════════════════════════════════════════
 
         case 'welcome': {
             if (!m.isGroup) return m.reply({ text: '❌ Command ini hanya untuk grup.' });
@@ -277,10 +264,6 @@ ${groupCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
             break;
         }
 
-        // ══════════════════════════════════════════════════════
-        //  GOODBYE
-        // ══════════════════════════════════════════════════════
-
         case 'goodbye': {
             if (!m.isGroup) return m.reply({ text: '❌ Command ini hanya untuk grup.' });
             const isAdmin = await isGroupAdmin(Hanz, sender, senderJid);
@@ -296,10 +279,6 @@ ${groupCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
             });
             break;
         }
-
-        // ══════════════════════════════════════════════════════
-        //  ANTILINK
-        // ══════════════════════════════════════════════════════
 
         case 'antilink': {
             if (!m.isGroup) return m.reply({ text: '❌ Command ini hanya untuk grup.' });
