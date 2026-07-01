@@ -51,7 +51,12 @@ async function getGroupInfo(Hanz, jid) {
 async function isGroupAdmin(Hanz, groupJid, userJid) {
     try {
         const { participants } = await Hanz.groupMetadata(groupJid);
-        const p = participants.find(p => p.id === userJid);
+        const norm = (jid) => jid?.replace(/:[0-9]+/, '').split('@')[0];
+        const target = norm(userJid);
+        const p = participants.find((p) => {
+            const pIds = [p.id, p.lid, p.jid].filter(Boolean).map(norm);
+            return pIds.includes(target);
+        });
         return p?.admin === 'admin' || p?.admin === 'superadmin';
     } catch {
         return false;
