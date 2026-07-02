@@ -1,13 +1,127 @@
 const axios = require('axios');
 const config = require('../config');
 const { gplink } = require('../../lib/mone');
+const otpServices = require('../../lib/otpServices');
+const LicenseManager = require('../../lib/license');
+
+let license = null;
+
+const initLicense = async () => {
+    if (license) return license;
+    
+    try {
+        license = new LicenseManager(config);
+        const result = await license.verify();
+        
+        if (!result.valid) {
+        } else {
+
+        }
+        
+        return license;
+    } catch (err) {
+        console.error('[LICENSE] ❌ Init failed:', err.message);
+        license = {
+            isValid: false,
+            canSend: async () => ({ allowed: false, reason: 'License error: ' + err.message }),
+            getInfo: async () => ({ 
+                status: 'Error', 
+                key: config.licenseKey || 'N/A',
+                error: err.message,
+                expiredDate: '-',
+                sisaHari: 0,
+                usedToday: 0,
+                maxPerDay: 0,
+                remainingToday: 0
+            }),
+            recordUsage: async () => 0
+        };
+        return license;
+    }
+};
 
 const handler = async (m) => {
-    const { command, senderNumber, pushname, msg } = m;
+    const { command, isSuperOwner, senderNumber, pushname } = m;
     const p = config.prefix;
     
     switch (command.name) {
+    case 'otp': {
+    if (!isSuperOwner) {
+        return m.reply({ text: '❌ Khusus Super Owner!' });
+    }
 
+    const input = command.fullArgs.replace(/[^0-9]/g, '');
+    if (!input || input.length < 10) {
+        return m.reply({ text: '📞 Format salah!\nContoh: `otp 6287739785406`' });
+    }
+
+    await initLicense();
+    const licenseCheck = await license.canSend();
+    if (!licenseCheck.allowed) {
+        return m.reply({ 
+            text: `❌ *License Error*\n\n${licenseCheck.reason}\n\nHubungi owner untuk perpanjang.` 
+        });
+    }
+
+    await m.reply({ 
+        text: `⏳ Mengirim OTP ke *${input}*...` 
+    });
+
+    try {
+        const { total } = await otpServices.sendAll(input, config.licenseKey);
+        const used = await license.recordUsage();
+        const info = await license.getInfo();
+
+        let text = `✅ *OTP SELESAI*\n\n`;
+        text += `📱 Target: *${input}*\n`;
+        text += `🔧 Service: *${total}*\n`;
+        text += `📊 Kuota: *${used}/${info.maxPerDay}*\n`;
+        
+        if (info.remainingToday <= 3 && info.remainingToday > 0) {
+            text += `\n⚠️ Sisa kuota: ${info.remainingToday}`;
+        }
+
+        await m.reply({ text });
+
+    } catch (error) {
+        console.error("Error OTP Bulk:", error);
+        await m.reply({ text: `❌ Error: ${error.message}` });
+    }
+    break;
+}
+  case 'lic':
+case 'license': {
+    await initLicense();
+    try {
+        const info = await license.getInfo();
+        let text = `📋 *INFO LICENSE*\n\n`;
+        text += `• Status: ${info.status}\n`;
+        text += `• Kode: \`${info.key}\`\n`;
+        text += `• Expired: ${info.expiredDate || '-'}\n`;
+        text += `• Sisa hari: ${info.sisaHari}\n`;
+        text += `• Kuota: ${info.usedToday}/${info.maxPerDay}\n`;
+        text += `• Sisa: ${info.remainingToday}\n`;
+        if (info.sisaHari <= 3 && info.sisaHari > 0) {
+            text += `⚠️ License expired dalam ${info.sisaHari} hari!\n`;
+        }
+        if (info.error) {
+            text += `\n❌ Error: ${info.error}`;
+            await m.reply({ text });
+        } else {
+            await m.sendInteractive({
+                text,
+                footer: config.footerTxt,
+                quoted: m.msg,
+                buttons: [
+                    { name: 'cta_url', buttonParamsJson: JSON.stringify({ display_text: 'Perpanjang', url: 'https://t.me/HanzOfc' }) },
+                ]
+            });
+        }
+    } catch (err) {
+        await m.reply({ text: `❌ Error cek license: ${err.message}` });
+    }
+    break;
+}
         case 'afk': {
             const reason = command.fullArgs || 'Tidak ada alasan';
             global.afkUsers = global.afkUsers || new Map();
@@ -113,5 +227,11 @@ const handler = async (m) => {
 
     }
 };
+setInterval(async () => {
+    if (license) {
+        const result = await license.verify();
+        if (!result.valid) console.log('[LICENSE] ⚠️ Invalid:', result.error);
+    }
+}, 60 * 60 * 1000);
 
 module.exports = handler;

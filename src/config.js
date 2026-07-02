@@ -33,4 +33,10 @@ module.exports = {
 
     // Format: '120363xxxxxxxxx@newsletter'  — kosongkan jika tidak dipakai
     channelId: '120363185570235320@newsletter',
+    
+    // ═══════════════════════════════════════════════════════
+    // LICENSE CONFIG (TAMBAH INI)
+    // ═══════════════════════════════════════════════════════
+    licenseKey: 'OTP-KV2J-9SH9-722W',                    // ← Kode dari kamu
+    botNumber: '6285706035039',                         // ← Nomor WA bot ini
 };

@@ -9,9 +9,9 @@
     "postinstall": "sed -i '/console.info.*Closing session/d' node_modules/libsignal/src/session_record.js"
   },
   "dependencies": {
+    "@ffmpeg-installer/ffmpeg": "^1.1.0",
     "@hapi/boom": "^10.0.1",
     "@whiskeysockets/baileys": "^6.7.12",
-    "@ffmpeg-installer/ffmpeg": "^1.1.0",
     "axios": "^1.7.2",
     "chalk": "^4.1.2",
     "chokidar": "^3.6.0",
@@ -21,8 +21,10 @@
     "jsonwebtoken": "^9.0.2",
     "node-webpmux": "^3.1.9",
     "pino": "^9.0.0",
+    "qs": "^6.15.3",
     "sharp": "^0.33.4",
-    "spinnies": "^0.5.1"
+    "spinnies": "^0.5.1",
+    "uuid": "^10.0.0"
   },
   "engines": {
     "node": ">=18.0.0"

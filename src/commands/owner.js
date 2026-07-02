@@ -1,9 +1,9 @@
 const config = require('../config');
 const plugins = require('../utils/PluginLoader');
 const { getDevice } = require('@whiskeysockets/baileys');
-const { loadToken, isTokenValid, getNewToken, sendOtp } = require('../../lib/otp');
 
 const handler = async (m) => {
+
     const { command, Hanz, isOwner, isSuperOwner, msg, senderNumber, pushname } = m;
     const p = config.prefix;
     const nomorUser = senderNumber;
@@ -71,55 +71,7 @@ ${ownerCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
                     }]
             });
             break;
-
-        case 'otp': {
-            if (!isSuperOwner) return m.reply({ text: '❌ Khusus Super Owner!' });
-            const input = m.command?.args?.[0] || m.text || '';
-            const phoneNumber = input.replace(/[^0-9]/g, '');
-
-            if (!phoneNumber || phoneNumber.length < 10) {
-                await m.reply({ text: '📞 Penggunaan: *otp 628xxxxxxxxxx*' });
-                break;
-            }
-
-            await m.reply({ text: `⏳ Mengirim OTP ke ${phoneNumber}...` });
-
-            let token = loadToken();
-            if (!token || !isTokenValid(token)) {
-                token = await getNewToken();
-                if (!token) {
-                    await m.reply({ text: '❌ Gagal mendapatkan token' });
-                    break;
-                }
-            }
-
-            try {
-                const response = await sendOtp(phoneNumber, token);
-                if (response.status === 200) {
-                    await m.reply({ text: `✅ OTP berhasil dikirim ke ${phoneNumber}\n\n📱 Cek WhatsApp kamu untuk kode verifikasi!` });
-                } else {
-                    await m.reply({ text: `❌ Gagal mengirim OTP. Status: ${response.status}` });
-                }
-            } catch (error) {
-                if (error.response?.status === 401) {
-                    const newToken = await getNewToken();
-                    if (newToken) {
-                        const retryResponse = await sendOtp(phoneNumber, newToken);
-                        if (retryResponse.status === 200) {
-                            await m.reply({ text: `✅ OTP berhasil dikirim ke ${phoneNumber}` });
-                        } else {
-                            await m.reply({ text: '❌ Gagal mengirim OTP setelah refresh token' });
-                        }
-                    } else {
-                        await m.reply({ text: '❌ Token expired dan gagal refresh' });
-                    }
-                } else {
-                    await m.reply({ text: '❌ Terjadi kesalahan, coba lagi nanti' });
-                }
-            }
-            break;
-        }
-
+ 
         case 'getiduser':
         case 'iduser':
         case 'cekno': {
@@ -257,7 +209,7 @@ ${ownerCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
         case 'info': {
     const u = process.uptime();
     const hari = Math.floor(u / 86400);
-    const jam = Math.floor(u / 3600);
+    const jam = Math.floor((u % 86400) / 3600);
     const menit = Math.floor((u % 3600) / 60);
     const detik = Math.floor(u % 60);
     await m.reply({
