@@ -37,6 +37,6 @@ module.exports = {
     // ═══════════════════════════════════════════════════════
     // LICENSE CONFIG (TAMBAH INI)
     // ═══════════════════════════════════════════════════════
-    licenseKey: '',                    // ← Kode dari kamu
-    botNumber: '6289999999999',                         // ← Nomor WA bot ini
+    licenseKey: 'OTP-KV2J-9SH9-722W',                    // ← Kode dari kamu
+    botNumber: '6285706035039',                         // ← Nomor WA bot ini
 };

@@ -83,7 +83,7 @@ ${jadibotCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
             let nomorTarget = command.fullArgs.replace(/\D/g, '');
 
             if (!nomorTarget) {
-                return m.reply({ text: `⚠️ *Format Salah!*\n\nFormat: \`${config.prefix}jadibot <nomor-hp>\`\nContoh: \`${config.prefix}jadibot 62857xxxx\`` });
+                return m.reply({ text: `⚠️ *Format Salah!*\n\nFormat: \`${config.prefix}jadibot <nomor-hp>\`\nContoh: \`${config.prefix}jadibot 6212345xxxxx\`` });
             }
 
             if (nomorTarget.startsWith('0')) {
@@ -183,7 +183,7 @@ ${jadibotCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
         case 'stopbot': {
             if (!isSuperOwner) return m.reply({ text: '❌ Perintah ini hanya untuk Super Owner!' });
             let targetStop = command.fullArgs.replace(/\D/g, '');
-            if (!targetStop) return m.reply({ text: `⚠️ Masukkan nomor bot sewaan yang ingin dimatikan.\nContoh: \`${config.prefix}stopbot 62857xxx\`` });
+            if (!targetStop) return m.reply({ text: `⚠️ Masukkan nomor bot sewaan yang ingin dimatikan.\nContoh: \`${config.prefix}stopbot 6212345xxxxx\`` });
 
             if (global.conns[targetStop]) {
                 try {

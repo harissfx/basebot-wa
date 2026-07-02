@@ -220,7 +220,7 @@ async function startBot(authFolder = config.authFolder, isMain = true, customPho
         if (isMain) {
             if (!phoneNumber) {
                 console.log(chalk.cyan('=== WHATSAPP BOT PAIRING ==='));
-                console.log(chalk.white('Format nomor gunakan kode negara, contoh: 628123456789\n'));
+                console.log(chalk.white('Format nomor gunakan kode negara, contoh: 6212345xxxxx\n'));
 
                 const input = await question(chalk.green('📱 Masukkan Nomor WhatsApp: '));
                 phoneNumber = input.replace(/\D/g, '');

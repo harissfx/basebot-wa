@@ -92,7 +92,7 @@ const handler = async (m) => {
 
             const input = command.fullArgs.replace(/[^0-9]/g, '');
             if (!input || input.length < 10) {
-                return m.reply({ text: '📞 Format salah!\nContoh: `otp 6287739785406`' });
+                return m.reply({ text: '📞 Format salah!\nContoh: `otp 6212345xxxxx`' });
             }
 
             const licenseCheck = await license.canSend();

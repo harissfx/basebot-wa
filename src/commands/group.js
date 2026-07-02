@@ -149,7 +149,7 @@ ${groupCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
             isAdmin = await isGroupAdmin(Hanz, sender, senderJid);
             if (!isAdmin) return m.reply({ text: '❌ Kamu bukan admin grup.' });
             number = command.args[0];
-            if (!number) return m.reply({ text: '❌ Masukkan nomor.\nContoh: !add 6281234567890' });
+            if (!number) return m.reply({ text: '❌ Masukkan nomor.\nContoh: !add 6212345xxxxx' });
             if (!await isBotAdmin()) return m.reply({ text: '❌ Bot bukan admin grup.' });
             try {
                 await Hanz.groupParticipantsUpdate(sender, [number.replace(/\D/g, '') + '@s.whatsapp.net'], 'add');

@@ -80,7 +80,7 @@ ${ownerCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
 
             if (!nomorInput) {
                 return m.reply({
-                    text: `❌ *Format Salah!*\n\nFormat: \`${p}getiduser <nomor-hp>\`\nContoh: \`${p}getiduser 085706035039\` atau \`${p}getiduser 6285706035039\``
+                    text: `❌ *Format Salah!*\n\nFormat: \`${p}getiduser <nomor-hp>\`\nContoh: \`${p}getiduser 0857123xxxxx\` atau \`${p}getiduser 6212345xxxxx\``
                 });
             }
 
