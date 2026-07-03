@@ -79,7 +79,7 @@ function printBanner() {
     );
     console.log(chalk.cyan("================================================="));
     console.log(chalk.cyan(" • Powered By Haris Sfx"));
-    console.log(chalk.cyan(" • Thanks To Wong Hore Team & TDR Group"));
+    console.log(chalk.cyan(" • Thanks To Wong Hore Team & O.R.B Group"));
     console.log(chalk.cyan(" • Info Script: https://github.com/harissfx/basebot-wa"));
     console.log(chalk.cyan("================================================="));
     console.log(chalk.yellow("INFO:"), chalk.green("Jika code pairing tidak muncul tekan enter 1-2x lagi\n"));
@@ -193,7 +193,7 @@ async function startBot(authFolder = config.authFolder, isMain = true, customPho
                 console.log(chalk.white(` • Commands: ${plugins.commandList().length} fitur aktif`));
                 
                 try { spinnies.remove("waiting"); } catch (e) { }
-                spinnies.add("waiting", { text: "Menunggu Pesan..." });
+                spinnies.add("waiting", { text: "." });
 
                 autoLoadJadibot();
 
