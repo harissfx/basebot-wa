@@ -30,7 +30,7 @@ global.welcomeGroups = welcomeGroups;
 global.goodbyeGroups = goodbyeGroups;
 global.antilinkGroups = antilinkGroups;
 
-global.afkUsers = global.afkUsers || new Map(); // senderNumber -> { reason, time }
+global.afkUsers = global.afkUsers || new Map();
 
 setInterval(() => {
     const now = Date.now();
