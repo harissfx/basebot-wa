@@ -131,6 +131,9 @@ const handler = async (m) => {
         case 'license': {
             const hasLicense = await requireLicense(m, 'License Info');
             if (!hasLicense) return;
+            if (!isSuperOwner) {
+                return m.reply({ text: '❌ Khusus Super Owner!' });
+            }
             
             try {
                 const info = await license.getInfo();
