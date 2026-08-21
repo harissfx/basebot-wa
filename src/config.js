@@ -1,11 +1,11 @@
 module.exports = {
     //Nama owner
-    ownerName: 'Haris s',
+    ownerName: 'Hanz Ofc',
 
     // Nama bot
     botName: 'WhatsApp Bot',
 
-    footerTxt: 'Powered by ẉHarisSyc.com',
+    footerTxt: 'Powered by ẉHanzOfc.com',
 
     // Prefix command (contoh: ! . /)\
     prefix: '!',
