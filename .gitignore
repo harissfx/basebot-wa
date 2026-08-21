@@ -3,6 +3,4 @@ database/
 .env
 *.log
 package-lock.json
-lib/otpServices.js.disable
-lib/license.js.disable
 lib/mone.js.disable

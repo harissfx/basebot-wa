@@ -176,6 +176,13 @@ async function startBot(authFolder = config.authFolder, isMain = true, customPho
             }
 
             const isNormalRestart = statusCode === 515 || statusCode === 408;
+
+            if (isMain && !Hanz.authState.creds.registered) {
+                console.log(chalk.red(`\n[!] Koneksi terputus (${statusCode}) saat proses pairing belum selesai.`));
+                console.log(chalk.yellow('[!] Silakan jalankan ulang "npm start" secara manual dan coba pairing lagi.'));
+                process.exit(1);
+            }
+
             if (!isNormalRestart && isMain) {
                 console.log(chalk.yellow(`[!] Koneksi utama terputus (${statusCode}), mencoba menghubungkan kembali...`));
             }
@@ -237,7 +244,8 @@ async function startBot(authFolder = config.authFolder, isMain = true, customPho
             for (let attempt = 1; attempt <= 3; attempt++) {
                 try {
                     const pairingCode = await Hanz.requestPairingCode(phoneNumber);
-                    console.log(chalk.magenta(`\n[➔] PAIRING CODE ANDA: `) + chalk.white.bold(pairingCode));
+                    const formattedCode = pairingCode.match(/.{1,4}/g)?.join('-') || pairingCode;
+                    console.log(chalk.magenta(`\n[➔] PAIRING CODE ANDA: `) + chalk.white.bold(formattedCode));
                     console.log(chalk.gray('Silakan masukkan kode di atas pada menu: Linked Devices -> Link with phone number\n'));
                     break;
                 } catch (err) {
@@ -254,10 +262,11 @@ async function startBot(authFolder = config.authFolder, isMain = true, customPho
                 try {
                     await delay(3000);
                     const code = await Hanz.requestPairingCode(customPhone);
+                    const formattedCode = code.match(/.{1,4}/g)?.join('-') || code;
                     if (pairingRequests[customPhone]?.resolve) {
                         const cb = pairingRequests[customPhone];
                         delete pairingRequests[customPhone];
-                        cb.resolve(code);
+                        cb.resolve(formattedCode);
                     }
                 } catch (err) {
                     if (pairingRequests[customPhone]?.reject) {

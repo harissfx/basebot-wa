@@ -65,6 +65,7 @@ whatsapp-bot/
 ├── lib/                            # Library utilitas eksternal
 │   ├── ffmpeg.js                   # Helper konversi media (FFmpeg)
 │   ├── funData.js                  # Data fun dan game
+│   ├── license.js                  # [OBFUSCATED]fitur extra tapi beli licensinya du
 │   ├── ytdlp.js                    # Helper download YouTube/TikTok
 │   ├── otp.js                      # [OBFUSCATED] Generator OTP
 │   ├── random.js                   # Fungsi random
