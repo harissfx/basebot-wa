@@ -1,15 +1,49 @@
 const { delay } = require('../utils/helper');
 const { getGroupInfo } = require('../utils/helper');
 const config = require('../config');
+const mess = require('../config').mess;
 const plugins = require('../utils/PluginLoader');
-const { getDevice } = require('@whiskeysockets/baileys');
+const { getDevice } = require('baileys');
+const { sendSlotGame } = require('../../lib/htmlrich/slotGame');
+const { sendMatch3Game } = require('../../lib/htmlrich/match3Game');
+const { sendBlockStackGame } = require('../../lib/htmlrich/blockStackGame');
+const { sendFlappyGame } = require('../../lib/htmlrich/flappyGame');
+const { sendBrickBreakerGame } = require('../../lib/htmlrich/brickBreakerGame');
+const { sendSnakeGame } = require('../../lib/htmlrich/snakeGame');
+const { sendRoomRaiderGame } = require('../../lib/htmlrich/roomRaiderGame');
+const { send2048Game } = require('../../lib/htmlrich/game2048');
+const { sendMemoryGame } = require('../../lib/htmlrich/memoryGame');
+const { sendWordleGame } = require('../../lib/htmlrich/wordleGame');
+const { sendWhackGame } = require('../../lib/htmlrich/whackGame');
+const { sendDinoGame } = require('../../lib/htmlrich/dinoGame');
+const { sendCrossyGame } = require('../../lib/htmlrich/crossyGame');
+const { sendFruitSliceGame } = require('../../lib/htmlrich/fruitSliceGame');
+const { sendSpaceShooterGame } = require('../../lib/htmlrich/spaceShooterGame');
+const { sendLaneRunnerGame } = require('../../lib/htmlrich/laneRunnerGame');
+const { sendFishingGame } = require('../../lib/htmlrich/fishingGame');
+const { sendLavaCaveGame } = require('../../lib/htmlrich/lavaCaveGame');
+
 const { pick } = require('../../lib/random');
 
 const tebakAngkaGame = {};
 const tebakKataGame  = {};
 
+function hashStr(str) {
+    let h = 5381;
+    for (let i = 0; i < str.length; i++) h = ((h << 5) + h + str.charCodeAt(i)) >>> 0;
+    return h;
+}
+function hariIniWIB() {
+    return new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' });
+}
+function barPersen(persen, panjang = 10) {
+    const isi = Math.round((persen / 100) * panjang);
+    return '█'.repeat(isi) + '░'.repeat(panjang - isi);
+}
+
 const { JOKES, FORTUNES, QUOTES, FAKTA, TRUTH_LIST, DARE_LIST,
-        ROAST_TEMPLATES, ZODIAK_DATA, ZODIAK_RAMALAN, KATA_LIST, DADU_JENIS }
+        ROAST_TEMPLATES, ZODIAK_DATA, ZODIAK_RAMALAN, KATA_LIST, DADU_JENIS,
+        KHODAM_LIST, KHODAM_KOMENTAR, KAPANKAH_WAKTU, SUIT_EMOJI, SUIT_MENANG_ATAS, SUIT_ALIAS }
         = require('../../lib/funData');
 
 function buatSensorKata(kata, terungkap = []) {
@@ -17,8 +51,8 @@ function buatSensorKata(kata, terungkap = []) {
 }
 
 const handler = async (m) => {
-    const { command, isSuperOwner, Hanz, sender, msg, senderNumber, pushname, isOwner, isGroup } = m;
-    const p = config.prefix;
+    const { command, isSuperOwner, Hanz, msg, senderNumber, pushname, isOwner, isGroup } = m;
+    const p = m.prefix;
     const args = command.args;
     const nomorUser = senderNumber;
     let max, answers, metadata, members, targetMember;
@@ -47,7 +81,7 @@ ${funCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
             await m.sendInteractive({
                 text: menu,
                 footer: config.footerTxt,
-                quoted: m.fakeOrder,
+                quoted: m.fakePay,
                 contextInfo: {
                     mentionedJid: ["0@s.whatsapp.net"],
                     forwardingScore: 111,
@@ -82,12 +116,15 @@ ${funCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
                             }, {
                                 highlight_label: "",
                                 rows: [{ title: "Group Menu", description: "Select to display group menu ", id: "groupmenu" }]
+                            }, {
+                                highlight_label: "",
+                                rows: [{ title: "Extra Menu", description: "Select to display extra menu", id: "extramenu" }]
                             }]
                         })
                     }]
             });
-            break;
         }
+            break;
 
         case 'dice': {
             const jenis = args[0]?.toLowerCase();
@@ -97,24 +134,24 @@ ${funCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
             await m.react('🎲');
             await delay(500);
             await m.reply({ text: `🎲 *Dadu ${label} (1-${sisi})*\n\nHasil: *${hasil}*\n\n_Ketik ${p}dice d4/d8/d10/d12/d20/d100 untuk dadu lain_` });
-            break;
         }
+            break;
 
         case 'coin': {
             const hasil = Math.random() < 0.5 ? 'Kepala 🦁' : 'Ekor 🔢';
             await m.react('🪙');
             await delay(500);
             await m.reply({ text: `🪙 *Lempar Koin*\n\nHasil: *${hasil}*` });
-            break;
         }
+            break;
 
         case 'random': {
             max = parseInt(args[0]) || 100;
             const min = parseInt(args[1]) || 1;
             const hasil = Math.floor(Math.random() * (max - min + 1)) + min;
             await m.reply({ text: `🔢 *Random Number*\n\nRentang: ${min} - ${max}\nHasil: *${hasil}*\n\n_Ketik ${p}random [max] [min] untuk rentang custom_` });
-            break;
         }
+            break;
 
         case '8ball': {
             answers = [
@@ -130,40 +167,349 @@ ${funCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
             await m.react('🎱');
             await delay(800);
             await m.reply({ text: `🎱 *Magic 8-Ball*\n\n❓ Pertanyaan: _${pertanyaan}_\n\n✨ Jawaban: *${pick(answers)}*` });
-            break;
         }
+            break;
 
         case 'joke': {
             await m.react('😂');
             await m.reply({ text: pick(JOKES) });
-            break;
         }
+            break;
 
         case 'fortune': {
             await m.react('🥠');
             await m.reply({ text: pick(FORTUNES) });
-            break;
         }
-
-        case 'typing': {
-            await Hanz.sendPresenceUpdate('composing', sender);
-            await delay(2000);
-            await Hanz.sendPresenceUpdate('paused', sender);
-            await m.reply({ text: '⌨️ Ini contoh typing indicator!' });
             break;
+        case 'slots':
+        case 'slot': {
+            await m.react('🎰');
+            try {
+                await sendSlotGame(Hanz, m.chat);
+            } catch (err) {
+                console.error('[slots]', err);
+                await m.reply({ text: '❌ Gagal kirim slot game: ' + (err.message || err) });
+            }
         }
-
-        case 'quote': {
+            break;
+        case 'match3':
+        case 'gem':
+        case 'gemmatch': {
+            await m.react('💎');
+            try {
+                await sendMatch3Game(Hanz, m.chat);
+            } catch (err) {
+                console.error('[match3]', err);
+                await m.reply({ text: '❌ Gagal kirim match3 game: ' + (err.message || err) });
+            }
+        }
+            break;
+        case 'blockstack':
+        case 'tetris':
+        case 'susunbalok': {
+            await m.react('🧱');
+            try {
+                await sendBlockStackGame(Hanz, m.chat);
+            } catch (err) {
+                console.error('[blockstack]', err);
+                await m.reply({ text: '❌ Gagal kirim block stack game: ' + (err.message || err) });
+            }
+        }
+            break;
+        case 'flappy':
+        case 'burung':
+        case 'flappyhop': {
+            await m.react('🐦');
+            try {
+                await sendFlappyGame(Hanz, m.chat);
+            } catch (err) {
+                console.error('[flappy]', err);
+                await m.reply({ text: '❌ Gagal kirim flappy game: ' + (err.message || err) });
+            }
+        }
+            break;
+        case 'breakout':
+        case 'brickbreaker':
+        case 'brick': {
+            await m.react('🧱');
+            try {
+                await sendBrickBreakerGame(Hanz, m.chat);
+            } catch (err) {
+                console.error('[breakout]', err);
+                await m.reply({ text: '❌ Gagal kirim brick breaker game: ' + (err.message || err) });
+            }
+        }
+            break;
+        case 'snake':
+        case 'ular':
+        case 'ularnaga': {
+            await m.react('🐍');
+            try {
+                await sendSnakeGame(Hanz, m.chat);
+            } catch (err) {
+                console.error('[snake]', err);
+                await m.reply({ text: '❌ Gagal kirim snake game: ' + (err.message || err) });
+            }
+        }
+            break;
+                case 'roomraider':
+        case 'fps':
+        case 'tembakan': {
+            await m.react('🔫');
+            try {
+                await sendRoomRaiderGame(Hanz, m.chat);
+            } catch (err) {
+                console.error('[roomraider]', err);
+                await m.reply({ text: '❌ Gagal kirim room raider game: ' + (err.message || err) });
+            }
+        }
+            break;
+        case '2048':
+        case 'game2048': {
+            await m.react('🔢');
+            try {
+                await send2048Game(Hanz, m.chat);
+            } catch (err) {
+                console.error('[2048]', err);
+                await m.reply({ text: '❌ Gagal kirim game 2048: ' + (err.message || err) });
+            }
+        }
+            break;
+        case 'memory':
+        case 'pasangan':
+        case 'memorycard': {
+            await m.react('🃏');
+            try {
+                await sendMemoryGame(Hanz, m.chat);
+            } catch (err) {
+                console.error('[memory]', err);
+                await m.reply({ text: '❌ Gagal kirim game memory: ' + (err.message || err) });
+            }
+        }
+            break;
+        case 'wordle':
+        case 'katle': {
+            await m.react('🔤');
+            try {
+                await sendWordleGame(Hanz, m.chat);
+            } catch (err) {
+                console.error('[wordle]', err);
+                await m.reply({ text: '❌ Gagal kirim game wordle: ' + (err.message || err) });
+            }
+        }
+            break;
+        case 'whack':
+        case 'tikus':
+        case 'pukultikus': {
+            await m.react('🔨');
+            try {
+                await sendWhackGame(Hanz, m.chat);
+            } catch (err) {
+                console.error('[whack]', err);
+                await m.reply({ text: '❌ Gagal kirim game pukul tikus: ' + (err.message || err) });
+            }
+        }
+            break;
+        case 'dino':
+        case 'trex':
+        case 'dinorun': {
+            await m.react('🦖');
+            try {
+                await sendDinoGame(Hanz, m.chat);
+            } catch (err) {
+                console.error('[dino]', err);
+                await m.reply({ text: '❌ Gagal kirim game dino: ' + (err.message || err) });
+            }
+        }
+            break;
+        case 'crossy':
+        case 'seberang':
+        case 'penyebrang':
+        case 'crossyroad': {
+            await m.react('🐔');
+            try {
+                await sendCrossyGame(Hanz, m.chat);
+            } catch (err) {
+                console.error('[crossy]', err);
+                await m.reply({ text: '❌ Gagal kirim game penyebrang jalan: ' + (err.message || err) });
+            }
+        }
+            break;
+        case 'fruitslice':
+        case 'tebasbuah':
+        case 'fruitninja':
+        case 'tebas': {
+            await m.react('🍉');
+            try {
+                await sendFruitSliceGame(Hanz, m.chat);
+            } catch (err) {
+                console.error('[fruitslice]', err);
+                await m.reply({ text: '❌ Gagal kirim game tebas buah: ' + (err.message || err) });
+            }
+        }
+            break;
+        case 'spaceshooter':
+        case 'pesawat':
+        case 'tembakpesawat':
+        case 'shooter': {
+            await m.react('🚀');
+            try {
+                await sendSpaceShooterGame(Hanz, m.chat);
+            } catch (err) {
+                console.error('[spaceshooter]', err);
+                await m.reply({ text: '❌ Gagal kirim game pesawat tempur: ' + (err.message || err) });
+            }
+        }
+            break;
+        case 'lane':
+        case 'lari3':
+        case 'subway':
+        case 'larijalur': {
+            await m.react('🏃');
+            try {
+                await sendLaneRunnerGame(Hanz, m.chat);
+            } catch (err) {
+                console.error('[lanerunner]', err);
+                await m.reply({ text: '❌ Gagal kirim game lari 3 jalur: ' + (err.message || err) });
+            }
+        }
+            break;
+        case 'pancing':
+        case 'mancing':
+        case 'fishing': {
+            await m.react('🎣');
+            try {
+                await sendFishingGame(Hanz, m.chat);
+            } catch (err) {
+                console.error('[fishing]', err);
+                await m.reply({ text: '❌ Gagal kirim game pancing ikan: ' + (err.message || err) });
+            }
+        }
+            break;
+        case 'gualava':
+        case 'lavacave':
+        case 'platformer':
+        case 'petualang': {
+            await m.react('🌋');
+            try {
+                await sendLavaCaveGame(Hanz, m.chat);
+            } catch (err) {
+                console.error('[gualava]', err);
+                await m.reply({ text: '❌ Gagal kirim game gua lava: ' + (err.message || err) });
+            }
+        }
+            break;
+        case 'katabijak':
+        case 'motivasi': {
             await m.react('💬');
             await m.reply({ text: pick(QUOTES) });
-            break;
         }
+            break;
 
         case 'fakta': {
             await m.react('🧠');
             await m.reply({ text: pick(FAKTA) });
-            break;
         }
+            break;
+
+        case 'cekkhodam': {
+            const nama = (command.fullArgs || '').trim().slice(0, 40) || pushname;
+            const h = hashStr(`${nama.toLowerCase()}|${hariIniWIB()}`);
+            const khodam = KHODAM_LIST[h % KHODAM_LIST.length];
+            const power = (Math.floor(h / 7) % 100) + 1;
+            const tier = power >= 75 ? 'tinggi' : power >= 40 ? 'sedang' : 'rendah';
+            const daftarKomentar = KHODAM_KOMENTAR[tier];
+            const komentar = daftarKomentar[Math.floor(h / 13) % daftarKomentar.length];
+            await m.react('🔮');
+            await delay(600);
+            await m.reply({
+                text: [
+                    '🔮 *CEK KHODAM*', '',
+                    `👤 Nama    : ${nama}`,
+                    `👻 Khodam  : *${khodam}*`,
+                    `⚡ Power   : ${barPersen(power)} ${power}%`, '',
+                    `💬 ${komentar}`, '',
+                    '_Hasil berlaku untuk hari ini, besok bisa beda._',
+                ].join('\n')
+            });
+        }
+            break;
+
+        case 'cekjodoh': {
+            const raw = (command.fullArgs || '').trim();
+            const bagian = raw.split(/\s*(?:\||&|\bdan\b|\bx\b)\s*/i).map(s => s.trim()).filter(Boolean);
+            if (!bagian.length) {
+                return m.reply({
+                    text: [
+                        '💘 *Cek Kecocokan*', '',
+                        `• \`${p}cekjodoh nama1|nama2\``,
+                        `• \`${p}cekjodoh nama\` (dicocokkan dengan kamu)`,
+                    ].join('\n')
+                });
+            }
+            const a = (bagian.length > 1 ? bagian[0] : pushname).slice(0, 30);
+            const b = (bagian.length > 1 ? bagian[1] : bagian[0]).slice(0, 30);
+            const kunci = [a.toLowerCase(), b.toLowerCase()].sort().join('+');
+            const persen = hashStr(kunci) % 101;
+            const komentar =
+                persen === 100 ? 'SEMPURNA! Ini sih bukan kebetulan, ini takdir 🔥' :
+                persen >= 81 ? 'Fix jodoh! Mulai siapin undangan 💍' :
+                persen >= 61 ? 'Cocok nih! Jangan digantung terus 😏' :
+                persen >= 41 ? 'Lumayan! Tinggal modal komunikasi.' :
+                persen >= 21 ? 'Masih jauh, tapi bukan mustahil. Perbanyak usaha!' :
+                'Mending temenan dulu aja ya 😅';
+            await m.react('💘');
+            await delay(500);
+            await m.reply({
+                text: [
+                    '💘 *CEK KECOCOKAN*', '',
+                    `${a}  ❤️  ${b}`, '',
+                    `${barPersen(persen)} *${persen}%*`, '',
+                    `💬 ${komentar}`,
+                ].join('\n')
+            });
+        }
+            break;
+
+        case 'kapankah': {
+            const tanya = (command.fullArgs || '').trim().replace(/\?+$/, '').slice(0, 120);
+            if (!tanya) {
+                return m.reply({ text: `❓ Mau tanya apa?\nContoh: \`${p}kapankah aku kaya\`` });
+            }
+            await m.react('⏳');
+            await delay(500);
+            await m.reply({ text: `❓ *Kapankah ${tanya}?*\n\n⏳ ${pick(KAPANKAH_WAKTU)}` });
+        }
+            break;
+
+        case 'suit': {
+            const raw = (command.fullArgs || '').trim().toLowerCase();
+            const pilihan = SUIT_EMOJI[raw] ? raw : (SUIT_ALIAS[raw] || null);
+            if (!pilihan) {
+                return m.reply({
+                    text: [
+                        '✊✌️✋ *SUIT vs BOT*', '',
+                        `Pilih: \`${p}suit batu\`, \`${p}suit gunting\`, atau \`${p}suit kertas\``,
+                        '_(boleh disingkat: b / g / k)_',
+                    ].join('\n')
+                });
+            }
+            const pilihanBot = pick(Object.keys(SUIT_EMOJI));
+            const menang = SUIT_MENANG_ATAS[pilihan] === pilihanBot;
+            const seri = pilihan === pilihanBot;
+            await m.react(seri ? '🤝' : menang ? '🏆' : '💀');
+            await m.reply({
+                text: [
+                    '✊✌️✋ *SUIT vs BOT*', '',
+                    `Kamu : ${SUIT_EMOJI[pilihan]} ${pilihan}`,
+                    `Bot  : ${SUIT_EMOJI[pilihanBot]} ${pilihanBot}`, '',
+                    seri ? '🤝 *Seri!* Coba lagi, siapa tahu hoki.' :
+                    menang ? `🏆 *Kamu menang, ${pushname}!* Bot-nya nangis di pojokan.` :
+                    '💀 *Kamu kalah!* Bot lagi bahagia sekarang.',
+                ].join('\n')
+            });
+        }
+            break;
 
         case 'roast': {
             const target = command.fullArgs?.trim() || pushname;
@@ -171,20 +517,20 @@ ${funCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
             await m.react('🔥');
             await delay(500);
             await m.reply({ text: roastFn(target) });
-            break;
         }
+            break;
 
         case 'truth': {
             await m.react('🫣');
             await m.reply({ text: `🫣 *Truth untuk ${pushname}:*\n\n${pick(TRUTH_LIST)}\n\n_Jawab dengan jujur ya! Gak ada yang ngehakimin (mungkin) 😇_` });
-            break;
         }
+            break;
 
         case 'dare': {
             await m.react('😈');
             await m.reply({ text: `😈 *Dare untuk ${pushname}:*\n\n${pick(DARE_LIST)}\n\n_Berani gak? Ingat, sekali dare, harus dilakukan! 💪_` });
-            break;
         }
+            break;
 
         case 'tod': {
             const pilihan = Math.random() < 0.5 ? 'TRUTH' : 'DARE';
@@ -192,8 +538,8 @@ ${funCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
             const emoji = pilihan === 'TRUTH' ? '🫣' : '😈';
             await m.react(emoji);
             await m.reply({ text: `${emoji} *${pilihan} untuk ${pushname}:*\n\n${isi}\n\n_Kamu dapat ${pilihan}! ${pilihan === 'TRUTH' ? 'Jawab jujur ya!' : 'Harus dilakukan!'}_` });
-            break;
         }
+            break;
 
         case 'zodiak': {
             const inputZodiak = args[0]?.toLowerCase();
@@ -208,15 +554,15 @@ ${funCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
             await m.reply({
                 text: `🔮 *Ramalan ${inputZodiak.charAt(0).toUpperCase() + inputZodiak.slice(1)} Hari Ini*\n\n${emoji} Zodiak: *${inputZodiak.toUpperCase()}*\n📅 Tanggal: ${tanggal}\n\n✨ *Ramalan:*\n${ramalan}\n\n💫 Keberuntungan: ${pick(bintang)}\n💰 Keuangan: ${pick(bintang)}\n❤️ Asmara: ${pick(bintang)}\n🏥 Kesehatan: ${pick(bintang)}`
             });
-            break;
         }
+            break;
 
         case 'siapakah': {
-            if (!isGroup) return m.reply({ text: '❌ Perintah ini hanya bisa dipakai di grup!' });
+            if (!isGroup) return m.reply(mess.group);
             const pertanyaanSiapa = command.fullArgs?.trim();
             if (!pertanyaanSiapa) return m.reply({ text: `❓ *Cara pakai:*\n${p}siapakah [pertanyaan]\n\nContoh: ${p}siapakah yang paling sering ghosting?` });
 
-            metadata = await getGroupInfo(Hanz, sender);
+            metadata = await getGroupInfo(Hanz, m.chat);
             if (!metadata) return m.reply({ text: '❌ Gagal mengambil data grup.' });
             members = metadata.participants;
             targetMember = pick(members);
@@ -226,8 +572,8 @@ ${funCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
                 text: `🎯 *Siapakah ${pertanyaanSiapa}?*\n\nBot telah memutar roda takdir...\n\n🎰 Dan jawabannya adalah... *@${targetNum}* ! 🎉\n\n_(disclaimer: ini random ya, jangan baper)_ 😂`,
                 mentions: [targetMember.id]
             });
-            break;
         }
+            break;
 
         case 'ship': {
             const nama1 = args[0] || pushname;
@@ -248,8 +594,8 @@ ${funCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
             await m.reply({
                 text: `💘 *Ship Meter*\n\n💑 ${nama1} + ${nama2}\n\n[${bar}] ${persentase}%\n\n${level}\n\n_(hasil berdasarkan algoritma canggih bot — bisa dipercaya 100% — mungkin)_ 😂`
             });
-            break;
         }
+            break;
 
         case 'tebakangka': {
             const key = senderNumber;
@@ -261,8 +607,8 @@ ${funCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
             tebakAngkaGame[key] = { angka: angkaRahasia, max: maxTA, sisa: 7 };
             await m.react('🎯');
             await m.reply({ text: `🎯 *Tebak Angka Dimulai!*\n\nAku sudah pilih angka antara 1 - ${maxTA}\nKamu punya *7 kesempatan* untuk menebak!\n\nKetik: ${p}tebak [angka]\nMenyerah? ketik: ${p}tebak serah` });
-            break;
         }
+            break;
 
         case 'tebak': {
             const key = senderNumber;
@@ -296,8 +642,8 @@ ${funCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
                 ? `📈 Terlalu kecil! Coba yang lebih besar.`
                 : `📉 Terlalu besar! Coba yang lebih kecil.`;
             await m.reply({ text: `${petunjuk}\n\nSisa kesempatan: *${game.sisa}*\nKetik: ${p}tebak [angka]` });
-            break;
         }
+            break;
 
         case 'tebakkata': {
             const keyK = senderNumber;
@@ -315,8 +661,8 @@ ${funCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
             };
             await m.react('🔤');
             await m.reply({ text: `🔤 *Tebak Kata Dimulai!*\n\n💡 Hint: ${soal.hint}\n\n${buatSensorKata(soal.kata, [])}\n\n❤️ Nyawa: 6\n\nTebak huruf: ${p}huruf [huruf]\nTebak langsung: ${p}jawab [kata]\nMenyerah: ${p}huruf serah` });
-            break;
         }
+            break;
 
         case 'huruf': {
             const keyH = senderNumber;
@@ -359,8 +705,8 @@ ${funCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
                 await m.react('✅');
                 await m.reply({ text: `✅ Huruf *${huruf}* ditemukan!\n\n${buatSensorKata(gH.kata, gH.terungkap)}\nNyawa: ${'❤️'.repeat(gH.nyawa)}${'🖤'.repeat(6 - gH.nyawa)}\n\nHuruf dicoba: ${gH.dicoba.join(', ')}` });
             }
-            break;
         }
+            break;
 
         case 'jawab': {
             const keyJ = senderNumber;
@@ -384,8 +730,8 @@ ${funCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
                 await m.react('❌');
                 await m.reply({ text: `❌ Bukan *${jawabanUser}*! Nyawa berkurang 2.\n\n${buatSensorKata(gJ.kata, gJ.terungkap)}\nNyawa: ${'❤️'.repeat(Math.max(gJ.nyawa, 0))}${'🖤'.repeat(6 - Math.max(gJ.nyawa, 0))}\n\nTerus tebak huruf: ${p}huruf [huruf]` });
             }
-            break;
         }
+            break;
 
         case 'pilih': {
             const opsiPilih = command.fullArgs?.split(/[,|\/]/).map(s => s.trim()).filter(Boolean);
@@ -395,8 +741,8 @@ ${funCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
             const pilihanBot = pick(opsiPilih);
             await m.react('🎯');
             await m.reply({ text: `🎯 *Bot Pilihkan Untukmu!*\n\nOpsi: ${opsiPilih.map((o, i) => `\n${i + 1}. ${o}`).join('')}\n\n✨ Bot memilih: *${pilihanBot}*\n\n_Keputusan bot adalah final... atau tidak, terserah kamu_ 😂` });
-            break;
         }
+            break;
 
         case 'baper': {
             const namaBaper = command.fullArgs?.trim() || 'Kamu';
@@ -409,8 +755,8 @@ ${funCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
             ];
             await m.react('🥺');
             await m.reply({ text: pick(baperList) });
-            break;
         }
+            break;
 
         case 'ultah': {
             const tglStr = args[0];
@@ -435,8 +781,8 @@ ${funCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
             await m.reply({
                 text: `🎂 *Info Ulang Tahun*\n\n📅 Tanggal lahir: ${dd}/${mm}/${yyyy}\n🎉 Umur sekarang: *${umur} tahun*\n⏳ Ulang tahun berikutnya: *${sisa} hari lagi*\n💓 Sudah hidup selama: *${detikHidup.toLocaleString()} detik*\n\n${umur < 20 ? '🌱 Masih muda! Nikmati masa mudamu!' : umur < 30 ? '🔥 Quarter life? Gaskeun!' : umur < 40 ? '✨ Mapan dan berpengalaman!' : '👑 Legend sejati!'}`
             });
-            break;
         }
+            break;
     }
 };
 

@@ -1,17 +1,20 @@
+const fs = require('fs');
+const path = require('path');
 const config = require('../config');
+const mess = require('../config').mess;
 const plugins = require('../utils/PluginLoader');
 const { sendInteractiveMessage } = require('../utils/interactiveHelper');
-const { getDevice } = require('@whiskeysockets/baileys');
+const { getDevice } = require('baileys');
 
 const handler = async (m) => {
 
-    const { command, isSuperOwner, isMain, Hanz, sender, msg, senderNumber, pushname, isOwner } = m;
-    const p = config.prefix;
+    const { command, isSuperOwner, isMain, Hanz, msg, senderNumber, pushname, isOwner } = m;
+    const p = m.prefix;
     const nomorUser = senderNumber;
-    if (!isOwner) return m.reply({ text: '❌ Perintah ini khusus untuk Owner Bot!' });
+    if (!isOwner) return m.reply(mess.owner);
 
     if (!isMain) {
-        return m.reply({ text: '❌ Fitur ini hanya bisa digunakan melalui *Bot Utama*, bukan dari clone bot!' });
+        return m.reply(mess.mainBotOnly);
     }
 
     switch (command.name) {
@@ -37,7 +40,7 @@ ${jadibotCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
             await m.sendInteractive({
                 text: menu,
                 footer: config.footerTxt,
-                quoted: m.fakeOrder,
+                quoted: m.fakePay,
                 contextInfo: {
                     mentionedJid: ["0@s.whatsapp.net"],
                     forwardingScore: 111,
@@ -72,6 +75,9 @@ ${jadibotCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
                             }, {
                                 highlight_label: "",
                                 rows: [{ title: "Group Menu", description: "Select to display group menu ", id: "groupmenu" }]
+                            }, {
+                                highlight_label: "",
+                                rows: [{ title: "Extra Menu", description: "Select to display extra menu", id: "extramenu" }]
                             }]
                         })
                     }]
@@ -79,11 +85,11 @@ ${jadibotCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
             break;
         case 'addbot':
         case 'jadibot': {
-            if (!isSuperOwner) return m.reply({ text: '❌ Perintah ini hanya untuk Super Owner!' });
+            if (!isSuperOwner) return m.reply(mess.superOwner);
             let nomorTarget = command.fullArgs.replace(/\D/g, '');
 
             if (!nomorTarget) {
-                return m.reply({ text: `⚠️ *Format Salah!*\n\nFormat: \`${config.prefix}jadibot <nomor-hp>\`\nContoh: \`${config.prefix}jadibot 6212345xxxxx\`` });
+                return m.reply({ text: `⚠️ *Format Salah!*\n\nFormat: \`${p}jadibot <nomor-hp>\`\nContoh: \`${p}jadibot 6212345xxxxx\`` });
             }
 
             if (nomorTarget.startsWith('0')) {
@@ -106,7 +112,6 @@ ${jadibotCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
             try {
                 const pairingCode = await global.createNewBotInstance(nomorTarget);
 
-                const ownerJid = sender;
                 const targetJid = `${nomorTarget}@s.whatsapp.net`;
 
                 try {
@@ -122,7 +127,7 @@ ${jadibotCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
                             {
                                 name: 'cta_copy',
                                 buttonParamsJson: JSON.stringify({
-                                    display_text: '📋 Copy Kode Pairing',
+                                    display_text: 'Copy Kode Pairing',
                                     copy_code: pairingCode
                                 })
                             }
@@ -145,7 +150,7 @@ ${jadibotCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
                         {
                             name: 'cta_copy',
                             buttonParamsJson: JSON.stringify({
-                                display_text: '📋 Copy Kode Pairing',
+                                display_text: 'Copy Kode Pairing',
                                 copy_code: pairingCode
                             })
                         }
@@ -156,39 +161,49 @@ ${jadibotCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
                 console.error('Gagal kloning bot:', error);
                 await m.reply({ text: `❌ Gagal membuat clone bot: ${error.message}` });
             }
-            break;
         }
+            break;
 
         case 'listbot': {
-            if (!isSuperOwner) return m.reply({ text: '❌ Perintah ini hanya untuk Super Owner!' });
-            const activeBots = Object.keys(global.conns || {});
+            if (!isSuperOwner) return m.reply(mess.superOwner);
+            const mainKey = path.basename(config.authFolder || 'session');
+            const cloneBots = Object.keys(global.conns || {}).filter(k => k !== mainKey && k !== 'session');
 
-            if (activeBots.length <= 1) {
+            if (!cloneBots.length) {
                 return m.reply({ text: `ℹ️ Belum ada clone bot (*jadibot*) yang aktif saat ini.` });
             }
 
-            let teksList = `🤖 *DAFTAR CLONE BOT AKTIF* 🤖\n\n`;
+            let teksList = `*DAFTAR CLONE BOT AKTIF* 🤖\n\n`;
             let urutan = 1;
 
-            activeBots.forEach(botFile => {
-                if (botFile !== config.authFolder.replace(/\D/g, '')) {
-                    teksList += `${urutan++}. *Nomor*: +${botFile}\n`;
-                }
+            cloneBots.forEach(botFile => {
+                teksList += `${urutan++}. *Nomor*: +${botFile}\n`;
             });
 
             await m.reply({ text: teksList });
-            break;
         }
+            break;
 
         case 'stopbot': {
-            if (!isSuperOwner) return m.reply({ text: '❌ Perintah ini hanya untuk Super Owner!' });
+            if (!isSuperOwner) return m.reply(mess.superOwner);
             let targetStop = command.fullArgs.replace(/\D/g, '');
-            if (!targetStop) return m.reply({ text: `⚠️ Masukkan nomor bot sewaan yang ingin dimatikan.\nContoh: \`${config.prefix}stopbot 6212345xxxxx\`` });
+            if (!targetStop) return m.reply({ text: `⚠️ Masukkan nomor bot sewaan yang ingin dimatikan.\nContoh: \`${p}stopbot 6212345xxxxx\`` });
 
             if (global.conns[targetStop]) {
                 try {
-                    global.conns[targetStop].logout();
+                    const sock = global.conns[targetStop];
+                    try {
+                        await sock.logout();
+                    } catch {
+                        try { sock.end?.(new Error('Stopped by owner')); } catch {}
+                        try { sock.ws?.close?.(); } catch {}
+                    }
                     delete global.conns[targetStop];
+
+                    const sessionPath = path.join(__dirname, '..', 'database', 'jadibot', targetStop);
+                    if (fs.existsSync(sessionPath)) {
+                        try { fs.rmSync(sessionPath, { recursive: true, force: true }); } catch {}
+                    }
 
                     await m.reply({ text: `✅ Sesi Clone Bot *+${targetStop}* berhasil dimatikan.` });
                 } catch (e) {
@@ -197,8 +212,8 @@ ${jadibotCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
             } else {
                 await m.reply({ text: `❌ Nomor *+${targetStop}* tidak ditemukan di dalam daftar bot aktif.` });
             }
-            break;
         }
+            break;
     }
 };
 
