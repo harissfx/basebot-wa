@@ -490,8 +490,8 @@ Setiap baris log memakai kolom tetap dan label asal bot, sehingga pesan dari bot
 
 ```
 [BOT]   Menghidupkan 2 clone bot...
-[BOT]   [CLONE 0053] +6283165110053 terhubung • Public • Prefix !  • Nama
-[BOT]   [CLONE 7890] +6281234567890 terhubung • Self   • Prefix .  • Toko Budi
+[BOT]   [CLONE 0053] +628xxxxxxxxxx terhubung • Public • Prefix !  • Nama
+[BOT]   [CLONE 7890] +628xxxxxxxxxx terhubung • Self   • Prefix .  • Toko Budi
 [MASUK] [UTAMA]      [PRIVAT]  628xxx (Nama) → halo
 [CMD]   [UTAMA]      [GRUP]    Nama Grup (Nama · 628xxx) → ping
 [CMD]   [CLONE 0053] [GRUP]    Nama Grup (Nama · 628xxx) → ping
