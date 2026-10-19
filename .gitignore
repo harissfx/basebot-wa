@@ -1,6 +1,8 @@
 node_modules/
-database/
-.env
+src/database/session/
+src/database/jadibot/
+Baileys3/
 *.log
 package-lock.json
-lib/mone.js.disable
+lib/mone.js.bak
+src/commands/sample.js.bak
