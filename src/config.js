@@ -1,37 +1,44 @@
 module.exports = {
-    //Nama owner
-    ownerName: 'Hanz Ofc',
 
-    // Nama bot
-    botName: 'WhatsApp Bot',
+    ownerName: 'Hanz Ofc',                                // nama pemilik bot, muncul di beberapa menu
+    botName: 'WhatsApp Bot',                             // nama bot, muncul di menu dan info
+    footerTxt: 'Powered by ẉHanzOfc.com',                // tulisan kecil di bagian bawah pesan bot
 
-    footerTxt: 'Powered by ẉHanzOfc.com',
+    prefix: '!',                                         // tanda di depan command, contoh: !menu (maks 5 karakter, tanpa spasi)
+    noPrefix: true,                                      // true: command jalan pakai prefix ATAU tanpa prefix | false: wajib pakai prefix
 
-    // Prefix command (contoh: ! . /)\
-    prefix: '!',
+    superOwner: '6289999999999',                         // HANYA 1 nomor. Akses penuh + bisa atur co-owner. Format 62xxx tanpa + dan spasi
+    coOwner: ['6289999999999', /* '6289999999999', */],  // boleh banyak nomor, dipisah koma. Akses owner biasa (tanpa menu settings)
 
-    // Super Owner — hanya 1 nomor, akses penuh termasuk manage co-owner
-    superOwner: '6289999999999',
+    botMode: 'public',                                   // 'public': semua orang boleh pakai bot | 'self': hanya owner yang dilayani
 
-    // Co-Owner — bisa lebih dari satu, akses owner biasa
-    coOwner: [
-        '6289999999999',
-        // '6289999999999',
-    ],
+    quoteStyle: 'pay',                                   // tampilan pesan yang di-quote bot: 'pay' (struk pembayaran), 'meta' (kontak Meta AI), 'status' (sticker pack)
 
-    // Mode bot: 'public' → semua orang | 'self' → hanya owner
-    botMode: 'public',
+    menuStyle: 1,                                        // 1=list+gambar, 2=product+list kategori
 
-    // Otomatis centang biru pesan yang masuk
-    autoRead: true,
+    autoRead: true,                                      // true: pesan masuk otomatis dicentang biru | false: dibiarkan belum dibaca
+    autoTyping: true,                                    // true: bot tampil "mengetik..." dulu sebelum balas chat pribadi | false: langsung balas
+    noSelfSync: false,                                   // true: pesan bot tidak di-sync ke device lain akun bot | false: normal
 
-    // Tampilkan indikator "mengetik..." saat membalas
-    autoTyping: true,
+    usePairingCode: true,                                 // true: login pakai kode pairing (8 digit) | false: login pakai scan QR code
+    authFolder: './src/database/session',                // folder penyimpanan data login WhatsApp. Hapus folder ini kalau mau scan QR / pairing ulang
+    channelId: '120363185570235320@newsletter',          // ID channel/saluran WhatsApp buat label "diteruskan dari". Kosongkan ('') kalau tidak dipakai
 
-    // Folder penyimpanan sesi login
-    authFolder: './src/database/session',
+    githubRepo: 'harissfx/basebot-wa',                   // format: 'username/nama-repo', dipakai command !checkupdate buat cek versi terbaru di GitHub
 
-    // Format: '120363xxxxxxxxx@newsletter'  — kosongkan jika tidak dipakai
-    channelId: '120363185570235320@newsletter',
-    
+    // ── Teks balasan guard ───────────────────────────────────────────────────────────────────────
+    mess: {
+        superOwner: '❌ Khusus Super Owner!',
+        owner:      '❌ Khusus Owner / Co-Owner.',
+        coOwner:    '❌ Khusus Co-Owner.',
+        group:      '❌ Command ini hanya untuk grup.',
+        private:    '❌ Command ini hanya bisa dipakai di chat pribadi.',
+        admin:      '❌ Kamu bukan admin grup.',
+        botAdmin:   '❌ Bot bukan admin grup.',
+        ownerOrAdmin: '❌ Khusus Owner / Admin grup.',
+        mainBotOnly:  '❌ Fitur ini hanya bisa dipakai lewat *Bot Utama*, bukan clone bot!',
+        error:      '❌ Terjadi kesalahan saat menjalankan perintah.',
+        wait:       '⏳ Tunggu sebentar...',
+    },
+
 };

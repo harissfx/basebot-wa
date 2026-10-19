@@ -47,11 +47,14 @@ async function getGroupInfo(Hanz, jid) {
     }
 }
 
+/** Normalisasi JID/LID → id polos (buang suffix device & domain) */
+function normJid(jid) { return jid?.replace(/:[0-9]+/, '').split('@')[0]; }
+
 /** Cek apakah user adalah admin di grup */
 async function isGroupAdmin(Hanz, groupJid, userJid) {
     try {
         const { participants } = await Hanz.groupMetadata(groupJid);
-        const norm = (jid) => jid?.replace(/:[0-9]+/, '').split('@')[0];
+        const norm = normJid;
         const target = norm(userJid);
         const p = participants.find((p) => {
             const pIds = [p.id, p.lid, p.jid].filter(Boolean).map(norm);
@@ -84,4 +87,4 @@ function getImage(name = 'logo') {
     return fs.readFileSync(imgPath);
 }
 
-module.exports = { formatUptime, formatJid, delay, formatBytes, randomString, getGroupInfo, isGroupAdmin, getImage, MEDIA };
+module.exports = { formatUptime, formatJid, normJid, delay, formatBytes, randomString, getGroupInfo, isGroupAdmin, getImage, MEDIA };

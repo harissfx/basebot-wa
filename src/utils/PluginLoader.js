@@ -3,22 +3,6 @@ const fs       = require('fs');
 const chokidar = require('chokidar');
 const chalk    = require('chalk'); 
 const readline = require('readline');
-
-/**
- * PluginLoader — support DUA format export:
- *
- * Format LAMA (object of functions):
- * module.exports = { ping: async (m) => {...}, menu: async (m) => {...} }
- *
- * Format BARU (switch case):
- * module.exports = async (m) => {
- *   switch (m.command.name) {
- *     case 'ping': ...; break;
- *     case 'menu': ...; break;
- *   }
- * }
- */
-
 const SRC_ROOT  = path.join(__dirname, '..');
 const PROJ_ROOT = path.join(__dirname, '..', '..');
 const LIB_ROOT  = path.join(PROJ_ROOT, 'lib');
@@ -141,10 +125,6 @@ class PluginLoader {
     init() {
         for (const f of this._scanFiles()) this._loadFile(f);
         const watchTarget = [SRC_ROOT, LIB_ROOT];
-
-        //console.log(chalk.blue(`[WATCHER] Monitoring src/ dan lib/ (kecuali node_modules & database)`));
-        //console.log(chalk.blue(`[LOADER] Total command aktif: ${Object.keys(this.plugins).length} fitur`));
-
         const watcher = chokidar.watch(watchTarget, {
             persistent: true,
             ignoreInitial: true,

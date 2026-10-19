@@ -1,4 +1,4 @@
-const { generateWAMessageFromContent, proto, isJidGroup } = require('@whiskeysockets/baileys');
+const { generateWAMessageFromContent, proto, isJidGroup } = require('baileys');
 
 function buildInteractiveNodes(buttonType = 'mixed') {
     return [{
@@ -21,6 +21,7 @@ function buildContextInfo(quoted, extra = {}) {
             base.stanzaId      = key.id;
             base.participant   = key.participant || key.remoteJid;
             base.quotedMessage = quoted.message;
+            if (key.remoteJid) base.remoteJid = key.remoteJid;
         } catch { /* skip */ }
     }
 
@@ -114,15 +115,19 @@ async function sendInteractiveMessage(Hanz, jid, content) {
 }
 
 async function sendButtonWithImage(Hanz, jid, content) {
-    const { text, footer = '', buttons = [], imageUrl, quoted, contextInfo: extra = {} } = content;
+    const { text, footer = '', buttons = [], imageUrl, imageBuffer, quoted, contextInfo: extra = {} } = content;
     const contextInfo = buildContextInfo(quoted, extra);
 
     try {
-        const axios = require('axios');
-        const { prepareWAMessageMedia } = require('@whiskeysockets/baileys');
+        const { prepareWAMessageMedia } = require('baileys');
 
-        const { data } = await axios.get(imageUrl, { responseType: 'arraybuffer' });
-        const media = await prepareWAMessageMedia({ image: Buffer.from(data) }, { upload: Hanz.waUploadToServer });
+        let imgBuf = Buffer.isBuffer(imageBuffer) ? imageBuffer : null;
+        if (!imgBuf) {
+            const axios = require('axios');
+            const { data } = await axios.get(imageUrl, { responseType: 'arraybuffer' });
+            imgBuf = Buffer.from(data);
+        }
+        const media = await prepareWAMessageMedia({ image: imgBuf }, { upload: Hanz.waUploadToServer });
 
         const interactiveMsg = proto.Message.InteractiveMessage.fromObject({
             body: { text },
@@ -150,7 +155,7 @@ async function sendInteractiveWithImage(Hanz, jid, content) {
     const contextInfo = buildContextInfo(quoted, extra);
 
     try {
-        const { prepareWAMessageMedia } = require('@whiskeysockets/baileys');
+        const { prepareWAMessageMedia } = require('baileys');
 
         let mediaInput;
         if (Buffer.isBuffer(imageSource)) {
@@ -180,4 +185,10 @@ async function sendInteractiveWithImage(Hanz, jid, content) {
     }
 }
 
-module.exports = { sendButtons, sendListMessage, sendInteractiveMessage, sendButtonWithImage, sendInteractiveWithImage };
+module.exports = {
+    sendButtons,
+    sendListMessage,
+    sendInteractiveMessage,
+    sendButtonWithImage,
+    sendInteractiveWithImage
+};
