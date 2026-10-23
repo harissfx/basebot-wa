@@ -11,7 +11,7 @@
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
     "@hapi/boom": "^10.0.1",
     "axios": "^1.7.2",
-    "baileys": "npm:@hanzofc/baileys",
+    "baileys": "npm:@hanzofc/baileys@7.2.1",
     "chalk": "^4.1.2",
     "cheerio": "^1.2.0",
     "chokidar": "^3.6.0",
