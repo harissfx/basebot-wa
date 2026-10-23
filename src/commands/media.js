@@ -484,7 +484,59 @@ ${mediaCmds.map(cmd => `│⪩ \`${p}${cmd}\``).join('\n')}
                 await Hanz.sendMessage(m.chat, { sticker: stickerBuffer }, { quoted: msg });
         }
             break;
+        case 'tomp3':
+        case 'mp3':
+        case 'toaudio': {
+            const mediaResult = await downloadMedia(quotedMsg);
+            if (!mediaResult || mediaResult.mediaType !== 'video') {
+                return m.reply({
+                    text: '❌ Reply sebuah video, atau kirim video dengan caption `' + m.prefix + 'tomp3`!\n\n' +
+                        'Cara pakai:\n• Reply video → `' + m.prefix + 'tomp3`\n• Kirim video + caption `' + m.prefix + 'tomp3`'
+                });
+            }
 
+            const { buffer } = mediaResult;
+            if (buffer.length > 64 * 1024 * 1024) {
+                return m.reply({ text: '❌ Video terlalu besar (maks 64 MB).' });
+            }
+
+            await m.react('⏳');
+            let inputPath, outputPath;
+
+            try {
+                inputPath = writeTmp(buffer, 'mp4');
+                outputPath = writeTmp(Buffer.alloc(0), 'mp3');
+                await runFFmpeg(inputPath, outputPath, (cmd) => {
+                    cmd
+                        .noVideo()
+                        .audioCodec('libmp3lame')
+                        .audioBitrate(128)
+                        .audioChannels(2)
+                        .audioFrequency(44100);
+                });
+                const mp3Buffer = fs.readFileSync(outputPath);
+                if (!mp3Buffer.length) throw new Error('Video tidak punya suara');
+                await Hanz.sendMessage(m.chat, {
+                    audio: mp3Buffer,
+                    mimetype: 'audio/mpeg',
+                    fileName: 'audio.mp3',
+                    ptt: false,
+                }, { quoted: msg });
+                cleanTmp(inputPath, outputPath);
+                await m.react('✅');
+            } catch (err) {
+                cleanTmp(inputPath, outputPath);
+                console.error('[TOMP3 ERROR]', err.message);
+                await m.react('❌');
+                const noAudio = /does not contain any stream|Output file is empty|tidak punya suara/i.test(err.message);
+                await m.reply({
+                    text: noAudio
+                        ? '❌ Video ini tidak punya suara, jadi tidak bisa dijadikan mp3.'
+                        : `❌ Gagal konversi video ke mp3.\nError: ${err.message}`
+                });
+            }
+        }
+            break;
         case 'toimg': {
             const mediaResult = await downloadMedia(quotedMsg);
             if (!mediaResult || mediaResult.mediaType !== 'sticker') {
