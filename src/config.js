@@ -6,7 +6,7 @@ module.exports = {
   prefix: "!", // tanda di depan command, contoh: !menu (maks 5 karakter, tanpa spasi)
   noPrefix: true, // true: command jalan pakai prefix ATAU tanpa prefix | false: wajib pakai prefix
 
-  superOwner: "6285124014109", // HANYA 1 nomor. Akses penuh + bisa atur co-owner. Format 62xxx tanpa + dan spasi
+  superOwner: "6289999999999", // HANYA 1 nomor. Akses penuh + bisa atur co-owner. Format 62xxx tanpa + dan spasi
   coOwner: ["6289999999999" /* '6289999999999', */], // boleh banyak nomor, dipisah koma. Akses owner biasa (tanpa menu settings)
 
   botMode: "public", // 'public': semua orang boleh pakai bot | 'self': hanya owner yang dilayani
