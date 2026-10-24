@@ -41,6 +41,7 @@ const chalk = require("chalk");
 const figlet = require("figlet");
 const qrcodeTerminal = require("qrcode-terminal");
 const config = require("./src/config.js");
+const prayerTimes = require("./src/utils/prayerTimes");
 const { loadCloneSettings, getSetting } = require("./src/utils/cloneSettings");
 
 const plugins = require("./src/utils/PluginLoader");
@@ -110,7 +111,7 @@ console.error = function (...args) {
 };
 
 const spinnies = (() => {
-  const TICK_MS = 80;
+  const TICK_MS = 50;
   const BRAILLE = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
   const BASE = [74, 111, 165];
   const GLOW = [190, 235, 255];
@@ -158,6 +159,26 @@ const spinnies = (() => {
   let timer = null;
   let tick = 0;
   let lastMsg = Date.now();
+  let _prayerTimings = null;
+  let _prayerLastFetch = 0;
+
+  async function refreshPrayer() {
+    try {
+      const cfg = config.prayer;
+      if (!cfg || cfg.enabled === false) {
+        _prayerTimings = null;
+        return;
+      }
+      const now = Date.now();
+      if (_prayerTimings && now - _prayerLastFetch < 30 * 60 * 1000) return;
+      _prayerTimings = await prayerTimes.ensure(
+        cfg.city || "Jakarta",
+        cfg.country || "Indonesia",
+        cfg.method ?? 20,
+      );
+      _prayerLastFetch = now;
+    } catch (_) {}
+  }
 
   function frame() {
     let x = tick % TOTAL;
@@ -211,7 +232,25 @@ const spinnies = (() => {
     const label = (
       fresh ? "baru ada pesan" : "sepi " + fmtElapsed(idle)
     ).padEnd(14);
-    return `${spin} ${text}${cursor}${pad}  ${dot} ${fresh ? rgb(GREEN_GLOW, label) : dim(label)}`;
+    const status = `${dot} ${fresh ? rgb(GREEN_GLOW, label) : dim(label)}`;
+
+    let sholat = "";
+    const cfg = config.prayer;
+    if (cfg && cfg.enabled !== false && _prayerTimings) {
+      const next = prayerTimes.getNext(_prayerTimings);
+      const limit =
+        Number(cfg.remindMinutes) > 0 ? Number(cfg.remindMinutes) : 15;
+      if (next && next.remainMin <= limit) {
+        const GOLD = [255, 200, 90];
+        const line = prayerTimes.formatLine(_prayerTimings);
+        const blink = Math.floor(tick / 2) % 2 === 0;
+        const icon = blink ? rgb(GOLD, "🕌") : "  ";
+        const body = rgb(GOLD, line);
+        sholat = `  ${dim("│")}  ${icon} ${body}`;
+      }
+    }
+
+    return `${spin} ${text}${cursor}${pad}  ${status}${sholat}`;
   }
 
   function stop() {
@@ -235,9 +274,11 @@ const spinnies = (() => {
       if (timer) return;
       tick = 0;
       lastMsg = Date.now();
+      refreshPrayer();
       process.stdout.write("\x1b[?25l");
       timer = setInterval(() => {
         try {
+          if (tick > 0 && tick % 6000 === 0) refreshPrayer();
           process.stdout.write("\r" + frame() + "\x1b[K");
           tick++;
         } catch (_) {}
