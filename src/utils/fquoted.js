@@ -9,7 +9,7 @@ const quotePay = {
     },
     message: {
         requestPaymentMessage: {
-            currencyCodeIso4217: 'IDR',
+            currencyCodeIso4217: 'USD',
             amount1000: 999999000,
             requestFrom: '0@s.whatsapp.net',
             noteMessage: {
